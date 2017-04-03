@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
--- File       : Kc705Pgp.vhd
+-- File       : Kc705Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-30
--- Last update: 2016-02-09
+-- Last update: 2017-04-03
 -------------------------------------------------------------------------------
 -- Description: Example using PGP2B Protocol
 -------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ use work.Pgp2bPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity Kc705Pgp is
+entity Kc705Pgp3 is
    generic (
       TPD_G         : time    := 1 ns;
       BUILD_INFO_G  : BuildInfoType;
@@ -46,9 +46,9 @@ entity Kc705Pgp is
       gtRxN  : in  sl;
       gtTxP  : out sl;
       gtTxN  : out sl);      
-end Kc705Pgp;
+end Kc705Pgp3;
 
-architecture top_level of Kc705Pgp is
+architecture top_level of Kc705Pgp3 is
 
    constant AXIS_SIZE_C : positive := 4;
 

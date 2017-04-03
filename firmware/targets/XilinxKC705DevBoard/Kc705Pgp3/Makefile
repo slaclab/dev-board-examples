@@ -8,6 +8,8 @@ export PRJ_VERSION = 0x00000001
 # Define target part
 export PRJ_PART = XC7K325TFFG900-2
 
+export KEEP_UNUSED_CODE = 1
+
 # Define the Microblaze source path
 export SDK_SRC_PATH = $(PROJ_DIR)/../../../common/core/src
 
