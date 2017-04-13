@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="Pgp3Tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="Pgp3Tb" />
+            <top_module name="arbiterpkg" />
+            <top_module name="axilitepkg" />
+            <top_module name="axistreampkg" />
+            <top_module name="crcpkg" />
+            <top_module name="pgp3pkg" />
+            <top_module name="ssipkg" />
+            <top_module name="stdrtlpkg" />
+            <top_module name="textutilpkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="78516666666fs"></ZoomStartTime>
+      <ZoomEndTime time="104296666667fs"></ZoomEndTime>
+      <Cursor1Time time="100000000000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="174"></NameColumnWidth>
+      <ValueColumnWidth column_width="398"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="8" />
+   <wvobject type="group" fp_name="group43">
+      <obj_property name="label">TX_MUX</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamMux_1/axisClk">
+         <obj_property name="ElementShortName">axisClk</obj_property>
+         <obj_property name="ObjectShortName">axisClk</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamMux_1/axisRst">
+         <obj_property name="ElementShortName">axisRst</obj_property>
+         <obj_property name="ObjectShortName">axisRst</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamMux_1/disableSel">
+         <obj_property name="ElementShortName">disableSel[3:0]</obj_property>
+         <obj_property name="ObjectShortName">disableSel[3:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamMux_1/rearbitrate">
+         <obj_property name="ElementShortName">rearbitrate</obj_property>
+         <obj_property name="ObjectShortName">rearbitrate</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamMux_1/sAxisMasters">
+         <obj_property name="ElementShortName">sAxisMasters[3:0]</obj_property>
+         <obj_property name="ObjectShortName">sAxisMasters[3:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamMux_1/sAxisSlaves">
+         <obj_property name="ElementShortName">sAxisSlaves[3:0]</obj_property>
+         <obj_property name="ObjectShortName">sAxisSlaves[3:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamMux_1/mAxisMaster">
+         <obj_property name="ElementShortName">mAxisMaster</obj_property>
+         <obj_property name="ObjectShortName">mAxisMaster</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamMux_1/mAxisSlave">
+         <obj_property name="ElementShortName">mAxisSlave</obj_property>
+         <obj_property name="ObjectShortName">mAxisSlave</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamMux_1/r">
+         <obj_property name="ElementShortName">r</obj_property>
+         <obj_property name="ObjectShortName">r</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamMux_1/rin">
+         <obj_property name="ElementShortName">rin</obj_property>
+         <obj_property name="ObjectShortName">rin</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamMux_1/sAxisMastersTmp">
+         <obj_property name="ElementShortName">sAxisMastersTmp[3:0]</obj_property>
+         <obj_property name="ObjectShortName">sAxisMastersTmp[3:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamMux_1/pipeAxisMaster">
+         <obj_property name="ElementShortName">pipeAxisMaster</obj_property>
+         <obj_property name="ObjectShortName">pipeAxisMaster</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamMux_1/pipeAxisSlave">
+         <obj_property name="ElementShortName">pipeAxisSlave</obj_property>
+         <obj_property name="ObjectShortName">pipeAxisSlave</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group44">
+      <obj_property name="label">TX_PACKETIZE</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/axisClk">
+         <obj_property name="ElementShortName">axisClk</obj_property>
+         <obj_property name="ObjectShortName">axisClk</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/axisRst">
+         <obj_property name="ElementShortName">axisRst</obj_property>
+         <obj_property name="ObjectShortName">axisRst</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/rearbitrate">
+         <obj_property name="ElementShortName">rearbitrate</obj_property>
+         <obj_property name="ObjectShortName">rearbitrate</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/sAxisMaster">
+         <obj_property name="ElementShortName">sAxisMaster</obj_property>
+         <obj_property name="ObjectShortName">sAxisMaster</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/sAxisSlave">
+         <obj_property name="ElementShortName">sAxisSlave</obj_property>
+         <obj_property name="ObjectShortName">sAxisSlave</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/mAxisMaster">
+         <obj_property name="ElementShortName">mAxisMaster</obj_property>
+         <obj_property name="ObjectShortName">mAxisMaster</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/mAxisSlave">
+         <obj_property name="ElementShortName">mAxisSlave</obj_property>
+         <obj_property name="ObjectShortName">mAxisSlave</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/r">
+         <obj_property name="ElementShortName">r</obj_property>
+         <obj_property name="ObjectShortName">r</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/rin">
+         <obj_property name="ElementShortName">rin</obj_property>
+         <obj_property name="ObjectShortName">rin</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/packetNumberOut">
+         <obj_property name="ElementShortName">packetNumberOut[15:0]</obj_property>
+         <obj_property name="ObjectShortName">packetNumberOut[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/packetActiveOut">
+         <obj_property name="ElementShortName">packetActiveOut</obj_property>
+         <obj_property name="ObjectShortName">packetActiveOut</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/inputAxisMaster">
+         <obj_property name="ElementShortName">inputAxisMaster</obj_property>
+         <obj_property name="ObjectShortName">inputAxisMaster</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/inputAxisSlave">
+         <obj_property name="ElementShortName">inputAxisSlave</obj_property>
+         <obj_property name="ObjectShortName">inputAxisSlave</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/outputAxisMaster">
+         <obj_property name="ElementShortName">outputAxisMaster</obj_property>
+         <obj_property name="ObjectShortName">outputAxisMaster</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/outputAxisSlave">
+         <obj_property name="ElementShortName">outputAxisSlave</obj_property>
+         <obj_property name="ObjectShortName">outputAxisSlave</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_AxiStreamPacketizer2_1/crcOut">
+         <obj_property name="ElementShortName">crcOut[31:0]</obj_property>
+         <obj_property name="ObjectShortName">crcOut[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group61">
+      <obj_property name="label">TX_Protocol</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/pgpTxClk">
+         <obj_property name="ElementShortName">pgpTxClk</obj_property>
+         <obj_property name="ObjectShortName">pgpTxClk</obj_property>
+         <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/pgpTxRst">
+         <obj_property name="ElementShortName">pgpTxRst</obj_property>
+         <obj_property name="ObjectShortName">pgpTxRst</obj_property>
+         <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/pgpTxIn">
+         <obj_property name="ElementShortName">pgpTxIn</obj_property>
+         <obj_property name="ObjectShortName">pgpTxIn</obj_property>
+         <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/pgpTxOut">
+         <obj_property name="ElementShortName">pgpTxOut</obj_property>
+         <obj_property name="ObjectShortName">pgpTxOut</obj_property>
+         <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/pgpTxMaster">
+         <obj_property name="ElementShortName">pgpTxMaster</obj_property>
+         <obj_property name="ObjectShortName">pgpTxMaster</obj_property>
+         <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/pgpTxSlave">
+         <obj_property name="ElementShortName">pgpTxSlave</obj_property>
+         <obj_property name="ObjectShortName">pgpTxSlave</obj_property>
+         <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/locRxFifoCtrl">
+         <obj_property name="ElementShortName">locRxFifoCtrl[3:0]</obj_property>
+         <obj_property name="ObjectShortName">locRxFifoCtrl[3:0]</obj_property>
+         <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/locRxLinkReady">
+         <obj_property name="ElementShortName">locRxLinkReady</obj_property>
+         <obj_property name="ObjectShortName">locRxLinkReady</obj_property>
+         <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/phyTxData">
+         <obj_property name="ElementShortName">phyTxData[63:0]</obj_property>
+         <obj_property name="ObjectShortName">phyTxData[63:0]</obj_property>
+         <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/phyTxHeader">
+         <obj_property name="ElementShortName">phyTxHeader[1:0]</obj_property>
+         <obj_property name="ObjectShortName">phyTxHeader[1:0]</obj_property>
+         <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/r">
+         <obj_property name="ElementShortName">r</obj_property>
+         <obj_property name="ObjectShortName">r</obj_property>
+         <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/r.skpCount">
+            <obj_property name="ElementShortName">.skpCount[15:0]</obj_property>
+            <obj_property name="ObjectShortName">.skpCount[15:0]</obj_property>
+            <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/r.pgpTxSlave">
+            <obj_property name="ElementShortName">.pgpTxSlave</obj_property>
+            <obj_property name="ObjectShortName">.pgpTxSlave</obj_property>
+            <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/r.phyTxData">
+            <obj_property name="ElementShortName">.phyTxData[63:0]</obj_property>
+            <obj_property name="ObjectShortName">.phyTxData[63:0]</obj_property>
+            <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/r.phyTxHeader">
+            <obj_property name="ElementShortName">.phyTxHeader[1:0]</obj_property>
+            <obj_property name="ObjectShortName">.phyTxHeader[1:0]</obj_property>
+            <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group74">
+      <obj_property name="label">TX_SCRAMBLER</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Pgp3TxProtocol_1/rin">
+         <obj_property name="ElementShortName">rin</obj_property>
+         <obj_property name="ObjectShortName">rin</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Scrambler_1/clk">
+         <obj_property name="ElementShortName">clk</obj_property>
+         <obj_property name="ObjectShortName">clk</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Scrambler_1/rst">
+         <obj_property name="ElementShortName">rst</obj_property>
+         <obj_property name="ObjectShortName">rst</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Scrambler_1/inputEn">
+         <obj_property name="ElementShortName">inputEn</obj_property>
+         <obj_property name="ObjectShortName">inputEn</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Scrambler_1/dataIn">
+         <obj_property name="ElementShortName">dataIn[63:0]</obj_property>
+         <obj_property name="ObjectShortName">dataIn[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Scrambler_1/sidebandIn">
+         <obj_property name="ElementShortName">sidebandIn[1:0]</obj_property>
+         <obj_property name="ObjectShortName">sidebandIn[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Scrambler_1/outputValid">
+         <obj_property name="ElementShortName">outputValid</obj_property>
+         <obj_property name="ObjectShortName">outputValid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Scrambler_1/dataOut">
+         <obj_property name="ElementShortName">dataOut[63:0]</obj_property>
+         <obj_property name="ObjectShortName">dataOut[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Scrambler_1/sidebandOut">
+         <obj_property name="ElementShortName">sidebandOut[1:0]</obj_property>
+         <obj_property name="ObjectShortName">sidebandOut[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Scrambler_1/r">
+         <obj_property name="ElementShortName">r</obj_property>
+         <obj_property name="ObjectShortName">r</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Tx_1/U_Scrambler_1/rin">
+         <obj_property name="ElementShortName">rin</obj_property>
+         <obj_property name="ObjectShortName">rin</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group85">
+      <obj_property name="label">RX_DESCRAMBLER</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Scrambler_1/clk">
+         <obj_property name="ElementShortName">clk</obj_property>
+         <obj_property name="ObjectShortName">clk</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Scrambler_1/rst">
+         <obj_property name="ElementShortName">rst</obj_property>
+         <obj_property name="ObjectShortName">rst</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Scrambler_1/inputEn">
+         <obj_property name="ElementShortName">inputEn</obj_property>
+         <obj_property name="ObjectShortName">inputEn</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Scrambler_1/dataIn">
+         <obj_property name="ElementShortName">dataIn[63:0]</obj_property>
+         <obj_property name="ObjectShortName">dataIn[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Scrambler_1/sidebandIn">
+         <obj_property name="ElementShortName">sidebandIn[1:0]</obj_property>
+         <obj_property name="ObjectShortName">sidebandIn[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Scrambler_1/outputValid">
+         <obj_property name="ElementShortName">outputValid</obj_property>
+         <obj_property name="ObjectShortName">outputValid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Scrambler_1/dataOut">
+         <obj_property name="ElementShortName">dataOut[63:0]</obj_property>
+         <obj_property name="ObjectShortName">dataOut[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Scrambler_1/sidebandOut">
+         <obj_property name="ElementShortName">sidebandOut[1:0]</obj_property>
+         <obj_property name="ObjectShortName">sidebandOut[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Scrambler_1/r">
+         <obj_property name="ElementShortName">r</obj_property>
+         <obj_property name="ObjectShortName">r</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Scrambler_1/rin">
+         <obj_property name="ElementShortName">rin</obj_property>
+         <obj_property name="ObjectShortName">rin</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group112">
+      <obj_property name="label">RX_PROTOCOL</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/pgpRxClk">
+         <obj_property name="ElementShortName">pgpRxClk</obj_property>
+         <obj_property name="ObjectShortName">pgpRxClk</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/pgpRxRst">
+         <obj_property name="ElementShortName">pgpRxRst</obj_property>
+         <obj_property name="ObjectShortName">pgpRxRst</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/pgpRxIn">
+         <obj_property name="ElementShortName">pgpRxIn</obj_property>
+         <obj_property name="ObjectShortName">pgpRxIn</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/pgpRxOut">
+         <obj_property name="ElementShortName">pgpRxOut</obj_property>
+         <obj_property name="ObjectShortName">pgpRxOut</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/pgpRxMaster">
+         <obj_property name="ElementShortName">pgpRxMaster</obj_property>
+         <obj_property name="ObjectShortName">pgpRxMaster</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/pgpRxSlave">
+         <obj_property name="ElementShortName">pgpRxSlave</obj_property>
+         <obj_property name="ObjectShortName">pgpRxSlave</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/remRxFifoCtrl">
+         <obj_property name="ElementShortName">remRxFifoCtrl[3:0]</obj_property>
+         <obj_property name="ObjectShortName">remRxFifoCtrl[3:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/remRxLinkReady">
+         <obj_property name="ElementShortName">remRxLinkReady</obj_property>
+         <obj_property name="ObjectShortName">remRxLinkReady</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/locRxLinkReady">
+         <obj_property name="ElementShortName">locRxLinkReady</obj_property>
+         <obj_property name="ObjectShortName">locRxLinkReady</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/phyRxValid">
+         <obj_property name="ElementShortName">phyRxValid</obj_property>
+         <obj_property name="ObjectShortName">phyRxValid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/phyRxData">
+         <obj_property name="ElementShortName">phyRxData[63:0]</obj_property>
+         <obj_property name="ObjectShortName">phyRxData[63:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/phyRxHeader">
+         <obj_property name="ElementShortName">phyRxHeader[1:0]</obj_property>
+         <obj_property name="ObjectShortName">phyRxHeader[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/r">
+         <obj_property name="ElementShortName">r</obj_property>
+         <obj_property name="ObjectShortName">r</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/r.pgpRxMaster">
+            <obj_property name="ElementShortName">.pgpRxMaster</obj_property>
+            <obj_property name="ObjectShortName">.pgpRxMaster</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/r.pgpRxOut">
+            <obj_property name="ElementShortName">.pgpRxOut</obj_property>
+            <obj_property name="ObjectShortName">.pgpRxOut</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/r.remRxFifoCtrl">
+            <obj_property name="ElementShortName">.remRxFifoCtrl[3:0]</obj_property>
+            <obj_property name="ObjectShortName">.remRxFifoCtrl[3:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/r.remRxLinkReady">
+            <obj_property name="ElementShortName">.remRxLinkReady</obj_property>
+            <obj_property name="ObjectShortName">.remRxLinkReady</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/r.locRxLinkReady">
+            <obj_property name="ElementShortName">.locRxLinkReady</obj_property>
+            <obj_property name="ObjectShortName">.locRxLinkReady</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/r.version">
+            <obj_property name="ElementShortName">.version[2:0]</obj_property>
+            <obj_property name="ObjectShortName">.version[2:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_Pgp3RxProtocol_1/rin">
+         <obj_property name="ElementShortName">rin</obj_property>
+         <obj_property name="ObjectShortName">rin</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group127">
+      <obj_property name="label">RX_DEPACKETIZER</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/axisClk">
+         <obj_property name="ElementShortName">axisClk</obj_property>
+         <obj_property name="ObjectShortName">axisClk</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/axisRst">
+         <obj_property name="ElementShortName">axisRst</obj_property>
+         <obj_property name="ObjectShortName">axisRst</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/sAxisMaster">
+         <obj_property name="ElementShortName">sAxisMaster</obj_property>
+         <obj_property name="ObjectShortName">sAxisMaster</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/sAxisSlave">
+         <obj_property name="ElementShortName">sAxisSlave</obj_property>
+         <obj_property name="ObjectShortName">sAxisSlave</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/mAxisMaster">
+         <obj_property name="ElementShortName">mAxisMaster</obj_property>
+         <obj_property name="ObjectShortName">mAxisMaster</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/mAxisSlave">
+         <obj_property name="ElementShortName">mAxisSlave</obj_property>
+         <obj_property name="ObjectShortName">mAxisSlave</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/r">
+         <obj_property name="ElementShortName">r</obj_property>
+         <obj_property name="ObjectShortName">r</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/rin">
+         <obj_property name="ElementShortName">rin</obj_property>
+         <obj_property name="ObjectShortName">rin</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/packetNumberOut">
+         <obj_property name="ElementShortName">packetNumberOut[15:0]</obj_property>
+         <obj_property name="ObjectShortName">packetNumberOut[15:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/packetActiveOut">
+         <obj_property name="ElementShortName">packetActiveOut</obj_property>
+         <obj_property name="ObjectShortName">packetActiveOut</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/frameErrorOut">
+         <obj_property name="ElementShortName">frameErrorOut</obj_property>
+         <obj_property name="ObjectShortName">frameErrorOut</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/crcOut">
+         <obj_property name="ElementShortName">crcOut[31:0]</obj_property>
+         <obj_property name="ObjectShortName">crcOut[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/inputAxisMaster">
+         <obj_property name="ElementShortName">inputAxisMaster</obj_property>
+         <obj_property name="ObjectShortName">inputAxisMaster</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/inputAxisSlave">
+         <obj_property name="ElementShortName">inputAxisSlave</obj_property>
+         <obj_property name="ObjectShortName">inputAxisSlave</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/outputAxisMaster">
+         <obj_property name="ElementShortName">outputAxisMaster</obj_property>
+         <obj_property name="ObjectShortName">outputAxisMaster</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDepacketizer2_1/outputAxisSlave">
+         <obj_property name="ElementShortName">outputAxisSlave</obj_property>
+         <obj_property name="ObjectShortName">outputAxisSlave</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group144">
+      <obj_property name="label">RX_DEMUX</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDeMux_1/axisClk">
+         <obj_property name="ElementShortName">axisClk</obj_property>
+         <obj_property name="ObjectShortName">axisClk</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDeMux_1/axisRst">
+         <obj_property name="ElementShortName">axisRst</obj_property>
+         <obj_property name="ObjectShortName">axisRst</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDeMux_1/sAxisMaster">
+         <obj_property name="ElementShortName">sAxisMaster</obj_property>
+         <obj_property name="ObjectShortName">sAxisMaster</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDeMux_1/sAxisSlave">
+         <obj_property name="ElementShortName">sAxisSlave</obj_property>
+         <obj_property name="ObjectShortName">sAxisSlave</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDeMux_1/mAxisMasters">
+         <obj_property name="ElementShortName">mAxisMasters[3:0]</obj_property>
+         <obj_property name="ObjectShortName">mAxisMasters[3:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDeMux_1/mAxisMasters[3]">
+            <obj_property name="ElementShortName">[3]</obj_property>
+            <obj_property name="ObjectShortName">[3]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDeMux_1/mAxisMasters[2]">
+            <obj_property name="ElementShortName">[2]</obj_property>
+            <obj_property name="ObjectShortName">[2]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDeMux_1/mAxisMasters[1]">
+            <obj_property name="ElementShortName">[1]</obj_property>
+            <obj_property name="ObjectShortName">[1]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDeMux_1/mAxisMasters[0]">
+            <obj_property name="ElementShortName">[0]</obj_property>
+            <obj_property name="ObjectShortName">[0]</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDeMux_1/mAxisSlaves">
+         <obj_property name="ElementShortName">mAxisSlaves[3:0]</obj_property>
+         <obj_property name="ObjectShortName">mAxisSlaves[3:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDeMux_1/pipeAxisMasters">
+         <obj_property name="ElementShortName">pipeAxisMasters[3:0]</obj_property>
+         <obj_property name="ObjectShortName">pipeAxisMasters[3:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDeMux_1/pipeAxisSlaves">
+         <obj_property name="ElementShortName">pipeAxisSlaves[3:0]</obj_property>
+         <obj_property name="ObjectShortName">pipeAxisSlaves[3:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDeMux_1/r">
+         <obj_property name="ElementShortName">r</obj_property>
+         <obj_property name="ObjectShortName">r</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/Pgp3Tb/U_Pgp3Rx_1/U_AxiStreamDeMux_1/rin">
+         <obj_property name="ElementShortName">rin</obj_property>
+         <obj_property name="ObjectShortName">rin</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>
