@@ -2,7 +2,7 @@
 -- File       : AppReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2017-03-17
+-- Last update: 2017-08-01
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -33,29 +33,34 @@ entity AppReg is
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Clock and Reset
-      clk             : in  sl;
-      rst             : in  sl;
+      clk              : in  sl;
+      rst              : in  sl;
       -- AXI-Lite interface
-      axilWriteMaster : in  AxiLiteWriteMasterType;
-      axilWriteSlave  : out AxiLiteWriteSlaveType;
-      axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType;
+      sAxilWriteMaster : in  AxiLiteWriteMasterType;
+      sAxilWriteSlave  : out AxiLiteWriteSlaveType;
+      sAxilReadMaster  : in  AxiLiteReadMasterType;
+      sAxilReadSlave   : out AxiLiteReadSlaveType;
       -- PBRS Interface
-      pbrsTxMaster    : out AxiStreamMasterType;
-      pbrsTxSlave     : in  AxiStreamSlaveType;
-      pbrsRxMaster    : in  AxiStreamMasterType;
-      pbrsRxSlave     : out AxiStreamSlaveType;
+      pbrsTxMaster     : out AxiStreamMasterType;
+      pbrsTxSlave      : in  AxiStreamSlaveType;
+      pbrsRxMaster     : in  AxiStreamMasterType;
+      pbrsRxSlave      : out AxiStreamSlaveType;
       -- HLS Interface
-      hlsTxMaster     : out AxiStreamMasterType;
-      hlsTxSlave      : in  AxiStreamSlaveType;
-      hlsRxMaster     : in  AxiStreamMasterType;
-      hlsRxSlave      : out AxiStreamSlaveType;
+      hlsTxMaster      : out AxiStreamMasterType;
+      hlsTxSlave       : in  AxiStreamSlaveType;
+      hlsRxMaster      : in  AxiStreamMasterType;
+      hlsRxSlave       : out AxiStreamSlaveType;
       -- MB Interface
-      mbTxMaster      : out AxiStreamMasterType;
-      mbTxSlave       : in  AxiStreamSlaveType;
+      mbTxMaster       : out AxiStreamMasterType;
+      mbTxSlave        : in  AxiStreamSlaveType;
+      -- EXT AXIL Interface
+      extAxilWriteMaster : out AxiLiteWriteMasterType;
+      extAxilWriteSlave  : in  AxiLiteWriteSlaveType;
+      extAxilReadMaster  : out AxiLiteReadMasterType;
+      extAxilReadSlave   : in  AxiLiteReadSlaveType;
       -- ADC Ports
-      vPIn            : in  sl;
-      vNIn            : in  sl);
+      vPIn             : in  sl;
+      vNIn             : in  sl);
 end AppReg;
 
 architecture mapping of AppReg is
@@ -63,7 +68,7 @@ architecture mapping of AppReg is
    constant SHARED_MEM_WIDTH_C : positive                           := 10;
    constant IRQ_ADDR_C         : slv(SHARED_MEM_WIDTH_C-1 downto 0) := (others => '1');
 
-   constant NUM_AXI_MASTERS_C : natural := 7;
+   constant NUM_AXI_MASTERS_C : natural := 8;
 
    constant VERSION_INDEX_C : natural := 0;
    constant XADC_INDEX_C    : natural := 1;
@@ -72,6 +77,7 @@ architecture mapping of AppReg is
    constant PRBS_TX_INDEX_C : natural := 4;
    constant PRBS_RX_INDEX_C : natural := 5;
    constant HLS_INDEX_C     : natural := 6;
+   constant EXT_INDEX_C     : natural := 7;
 
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       VERSION_INDEX_C => (
@@ -101,17 +107,21 @@ architecture mapping of AppReg is
       HLS_INDEX_C     => (
          baseAddr     => x"0006_0000",
          addrBits     => 16,
+         connectivity => X"FFFF"),
+      EXT_INDEX_C     => (
+         baseAddr     => x"1000_0000",
+         addrBits     => 28,
          connectivity => X"FFFF"));
 
-   signal mAxilWriteMaster : AxiLiteWriteMasterType;
-   signal mAxilWriteSlave  : AxiLiteWriteSlaveType;
-   signal mAxilReadMaster  : AxiLiteReadMasterType;
-   signal mAxilReadSlave   : AxiLiteReadSlaveType;
+   signal mbAxilWriteMaster : AxiLiteWriteMasterType;
+   signal mbAxilWriteSlave  : AxiLiteWriteSlaveType;
+   signal mbAxilReadMaster  : AxiLiteReadMasterType;
+   signal mbAxilReadSlave   : AxiLiteReadSlaveType;
 
-   signal mAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal mAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal mAxilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal mAxilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal locAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal locAxilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal locAxilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
    signal axiWrValid : sl;
    signal axiWrAddr  : slv(SHARED_MEM_WIDTH_C-1 downto 0);
@@ -121,15 +131,20 @@ architecture mapping of AppReg is
 
 begin
 
+   extAxilWriteMaster <= locAxilWriteMasters(EXT_INDEX_C);
+   locAxilWriteSlaves(EXT_INDEX_C) <= extAxilWriteSlave;
+   extAxilReadMaster <= locAxilReadMasters(EXT_INDEX_C);
+   locAxilReadSlaves(EXT_INDEX_C) <= extAxilReadSlave;
+
    U_CPU : entity work.MicroblazeBasicCoreWrapper
       generic map (
          TPD_G => TPD_G)
       port map (
          -- Master AXI-Lite Interface: [0x00000000:0x7FFFFFFF]
-         mAxilWriteMaster => mAxilWriteMaster,
-         mAxilWriteSlave  => mAxilWriteSlave,
-         mAxilReadMaster  => mAxilReadMaster,
-         mAxilReadSlave   => mAxilReadSlave,
+         mAxilWriteMaster => mbAxilWriteMaster,
+         mAxilWriteSlave  => mbAxilWriteSlave,
+         mAxilReadMaster  => mbAxilReadMaster,
+         mAxilReadSlave   => mbAxilReadSlave,
          -- Streaming
          mAxisMaster      => mbTxMaster,
          mAxisSlave       => mbTxSlave,
@@ -172,18 +187,18 @@ begin
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
       port map (
-         sAxiWriteMasters(0) => axilWriteMaster,
-         sAxiWriteMasters(1) => mAxilWriteMaster,
-         sAxiWriteSlaves(0)  => axilWriteSlave,
-         sAxiWriteSlaves(1)  => mAxilWriteSlave,
-         sAxiReadMasters(0)  => axilReadMaster,
-         sAxiReadMasters(1)  => mAxilReadMaster,
-         sAxiReadSlaves(0)   => axilReadSlave,
-         sAxiReadSlaves(1)   => mAxilReadSlave,
-         mAxiWriteMasters    => mAxilWriteMasters,
-         mAxiWriteSlaves     => mAxilWriteSlaves,
-         mAxiReadMasters     => mAxilReadMasters,
-         mAxiReadSlaves      => mAxilReadSlaves,
+         sAxiWriteMasters(0) => sAxilWriteMaster,
+         sAxiWriteMasters(1) => mbAxilWriteMaster,
+         sAxiWriteSlaves(0)  => sAxilWriteSlave,
+         sAxiWriteSlaves(1)  => mbAxilWriteSlave,
+         sAxiReadMasters(0)  => sAxilReadMaster,
+         sAxiReadMasters(1)  => mbAxilReadMaster,
+         sAxiReadSlaves(0)   => sAxilReadSlave,
+         sAxiReadSlaves(1)   => mbAxilReadSlave,
+         mAxiWriteMasters    => locAxilWriteMasters,
+         mAxiWriteSlaves     => locAxilWriteSlaves,
+         mAxiReadMasters     => locAxilReadMasters,
+         mAxiReadSlaves      => locAxilReadSlaves,
          axiClk              => clk,
          axiClkRst           => rst);
 
@@ -198,10 +213,10 @@ begin
          XIL_DEVICE_G     => XIL_DEVICE_G,
          EN_DEVICE_DNA_G  => true)
       port map (
-         axiReadMaster  => mAxilReadMasters(VERSION_INDEX_C),
-         axiReadSlave   => mAxilReadSlaves(VERSION_INDEX_C),
-         axiWriteMaster => mAxilWriteMasters(VERSION_INDEX_C),
-         axiWriteSlave  => mAxilWriteSlaves(VERSION_INDEX_C),
+         axiReadMaster  => locAxilReadMasters(VERSION_INDEX_C),
+         axiReadSlave   => locAxilReadSlaves(VERSION_INDEX_C),
+         axiWriteMaster => locAxilWriteMasters(VERSION_INDEX_C),
+         axiWriteSlave  => locAxilWriteSlaves(VERSION_INDEX_C),
          axiClk         => clk,
          axiRst         => rst);
 
@@ -214,10 +229,10 @@ begin
             TPD_G            => TPD_G,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
          port map (
-            axiReadMaster  => mAxilReadMasters(XADC_INDEX_C),
-            axiReadSlave   => mAxilReadSlaves(XADC_INDEX_C),
-            axiWriteMaster => mAxilWriteMasters(XADC_INDEX_C),
-            axiWriteSlave  => mAxilWriteSlaves(XADC_INDEX_C),
+            axiReadMaster  => locAxilReadMasters(XADC_INDEX_C),
+            axiReadSlave   => locAxilReadSlaves(XADC_INDEX_C),
+            axiWriteMaster => locAxilWriteMasters(XADC_INDEX_C),
+            axiWriteSlave  => locAxilWriteSlaves(XADC_INDEX_C),
             axiClk         => clk,
             axiRst         => rst,
             vPIn           => vPIn,
@@ -232,10 +247,10 @@ begin
          port map (
             axiClk         => clk,
             axiClkRst      => rst,
-            axiReadMaster  => mAxilReadMasters(SYS_MON_INDEX_C),
-            axiReadSlave   => mAxilReadSlaves(SYS_MON_INDEX_C),
-            axiWriteMaster => mAxilWriteMasters(SYS_MON_INDEX_C),
-            axiWriteSlave  => mAxilWriteSlaves(SYS_MON_INDEX_C));
+            axiReadMaster  => locAxilReadMasters(SYS_MON_INDEX_C),
+            axiReadSlave   => locAxilReadSlaves(SYS_MON_INDEX_C),
+            axiWriteMaster => locAxilWriteMasters(SYS_MON_INDEX_C),
+            axiWriteSlave  => locAxilWriteSlaves(SYS_MON_INDEX_C));
 
    end generate;
 
@@ -250,10 +265,10 @@ begin
          port map (
             axiClk         => clk,
             axiClkRst      => rst,
-            axiReadMaster  => mAxilReadMasters(XADC_INDEX_C),
-            axiReadSlave   => mAxilReadSlaves(XADC_INDEX_C),
-            axiWriteMaster => mAxilWriteMasters(XADC_INDEX_C),
-            axiWriteSlave  => mAxilWriteSlaves(XADC_INDEX_C));
+            axiReadMaster  => locAxilReadMasters(XADC_INDEX_C),
+            axiReadSlave   => locAxilReadSlaves(XADC_INDEX_C),
+            axiWriteMaster => locAxilWriteMasters(XADC_INDEX_C),
+            axiWriteSlave  => locAxilWriteSlaves(XADC_INDEX_C));
       --------------------------
       -- AXI-Lite: SYSMON Module
       --------------------------
@@ -261,10 +276,10 @@ begin
          generic map (
             TPD_G => TPD_G)
          port map (
-            axiReadMaster  => mAxilReadMasters(SYS_MON_INDEX_C),
-            axiReadSlave   => mAxilReadSlaves(SYS_MON_INDEX_C),
-            axiWriteMaster => mAxilWriteMasters(SYS_MON_INDEX_C),
-            axiWriteSlave  => mAxilWriteSlaves(SYS_MON_INDEX_C),
+            axiReadMaster  => locAxilReadMasters(SYS_MON_INDEX_C),
+            axiReadSlave   => locAxilReadSlaves(SYS_MON_INDEX_C),
+            axiWriteMaster => locAxilWriteMasters(SYS_MON_INDEX_C),
+            axiWriteSlave  => locAxilWriteSlaves(SYS_MON_INDEX_C),
             axiClk         => clk,
             axiRst         => rst,
             vPIn           => vPIn,
@@ -294,10 +309,10 @@ begin
          -- AXI-Lite Interface
          axiClk         => clk,
          axiRst         => rst,
-         axiReadMaster  => mAxilReadMasters(MEM_INDEX_C),
-         axiReadSlave   => mAxilReadSlaves(MEM_INDEX_C),
-         axiWriteMaster => mAxilWriteMasters(MEM_INDEX_C),
-         axiWriteSlave  => mAxilWriteSlaves(MEM_INDEX_C));
+         axiReadMaster  => locAxilReadMasters(MEM_INDEX_C),
+         axiReadSlave   => locAxilReadSlaves(MEM_INDEX_C),
+         axiWriteMaster => locAxilWriteMasters(MEM_INDEX_C),
+         axiWriteSlave  => locAxilWriteSlaves(MEM_INDEX_C));
 
    -------------------
    -- AXI-Lite PRBS RX
@@ -318,10 +333,10 @@ begin
          packetLength    => X"000000ff",
          tDest           => X"00",
          tId             => X"00",
-         axilReadMaster  => mAxilReadMasters(PRBS_TX_INDEX_C),
-         axilReadSlave   => mAxilReadSlaves(PRBS_TX_INDEX_C),
-         axilWriteMaster => mAxilWriteMasters(PRBS_TX_INDEX_C),
-         axilWriteSlave  => mAxilWriteSlaves(PRBS_TX_INDEX_C));
+         axilReadMaster  => locAxilReadMasters(PRBS_TX_INDEX_C),
+         axilReadSlave   => locAxilReadSlaves(PRBS_TX_INDEX_C),
+         axilWriteMaster => locAxilWriteMasters(PRBS_TX_INDEX_C),
+         axilWriteSlave  => locAxilWriteSlaves(PRBS_TX_INDEX_C));
 
    -------------------
    -- AXI-Lite PRBS RX
@@ -339,10 +354,10 @@ begin
          mAxisRst       => rst,
          axiClk         => clk,
          axiRst         => rst,
-         axiReadMaster  => mAxilReadMasters(PRBS_RX_INDEX_C),
-         axiReadSlave   => mAxilReadSlaves(PRBS_RX_INDEX_C),
-         axiWriteMaster => mAxilWriteMasters(PRBS_RX_INDEX_C),
-         axiWriteSlave  => mAxilWriteSlaves(PRBS_RX_INDEX_C));
+         axiReadMaster  => locAxilReadMasters(PRBS_RX_INDEX_C),
+         axiReadSlave   => locAxilReadSlaves(PRBS_RX_INDEX_C),
+         axiWriteMaster => locAxilWriteMasters(PRBS_RX_INDEX_C),
+         axiWriteSlave  => locAxilWriteSlaves(PRBS_RX_INDEX_C));
 
    ------------------------------
    -- AXI-Lite HLS Example Module
@@ -351,10 +366,10 @@ begin
       port map (
          axiClk         => clk,
          axiRst         => rst,
-         axiReadMaster  => mAxilReadMasters(HLS_INDEX_C),
-         axiReadSlave   => mAxilReadSlaves(HLS_INDEX_C),
-         axiWriteMaster => mAxilWriteMasters(HLS_INDEX_C),
-         axiWriteSlave  => mAxilWriteSlaves(HLS_INDEX_C));
+         axiReadMaster  => locAxilReadMasters(HLS_INDEX_C),
+         axiReadSlave   => locAxilReadSlaves(HLS_INDEX_C),
+         axiWriteMaster => locAxilWriteMasters(HLS_INDEX_C),
+         axiWriteSlave  => locAxilWriteSlaves(HLS_INDEX_C));
 
    ------------------------------------
    -- AXI Streaming: HLS Example Module

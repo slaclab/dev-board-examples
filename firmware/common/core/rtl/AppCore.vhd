@@ -2,7 +2,7 @@
 -- File       : AppCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2017-03-17
+-- Last update: 2017-08-01
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ entity AppCore is
       AXIS_SIZE_G      : positive         := 1;
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       MAC_ADDR_G       : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01 (ETH only)
-      IP_ADDR_G        : slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10 (ETH only)
+      IP_ADDR_G        : slv(31 downto 0) := x"0A02A8C0";      -- 192.168.2.10 (ETH only)
       DHCP_G           : boolean          := true;
       JUMBO_G          : boolean          := false);
    port (
@@ -44,12 +44,17 @@ entity AppCore is
       rxMasters : in  AxiStreamMasterArray(AXIS_SIZE_G-1 downto 0);
       rxSlaves  : out AxiStreamSlaveArray(AXIS_SIZE_G-1 downto 0);
       rxCtrl    : out AxiStreamCtrlArray(AXIS_SIZE_G-1 downto 0);
+      -- EXT AXIL Interface
+      extAxilWriteMaster : out AxiLiteWriteMasterType;
+      extAxilWriteSlave  : in  AxiLiteWriteSlaveType := AXI_LITE_WRITE_SLAVE_INIT_C;
+      extAxilReadMaster  : out AxiLiteReadMasterType;
+      extAxilReadSlave   : in  AxiLiteReadSlaveType := AXI_LITE_READ_SLAVE_INIT_C;
       -- ADC Ports
       vPIn      : in  sl;
       vNIn      : in  sl);
 end AppCore;
 
-architecture mapping of AppCore is
+architecture rtl of AppCore is
 
    signal axilReadMaster  : AxiLiteReadMasterType;
    signal axilReadSlave   : AxiLiteReadSlaveType;
@@ -161,28 +166,33 @@ begin
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
       port map (
          -- Clock and Reset
-         clk             => clk,
-         rst             => rst,
+         clk                => clk,
+         rst                => rst,
          -- AXI-Lite interface
-         axilWriteMaster => axilWriteMaster,
-         axilWriteSlave  => axilWriteSlave,
-         axilReadMaster  => axilReadMaster,
-         axilReadSlave   => axilReadSlave,
+         sAxilWriteMaster    => axilWriteMaster,
+         sAxilWriteSlave     => axilWriteSlave,
+         sAxilReadMaster     => axilReadMaster,
+         sAxilReadSlave      => axilReadSlave,
          -- PBRS Interface
-         pbrsTxMaster    => pbrsTxMaster,
-         pbrsTxSlave     => pbrsTxSlave,
-         pbrsRxMaster    => pbrsRxMaster,
-         pbrsRxSlave     => pbrsRxSlave,
+         pbrsTxMaster       => pbrsTxMaster,
+         pbrsTxSlave        => pbrsTxSlave,
+         pbrsRxMaster       => pbrsRxMaster,
+         pbrsRxSlave        => pbrsRxSlave,
          -- HLS Interface
-         hlsTxMaster     => hlsTxMaster,
-         hlsTxSlave      => hlsTxSlave,
-         hlsRxMaster     => hlsRxMaster,
-         hlsRxSlave      => hlsRxSlave,
+         hlsTxMaster        => hlsTxMaster,
+         hlsTxSlave         => hlsTxSlave,
+         hlsRxMaster        => hlsRxMaster,
+         hlsRxSlave         => hlsRxSlave,
          -- Microblaze stream
-         mbTxMaster      => mbTxMaster,
-         mbTxSlave       => mbTxSlave,
+         mbTxMaster         => mbTxMaster,
+         mbTxSlave          => mbTxSlave,
+         -- Ext AXIL interface
+         extAxilWriteMaster => extAxilWriteMaster,
+         extAxilWriteSlave  => extAxilWriteSlave,
+         extAxilReadMaster  => extAxilReadMaster,
+         extAxilReadSlave   => extAxilReadSlave,
          -- ADC Ports
-         vPIn            => vPIn,
-         vNIn            => vNIn);
+         vPIn               => vPIn,
+         vNIn               => vNIn);
 
-end mapping;
+end rtl;
