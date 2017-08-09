@@ -71,6 +71,7 @@ architecture top_level of Kcu105Pgp3 is
    signal pgpTxMasters : AxiStreamMasterArray(PGP_NUM_VC_C-1 downto 0);
    signal pgpTxSlaves  : AxiStreamSlaveArray(PGP_NUM_VC_C-1 downto 0);
    signal pgpRxMasters : AxiStreamMasterArray(PGP_NUM_VC_C-1 downto 0);
+   signal pgpRxSlaves  : AxiStreamSlaveArray(PGP_NUM_VC_C-1 downto 0);
    signal pgpRxCtrl    : AxiStreamCtrlArray(PGP_NUM_VC_C-1 downto 0);
 
    -- PGP3
@@ -159,7 +160,7 @@ begin
             pgpTxSlaves     => pgpTxSlaves,
             pgpRxMasters    => pgpRxMasters,
             pgpRxCtrl       => pgpRxCtrl);
-      
+
       pgpRxSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
    end generate REAL_PGP;
 
