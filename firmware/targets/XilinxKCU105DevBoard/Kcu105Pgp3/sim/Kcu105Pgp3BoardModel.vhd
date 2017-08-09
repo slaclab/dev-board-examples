@@ -18,6 +18,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
+use work.StdRtlPkg.all;
+use work.AxiLitePkg.all;
+use work.AxiStreamPkg.all;
+use work.Pgp3Pkg.all;
+
+
 ----------------------------------------------------------------------------------------------------
 
 entity Kcu105Pgp3BoardModel is
@@ -30,7 +36,7 @@ architecture sim of Kcu105Pgp3BoardModel is
 
    -- component generics
    constant TPD_G         : time    := 1 ns;
---   constant BUILD_INFO_G  : BuildInfoType;
+   constant BUILD_INFO_G  : BuildInfoType := BUILD_INFO_DEFAULT_SLV_C;
    constant SIM_SPEEDUP_G : boolean := true;
    constant SIMULATION_G  : boolean := true;
 
@@ -56,7 +62,7 @@ begin
    U_Kcu105Pgp3 : entity work.Kcu105Pgp3
       generic map (
          TPD_G         => TPD_G,
---         BUILD_INFO_G  => BUILD_INFO_G,
+         BUILD_INFO_G  => BUILD_INFO_G,
          SIM_SPEEDUP_G => SIM_SPEEDUP_G,
          SIMULATION_G  => SIMULATION_G)
       port map (

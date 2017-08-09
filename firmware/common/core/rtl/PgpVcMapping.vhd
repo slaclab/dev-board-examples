@@ -2,7 +2,7 @@
 -- File       : PgpVcMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-30
--- Last update: 2017-03-17
+-- Last update: 2017-08-08
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -26,7 +26,8 @@ use work.Pgp2bPkg.all;
 
 entity PgpVcMapping is
    generic (
-      TPD_G : time := 1 ns);
+      TPD_G        : time    := 1 ns;
+      SIMULATION_G : boolean := false);
    port (
       -- Clock and Reset
       clk             : in  sl;
@@ -74,7 +75,7 @@ begin
    U_SRPv3 : entity work.SrpV3AxiLite
       generic map (
          TPD_G               => TPD_G,
-         SLAVE_READY_EN_G    => false,
+         SLAVE_READY_EN_G    => SIMULATION_G,
          GEN_SYNC_FIFO_G     => true,
          AXI_STREAM_CONFIG_G => SSI_PGP2B_CONFIG_C)
       port map (
@@ -82,6 +83,7 @@ begin
          sAxisClk         => clk,
          sAxisRst         => rst,
          sAxisMaster      => rxMasters(0),
+         sAxisSlave       => rxSlaves(0),
          sAxisCtrl        => rxCtrl(0),
          -- Streaming Master (Tx) Data Interface (mAxisClk domain)
          mAxisClk         => clk,
@@ -133,7 +135,7 @@ begin
          -- General Configurations
          TPD_G               => TPD_G,
          PIPE_STAGES_G       => 1,
-         SLAVE_READY_EN_G    => true,
+         SLAVE_READY_EN_G    => SIMULATION_G,
          VALID_THOLD_G       => 1,
          -- FIFO configurations
          BRAM_EN_G           => true,
@@ -151,6 +153,7 @@ begin
          sAxisClk    => clk,
          sAxisRst    => rst,
          sAxisMaster => rxMasters(1),
+         sAxisSlave  => rxSlaves(1),
          sAxisCtrl   => rxCtrl(1),
          -- Master Port
          mAxisClk    => clk,
@@ -195,7 +198,7 @@ begin
          -- General Configurations
          TPD_G               => TPD_G,
          PIPE_STAGES_G       => 1,
-         SLAVE_READY_EN_G    => true,
+         SLAVE_READY_EN_G    => SIMULATION_G,
          VALID_THOLD_G       => 1,
          -- FIFO configurations
          BRAM_EN_G           => true,
@@ -213,6 +216,7 @@ begin
          sAxisClk    => clk,
          sAxisRst    => rst,
          sAxisMaster => rxMasters(2),
+         sAxisSlave  => rxSlaves(2),
          sAxisCtrl   => rxCtrl(2),
          -- Master Port
          mAxisClk    => clk,
@@ -221,7 +225,7 @@ begin
          mAxisSlave  => hlsRxSlave);
 
    -- Terminate Unused slave AXIS
-   rxSlaves <= (others => AXI_STREAM_SLAVE_INIT_C);
+--   rxSlaves <= (others => AXI_STREAM_SLAVE_INIT_C);
 
    -- VC3 Microblaze
    MBTX_FIFO : entity work.AxiStreamFifo

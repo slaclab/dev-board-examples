@@ -2,7 +2,7 @@
 -- File       : AppReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2017-08-01
+-- Last update: 2017-08-08
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -30,37 +30,38 @@ entity AppReg is
       TPD_G            : time            := 1 ns;
       BUILD_INFO_G     : BuildInfoType;
       XIL_DEVICE_G     : string          := "7SERIES";
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
+      MICROBLAZE_EN_G  : boolean         := true);
    port (
       -- Clock and Reset
-      clk              : in  sl;
-      rst              : in  sl;
+      clk                : in  sl;
+      rst                : in  sl;
       -- AXI-Lite interface
-      sAxilWriteMaster : in  AxiLiteWriteMasterType;
-      sAxilWriteSlave  : out AxiLiteWriteSlaveType;
-      sAxilReadMaster  : in  AxiLiteReadMasterType;
-      sAxilReadSlave   : out AxiLiteReadSlaveType;
+      sAxilWriteMaster   : in  AxiLiteWriteMasterType;
+      sAxilWriteSlave    : out AxiLiteWriteSlaveType;
+      sAxilReadMaster    : in  AxiLiteReadMasterType;
+      sAxilReadSlave     : out AxiLiteReadSlaveType;
       -- PBRS Interface
-      pbrsTxMaster     : out AxiStreamMasterType;
-      pbrsTxSlave      : in  AxiStreamSlaveType;
-      pbrsRxMaster     : in  AxiStreamMasterType;
-      pbrsRxSlave      : out AxiStreamSlaveType;
+      pbrsTxMaster       : out AxiStreamMasterType;
+      pbrsTxSlave        : in  AxiStreamSlaveType;
+      pbrsRxMaster       : in  AxiStreamMasterType;
+      pbrsRxSlave        : out AxiStreamSlaveType;
       -- HLS Interface
-      hlsTxMaster      : out AxiStreamMasterType;
-      hlsTxSlave       : in  AxiStreamSlaveType;
-      hlsRxMaster      : in  AxiStreamMasterType;
-      hlsRxSlave       : out AxiStreamSlaveType;
+      hlsTxMaster        : out AxiStreamMasterType;
+      hlsTxSlave         : in  AxiStreamSlaveType;
+      hlsRxMaster        : in  AxiStreamMasterType;
+      hlsRxSlave         : out AxiStreamSlaveType;
       -- MB Interface
-      mbTxMaster       : out AxiStreamMasterType;
-      mbTxSlave        : in  AxiStreamSlaveType;
+      mbTxMaster         : out AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
+      mbTxSlave          : in  AxiStreamSlaveType;
       -- EXT AXIL Interface
       extAxilWriteMaster : out AxiLiteWriteMasterType;
       extAxilWriteSlave  : in  AxiLiteWriteSlaveType;
       extAxilReadMaster  : out AxiLiteReadMasterType;
       extAxilReadSlave   : in  AxiLiteReadSlaveType;
       -- ADC Ports
-      vPIn             : in  sl;
-      vNIn             : in  sl);
+      vPIn               : in  sl;
+      vNIn               : in  sl);
 end AppReg;
 
 architecture mapping of AppReg is
@@ -113,10 +114,10 @@ architecture mapping of AppReg is
          addrBits     => 28,
          connectivity => X"FFFF"));
 
-   signal mbAxilWriteMaster : AxiLiteWriteMasterType;
-   signal mbAxilWriteSlave  : AxiLiteWriteSlaveType;
-   signal mbAxilReadMaster  : AxiLiteReadMasterType;
-   signal mbAxilReadSlave   : AxiLiteReadSlaveType;
+   signal mbAxilWriteMaster : AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
+   signal mbAxilWriteSlave  : AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_INIT_C;
+   signal mbAxilReadMaster  : AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
+   signal mbAxilReadSlave   : AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_INIT_C;
 
    signal locAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -131,28 +132,30 @@ architecture mapping of AppReg is
 
 begin
 
-   extAxilWriteMaster <= locAxilWriteMasters(EXT_INDEX_C);
+   extAxilWriteMaster              <= locAxilWriteMasters(EXT_INDEX_C);
    locAxilWriteSlaves(EXT_INDEX_C) <= extAxilWriteSlave;
-   extAxilReadMaster <= locAxilReadMasters(EXT_INDEX_C);
-   locAxilReadSlaves(EXT_INDEX_C) <= extAxilReadSlave;
+   extAxilReadMaster               <= locAxilReadMasters(EXT_INDEX_C);
+   locAxilReadSlaves(EXT_INDEX_C)  <= extAxilReadSlave;
 
-   U_CPU : entity work.MicroblazeBasicCoreWrapper
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         -- Master AXI-Lite Interface: [0x00000000:0x7FFFFFFF]
-         mAxilWriteMaster => mbAxilWriteMaster,
-         mAxilWriteSlave  => mbAxilWriteSlave,
-         mAxilReadMaster  => mbAxilReadMaster,
-         mAxilReadSlave   => mbAxilReadSlave,
-         -- Streaming
-         mAxisMaster      => mbTxMaster,
-         mAxisSlave       => mbTxSlave,
-         -- IRQ
-         interrupt        => irqReq,
-         -- Clock and Reset
-         clk              => clk,
-         rst              => rst);
+   MICROBLAZE_GEN : if (MICROBLAZE_EN_G) generate
+      U_CPU : entity work.MicroblazeBasicCoreWrapper
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            -- Master AXI-Lite Interface: [0x00000000:0x7FFFFFFF]
+            mAxilWriteMaster => mbAxilWriteMaster,
+            mAxilWriteSlave  => mbAxilWriteSlave,
+            mAxilReadMaster  => mbAxilReadMaster,
+            mAxilReadSlave   => mbAxilReadSlave,
+            -- Streaming
+            mAxisMaster      => mbTxMaster,
+            mAxisSlave       => mbTxSlave,
+            -- IRQ
+            interrupt        => irqReq,
+            -- Clock and Reset
+            clk              => clk,
+            rst              => rst);
+   end generate MICROBLAZE_GEN;
 
    process (clk)
    begin

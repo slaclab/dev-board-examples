@@ -2,9 +2,9 @@
 -- File       : Kcu105Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-09
--- Last update: 2017-08-02
+-- Last update: 2017-08-09
 -------------------------------------------------------------------------------
--- Description: Example using PGP2B Protocol
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -159,25 +159,48 @@ begin
             pgpTxSlaves     => pgpTxSlaves,
             pgpRxMasters    => pgpRxMasters,
             pgpRxCtrl       => pgpRxCtrl);
+      
+      pgpRxSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
    end generate REAL_PGP;
 
    SIM_PGP : if (SIMULATION_G) generate
-      U_SimModel : entity work.PgpSimModel
-         generic map (
-            TPD_G => TPD_G)
-         port map (
-            pgpTxClk     => clk,
-            pgpTxClkRst  => rst,
-            pgpRxClk     => clk,
-            pgpRxClkRst  => rst,
-            pgpTxIn      => PGP2B_TX_IN_INIT_C,
-            pgpTxOut     => pgpTxOut,
-            pgpRxIn      => PGP2B_RX_IN_INIT_C,
-            pgpRxOut     => pgpRxOut,
-            pgpTxMasters => pgpTxMasters,
-            pgpTxSlaves  => pgpTxSlaves,
-            pgpRxMasters => pgpRxMasters,
-            pgpRxCtrl    => pgpRxCtrl);
+
+      GEN_AXIS_LANE : for i in 3 downto 0 generate
+         U_RogueStreamSimWrap_PGP_VC : entity work.RogueStreamSimWrap
+            generic map (
+               TPD_G         => TPD_G,
+               DEST_ID_G     => i,
+               AXIS_CONFIG_G => SSI_PGP2B_CONFIG_C)
+            port map (
+               clk         => clk,              -- [in]
+               rst         => rst,              -- [in]
+               sAxisClk    => clk,              -- [in]
+               sAxisRst    => rst,              -- [in]
+               sAxisMaster => pgpTxMasters(i),  -- [in]
+               sAxisSlave  => pgpTxSlaves(i),   -- [out]
+               mAxisClk    => clk,              -- [in]
+               mAxisRst    => rst,              -- [in]
+               mAxisMaster => pgpRxMasters(i),  -- [out]
+               mAxisSlave  => pgpRxSlaves(i));  -- [in]
+      end generate GEN_AXIS_LANE;
+
+      pgpRxOut.phyRxReady   <= '1';
+      pgpRxOut.linkReady    <= '1';
+      pgpRxOut.linkPolarity <= (others => '0');
+      pgpRxOut.frameRx      <= '0';
+      pgpRxOut.frameRxErr   <= '0';
+      pgpRxOut.linkDown     <= '0';
+      pgpRxOut.linkError    <= '0';
+      pgpRxOut.remLinkReady <= '1';
+      pgpRxOut.remOverflow  <= (others => '0');
+      pgpRxOut.remPause     <= (others => '0');
+
+      pgpTxOut.locOverflow <= (others => '0');
+      pgpTxOut.locPause    <= (others => '0');
+      pgpTxOut.phyTxReady  <= '1';
+      pgpTxOut.linkReady   <= '1';
+      pgpTxOut.frameTx     <= '0';
+      pgpTxOut.frameTxErr  <= '0';
 
    end generate SIM_PGP;
 
@@ -309,11 +332,13 @@ begin
    -------------------
    U_App : entity work.AppCore
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         XIL_DEVICE_G => "ULTRASCALE",
-         APP_TYPE_G   => "PGP",
-         AXIS_SIZE_G  => PGP_NUM_VC_C)
+         TPD_G           => TPD_G,
+         SIMULATION_G    => SIMULATION_G,
+         BUILD_INFO_G    => BUILD_INFO_G,
+         XIL_DEVICE_G    => "ULTRASCALE",
+         MICROBLAZE_EN_G => false,
+         APP_TYPE_G      => "PGP",
+         AXIS_SIZE_G     => PGP_NUM_VC_C)
       port map (
          -- Clock and Reset
          clk                => clk,
@@ -322,6 +347,7 @@ begin
          txMasters          => pgpTxMasters,
          txSlaves           => pgpTxSlaves,
          rxMasters          => pgpRxMasters,
+         rxSlaves           => pgpRxSlaves,
          rxCtrl             => pgpRxCtrl,
          -- AXIL interface
          extAxilWriteMaster => appAxilWriteMaster,

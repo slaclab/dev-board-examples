@@ -2,7 +2,7 @@
 -- File       : AppCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2017-08-01
+-- Last update: 2017-08-08
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -25,33 +25,35 @@ use work.AxiLitePkg.all;
 entity AppCore is
    generic (
       TPD_G            : time             := 1 ns;
+      SIMULATION_G     : boolean          := false;
       BUILD_INFO_G     : BuildInfoType;
       XIL_DEVICE_G     : string           := "7SERIES";
       APP_TYPE_G       : string           := "ETH";
       AXIS_SIZE_G      : positive         := 1;
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
+      MICROBLAZE_EN_G  : boolean          := true;
       MAC_ADDR_G       : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01 (ETH only)
       IP_ADDR_G        : slv(31 downto 0) := x"0A02A8C0";      -- 192.168.2.10 (ETH only)
       DHCP_G           : boolean          := true;
       JUMBO_G          : boolean          := false);
    port (
       -- Clock and Reset
-      clk       : in  sl;
-      rst       : in  sl;
+      clk                : in  sl;
+      rst                : in  sl;
       -- AXIS interface
-      txMasters : out AxiStreamMasterArray(AXIS_SIZE_G-1 downto 0);
-      txSlaves  : in  AxiStreamSlaveArray(AXIS_SIZE_G-1 downto 0);
-      rxMasters : in  AxiStreamMasterArray(AXIS_SIZE_G-1 downto 0);
-      rxSlaves  : out AxiStreamSlaveArray(AXIS_SIZE_G-1 downto 0);
-      rxCtrl    : out AxiStreamCtrlArray(AXIS_SIZE_G-1 downto 0);
+      txMasters          : out AxiStreamMasterArray(AXIS_SIZE_G-1 downto 0);
+      txSlaves           : in  AxiStreamSlaveArray(AXIS_SIZE_G-1 downto 0);
+      rxMasters          : in  AxiStreamMasterArray(AXIS_SIZE_G-1 downto 0);
+      rxSlaves           : out AxiStreamSlaveArray(AXIS_SIZE_G-1 downto 0);
+      rxCtrl             : out AxiStreamCtrlArray(AXIS_SIZE_G-1 downto 0);
       -- EXT AXIL Interface
       extAxilWriteMaster : out AxiLiteWriteMasterType;
       extAxilWriteSlave  : in  AxiLiteWriteSlaveType := AXI_LITE_WRITE_SLAVE_INIT_C;
       extAxilReadMaster  : out AxiLiteReadMasterType;
-      extAxilReadSlave   : in  AxiLiteReadSlaveType := AXI_LITE_READ_SLAVE_INIT_C;
+      extAxilReadSlave   : in  AxiLiteReadSlaveType  := AXI_LITE_READ_SLAVE_INIT_C;
       -- ADC Ports
-      vPIn      : in  sl;
-      vNIn      : in  sl);
+      vPIn               : in  sl;
+      vNIn               : in  sl);
 end AppCore;
 
 architecture rtl of AppCore is
@@ -124,7 +126,8 @@ begin
       ---------------------------------         
       U_PgpVcMapping : entity work.PgpVcMapping
          generic map (
-            TPD_G => TPD_G)
+            TPD_G        => TPD_G,
+            SIMULATION_G => SIMULATION_G)
          port map (
             -- Clock and Reset
             clk             => clk,
@@ -163,16 +166,17 @@ begin
          TPD_G            => TPD_G,
          BUILD_INFO_G     => BUILD_INFO_G,
          XIL_DEVICE_G     => XIL_DEVICE_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         MICROBLAZE_EN_G  => MICROBLAZE_EN_G)
       port map (
          -- Clock and Reset
          clk                => clk,
          rst                => rst,
          -- AXI-Lite interface
-         sAxilWriteMaster    => axilWriteMaster,
-         sAxilWriteSlave     => axilWriteSlave,
-         sAxilReadMaster     => axilReadMaster,
-         sAxilReadSlave      => axilReadSlave,
+         sAxilWriteMaster   => axilWriteMaster,
+         sAxilWriteSlave    => axilWriteSlave,
+         sAxilReadMaster    => axilReadMaster,
+         sAxilReadSlave     => axilReadSlave,
          -- PBRS Interface
          pbrsTxMaster       => pbrsTxMaster,
          pbrsTxSlave        => pbrsTxSlave,
