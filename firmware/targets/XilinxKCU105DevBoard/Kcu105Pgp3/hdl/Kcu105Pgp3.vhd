@@ -238,6 +238,9 @@ begin
       end generate SIM_PGP;
    end generate GEN_PGP;
 
+   led(0) <= pgpTxOut.linkReady;
+   led(1) <= pgpRxOut.linkReady;
+
    U_SrpV3AxiLite_1 : entity work.SrpV3AxiLite
       generic map (
          TPD_G               => TPD_G,
@@ -303,6 +306,9 @@ begin
          axilWriteSlave  => prbsAxilWriteSlaves(PGP3_NUM_VC_C*2),
          axilReadMaster  => prbsAxilReadMasters(PGP3_NUM_VC_C*2),
          axilReadSlave   => prbsAxilReadSlaves(PGP3_NUM_VC_C*2));
+
+   led(2) <= pgp3TxOut.linkReady;
+   led(3) <= pgp3RxOut.linkReady;
 
 
    U_XBAR : entity work.AxiLiteCrossbar
