@@ -62,7 +62,6 @@ architecture top_level of Kcu105Pgp3 is
    signal pgpRefClkDiv2 : sl;
    signal clk           : sl;
    signal rst           : sl;
-   signal phyReady      : sl;
 
    -- PGP2b
    constant PGP_NUM_VC_C : positive := 4;
@@ -90,18 +89,18 @@ architecture top_level of Kcu105Pgp3 is
    signal pgp3RxCtrl    : AxiStreamCtrlArray(PGP3_NUM_VC_C-1 downto 0);    -- [in]
 
 
-   constant XBAR_CFG_C : AxiLiteCrossbarMasterConfigArray(PGP3_NUM_VC_C*2 downto 0) :=
-      genAxiLiteConfig(PGP3_NUM_VC_C*2+1, X"10000000", 24, 16);
+   constant XBAR_CFG_C : AxiLiteCrossbarMasterConfigArray(PGP3_NUM_VC_C*2+1 downto 0) :=
+      genAxiLiteConfig(PGP3_NUM_VC_C*2+2, X"10000000", 24, 16);
 
    signal appAxilWriteMaster : AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
    signal appAxilWriteSlave  : AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_INIT_C;
    signal appAxilReadMaster  : AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
    signal appAxilReadSlave   : AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_INIT_C;
 
-   signal prbsAxilWriteMasters : AxiLiteWriteMasterArray(PGP3_NUM_VC_C*2 downto 0);
-   signal prbsAxilWriteSlaves  : AxiLiteWriteSlaveArray(PGP3_NUM_VC_C*2 downto 0);
-   signal prbsAxilReadMasters  : AxiLiteReadMasterArray(PGP3_NUM_VC_C*2 downto 0);
-   signal prbsAxilReadSlaves   : AxiLiteReadSlaveArray(PGP3_NUM_VC_C*2 downto 0);
+   signal prbsAxilWriteMasters : AxiLiteWriteMasterArray(PGP3_NUM_VC_C*2+1 downto 0);
+   signal prbsAxilWriteSlaves  : AxiLiteWriteSlaveArray(PGP3_NUM_VC_C*2+1 downto 0);
+   signal prbsAxilReadMasters  : AxiLiteReadMasterArray(PGP3_NUM_VC_C*2+1 downto 0);
+   signal prbsAxilReadSlaves   : AxiLiteReadSlaveArray(PGP3_NUM_VC_C*2+1 downto 0);
 
    signal prbsClk : slv(7 downto 0);
    signal prbsRst : slv(7 downto 0);
@@ -316,7 +315,7 @@ begin
          TPD_G              => TPD_G,
          DEC_ERROR_RESP_G   => AXI_RESP_DECERR_C,
          NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => PGP3_NUM_VC_C*2+1,
+         NUM_MASTER_SLOTS_G => PGP3_NUM_VC_C*2+2,
          MASTERS_CONFIG_G   => XBAR_CFG_C)
       port map (
          axiClk              => clk,
@@ -434,14 +433,29 @@ begin
    ----------------
    -- Misc. Signals
    ----------------
-   led(7) <= phyReady;
-   led(6) <= phyReady;
-   led(5) <= phyReady;
-   led(4) <= phyReady;
-   led(3) <= phyReady;
-   led(2) <= phyReady;
-   led(1) <= phyReady;
-   led(0) <= phyReady;
+   
+   U_AxiVersion_1: entity work.AxiVersion
+      generic map (
+         TPD_G              => TPD_G,
+         BUILD_INFO_G       => BUILD_INFO_G,
+--         SIM_DNA_VALUE_G    => SIM_DNA_VALUE_G,
+--         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+--         DEVICE_ID_G        => DEVICE_ID_G,
+         CLK_PERIOD_G       => 6.4e-9,
+         EN_DEVICE_DNA_G    => true,
+         EN_DS2411_G        => false,
+         EN_ICAP_G          => true)
+--         USE_SLOWCLK_G      => USE_SLOWCLK_G,
+--         BUFR_CLK_DIV_G     => BUFR_CLK_DIV_G,
+
+      port map (
+         axiClk         => clk,          -- [in]
+         axiRst         => rst,          -- [in]
+         axiReadMaster  => prbsAxilReadMasters(PGP3_NUM_VC_C*2+1),   -- [in]
+         axiReadSlave   => prbsAxilReadSlaves(PGP3_NUM_VC_C*2+1),    -- [out]
+         axiWriteMaster => prbsAxilWriteMasters(PGP3_NUM_VC_C*2+1),  -- [in]
+         axiWriteSlave  => prbsAxilWriteSlaves(PGP3_NUM_VC_C*2+1));   -- [out]
+
 
 
 
