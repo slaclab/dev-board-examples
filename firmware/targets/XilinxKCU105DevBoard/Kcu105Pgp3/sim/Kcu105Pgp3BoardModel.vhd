@@ -27,34 +27,38 @@ use work.Pgp3Pkg.all;
 ----------------------------------------------------------------------------------------------------
 
 entity Kcu105Pgp3BoardModel is
-
+   generic(
+      TPD_G             : time := 1 ns;
+      CLK_START_DELAY_G : time := 1 ns);
+   port (
+      pgp3RxP : in  sl;                 -- 
+      pgp3RxN : in  sl;                 -- 
+      pgp3TxP : out sl;                 -- 
+      pgp3TxN : out sl);                -- 
 end entity Kcu105Pgp3BoardModel;
 
 ----------------------------------------------------------------------------------------------------
 
 architecture sim of Kcu105Pgp3BoardModel is
 
-   -- component generics
-   constant TPD_G         : time    := 1 ns;
-   constant BUILD_INFO_G  : BuildInfoType := BUILD_INFO_DEFAULT_SLV_C;
-   constant SIM_SPEEDUP_G : boolean := true;
-   constant SIMULATION_G  : boolean := true;
+   signal extRst  : sl := '0';          -- 
+   signal led     : slv(7 downto 0);    -- 
+   signal vPIn    : sl := '0';          -- 
+   signal vNIn    : sl := '0';          -- 
+   signal pgpClkP : sl;                 -- 
+   signal pgpClkN : sl;                 -- 
+   signal pgpRxP  : sl := '0';          -- 
+   signal pgpRxN  : sl := '0';          -- 
+   signal pgpTxP  : sl := '0';  -- 
+   signal pgpTxN  : sl := '0';          -- 
 
-   -- component ports
-   signal extRst  : sl;                 -- [in]
-   signal led     : slv(7 downto 0);    -- [out]
-   signal vPIn    : sl := '0';          -- [in]
-   signal vNIn    : sl := '0';          -- [in]
-   signal pgpClkP : sl;                 -- [in]
-   signal pgpClkN : sl;                 -- [in]
-   signal pgpRxP  : sl;                 -- [in]
-   signal pgpRxN  : sl;                 -- [in]
-   signal pgpTxP  : sl;                 -- [out]
-   signal pgpTxN  : sl;                 -- [out]
-   signal pgp3RxP : sl;                 -- [in]
-   signal pgp3RxN : sl;                 -- [in]
-   signal pgp3TxP : sl;                 -- [out]
-   signal pgp3TxN : sl;                 -- [out]
+
+   -- component generics
+
+   constant BUILD_INFO_G  : BuildInfoType := BUILD_INFO_DEFAULT_SLV_C;
+   constant SIM_SPEEDUP_G : boolean       := true;
+   constant SIMULATION_G  : boolean       := true;
+
 
 begin
 
@@ -72,8 +76,8 @@ begin
          vNIn    => vNIn,               -- [in]
          pgpClkP => pgpClkP,            -- [in]
          pgpClkN => pgpClkN,            -- [in]
-         pgpRxP  => pgpTxP,             -- [in]
-         pgpRxN  => pgpTxN,             -- [in]
+         pgpRxP  => pgpRxP,             -- [in]
+         pgpRxN  => pgpRxN,             -- [in]
          pgpTxP  => pgpTxP,             -- [out]
          pgpTxN  => pgpTxN,             -- [out]
          pgp3RxP => pgp3RxP,            -- [in]
@@ -85,7 +89,7 @@ begin
    U_ClkRst_1 : entity work.ClkRst
       generic map (
          CLK_PERIOD_G      => 6.4 ns,
-         CLK_DELAY_G       => 1 ns,
+         CLK_DELAY_G       => CLK_START_DELAY_G,
          RST_START_DELAY_G => 0 ns,
          RST_HOLD_TIME_G   => 5 us,
          SYNC_RESET_G      => true)
