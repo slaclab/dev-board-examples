@@ -17,6 +17,7 @@
 # copied, modified, propagated, or distributed except according to the terms 
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
+import rogue
 
 import pyrogue as pr
 import pyrogue.simulation
@@ -31,11 +32,14 @@ import PyQt4.QtGui
 import PyQt4.QtCore
 import sys
 
+rogue.Logging.setFilter('pyrogue.SrpV3', rogue.Logging.Debug)
 
 class Kcu105Pgp3(pr.Device):
     def __init__(self, channels=4, **kwargs):
                  
         super().__init__(**kwargs)
+
+        self.add(surf.axi.AxiVersion(offset=0x10000000+0x10000*(2*channels+1)))
 
         self.add(surf.protocols.pgp.Pgp3AxiL(
             offset = 0x10000000 + 0x10000*(2*channels),
@@ -44,33 +48,38 @@ class Kcu105Pgp3(pr.Device):
             errorCountBits = 4,
             statusCountBits = 32))        
 
-        for i in range(0, channels*2, 2):
-            self.add(surf.protocols.ssi.SsiPrbsTx(name=f'Ch{i}PrbsTx', offset=0x10010000*i))
-            self.add(surf.protocols.ssi.SsiPrbsRx(name=f'Ch{i}PrbsRx', offset=0x10020000*i))        
+        for i in range(channels):
+            self.add(surf.protocols.ssi.SsiPrbsTx(name=f'Ch{i}PrbsTx', offset=0x10000000 + (0x10000*2*i)))
+            self.add(surf.protocols.ssi.SsiPrbsRx(name=f'Ch{i}PrbsRx', offset=0x10000000 + (0x10000*2*i+0x10000)))
 
 
 
 
 class Kcu105Pgp3Root(pr.Root):
-    def __init__(self, **kwargs):
-        super().__init__(name='Kcu105', description='', **kwargs)
-
-        #vc = rogue.hardware.pgp.PgpCard('/dev/pgpcard_0', 0, 0)
-        #srp = rogue.protocols.srp.SrpV3()
-        #pr.streamConnectBiDir(vc, srp)
-        srp = pyrogue.simulation.MemEmulate()
+    def __init__(self, memBase):
+        super().__init__(name='Kcu105', description='')
         
 
-        logging.getLogger('pyrogue.SRP').setLevel(logging.DEBUG)
+        rogue.Logging.setFilter('pyrogue.SrpV3', rogue.Logging.Debug)
         
-        self.add(Kcu105Pgp3(memBase=srp))
+        self.add(Kcu105Pgp3(name='Kcu105Pgp3[0]', memBase=memBase[0]))
+        self.add(Kcu105Pgp3(name='Kcu105Pgp3[1]', memBase=memBase[1]))        
 
         self.start(pollEn=False)
 
         
 if __name__ == '__main__':
 
-    with Kcu105Pgp3Root() as root:
+    vc = [rogue.hardware.pgp.PgpCard('/dev/pgpcard_0', 0, 0),
+          rogue.hardware.pgp.PgpCard('/dev/pgpcard_0', 1, 0)]
+    srp = [rogue.protocols.srp.SrpV3(),
+           rogue.protocols.srp.SrpV3()]
+    
+    pr.streamConnectBiDir(vc[0], srp[0])
+    pr.streamConnectBiDir(vc[1], srp[1])    
+    #    srp = pyrogue.simulation.MemEmulate()    
+
+    with Kcu105Pgp3Root(memBase=srp) as root:
         appTop = PyQt4.QtGui.QApplication(sys.argv)
         guiTop = pyrogue.gui.GuiTop(group='Pgp3')
         guiTop.addTree(root)
