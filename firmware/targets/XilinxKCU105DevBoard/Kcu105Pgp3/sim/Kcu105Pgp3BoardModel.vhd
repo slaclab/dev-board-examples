@@ -70,10 +70,10 @@ begin
          SIM_SPEEDUP_G => SIM_SPEEDUP_G,
          SIMULATION_G  => SIMULATION_G)
       port map (
-         extRst  => extRst,             -- [in]
+--         extRst  => extRst,             -- [in]
          led     => led,                -- [out]
-         vPIn    => vPIn,               -- [in]
-         vNIn    => vNIn,               -- [in]
+--          vPIn    => vPIn,               -- [in]
+--          vNIn    => vNIn,               -- [in]
          pgpClkP => pgpClkP,            -- [in]
          pgpClkN => pgpClkN,            -- [in]
          pgpRxP  => pgpRxP,             -- [in]
