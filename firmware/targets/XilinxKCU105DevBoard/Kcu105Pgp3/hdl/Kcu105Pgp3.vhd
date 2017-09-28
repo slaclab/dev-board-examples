@@ -272,7 +272,8 @@ begin
 --          RX_ALIGN_BAD_COUNT_G            => RX_ALIGN_BAD_COUNT_G,
 --          RX_ALIGN_SLIP_WAIT_G            => RX_ALIGN_SLIP_WAIT_G,
          PGP_TX_ENABLE_G => true,
-         NUM_VC_G        => PGP3_NUM_VC_C)
+         NUM_VC_G        => PGP3_NUM_VC_C,
+         AXIL_CLK_FREQ_G => 156.25e6)
 --          TX_CELL_WORDS_MAX_G             => TX_CELL_WORDS_MAX_G,
 --          TX_SKP_INTERVAL_G               => TX_SKP_INTERVAL_G,
 --          TX_SKP_BURST_SIZE_G             => TX_SKP_BURST_SIZE_G,
