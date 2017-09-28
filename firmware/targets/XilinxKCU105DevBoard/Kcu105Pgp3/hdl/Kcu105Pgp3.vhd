@@ -2,7 +2,7 @@
 -- File       : Kcu105Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-09
--- Last update: 2017-09-27
+-- Last update: 2017-09-28
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -433,28 +433,29 @@ begin
    ----------------
    -- Misc. Signals
    ----------------
-   
-   U_AxiVersion_1: entity work.AxiVersion
+
+   U_AxiVersion_1 : entity work.AxiVersion
       generic map (
-         TPD_G              => TPD_G,
-         BUILD_INFO_G       => BUILD_INFO_G,
+         TPD_G           => TPD_G,
+         BUILD_INFO_G    => BUILD_INFO_G,
+         XIL_DEVICE_G    => "ULTRASCALE",
 --         SIM_DNA_VALUE_G    => SIM_DNA_VALUE_G,
 --         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
 --         DEVICE_ID_G        => DEVICE_ID_G,
-         CLK_PERIOD_G       => 6.4e-9,
-         EN_DEVICE_DNA_G    => true,
-         EN_DS2411_G        => false,
-         EN_ICAP_G          => true)
+         CLK_PERIOD_G    => 6.4e-9,
+         EN_DEVICE_DNA_G => true,
+         EN_DS2411_G     => false,
+         EN_ICAP_G       => true)
 --         USE_SLOWCLK_G      => USE_SLOWCLK_G,
 --         BUFR_CLK_DIV_G     => BUFR_CLK_DIV_G,
 
       port map (
-         axiClk         => clk,          -- [in]
-         axiRst         => rst,          -- [in]
+         axiClk         => clk,                                      -- [in]
+         axiRst         => rst,                                      -- [in]
          axiReadMaster  => prbsAxilReadMasters(PGP3_NUM_VC_C*2+1),   -- [in]
          axiReadSlave   => prbsAxilReadSlaves(PGP3_NUM_VC_C*2+1),    -- [out]
          axiWriteMaster => prbsAxilWriteMasters(PGP3_NUM_VC_C*2+1),  -- [in]
-         axiWriteSlave  => prbsAxilWriteSlaves(PGP3_NUM_VC_C*2+1));   -- [out]
+         axiWriteSlave  => prbsAxilWriteSlaves(PGP3_NUM_VC_C*2+1));  -- [out]
 
 
 
