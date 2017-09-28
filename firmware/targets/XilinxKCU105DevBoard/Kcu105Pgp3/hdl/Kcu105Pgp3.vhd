@@ -36,8 +36,8 @@ entity Kcu105Pgp3 is
       NO_PGP2B_G    : boolean := false);
    port (
       -- Misc. IOs
-      extRst  : in  sl;
-      led     : out slv(7 downto 0);
+      --extRst  : in  sl;
+      led     : out slv(7 downto 0) := (others => '0');
       -- XADC Ports
 --       vPIn    : in  sl;
 --       vNIn    : in  sl;
@@ -392,7 +392,7 @@ begin
          OUT_POLARITY_G => '1')
       port map (
          clk    => clk,
-         arst   => extRst,
+--         arst   => extRst,
          rstOut => rst);
 
    -------------------
@@ -458,6 +458,24 @@ begin
          axiWriteSlave  => prbsAxilWriteSlaves(PGP3_NUM_VC_C*2+1));  -- [out]
 
 
+   U_Heartbeat_1 : entity work.Heartbeat
+      generic map (
+         TPD_G        => TPD_G,
+         PERIOD_IN_G  => 6.4e-9,
+         PERIOD_OUT_G => 1.0)
+      port map (
+         clk => clk,                    -- [in]
+         rst => rst,                    -- [in]
+         o   => led(6));                -- [out]
 
+   U_Heartbeat_2 : entity work.Heartbeat
+      generic map (
+         TPD_G        => TPD_G,
+         PERIOD_IN_G  => 6.4e-9,
+         PERIOD_OUT_G => 1.0)
+      port map (
+         clk => pgp3Clk,                -- [in]
+         rst => pgp3ClkRst,             -- [in]
+         o   => led(7));                -- [out]
 
 end top_level;
