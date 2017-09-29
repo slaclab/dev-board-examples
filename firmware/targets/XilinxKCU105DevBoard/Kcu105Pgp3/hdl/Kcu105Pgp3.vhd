@@ -112,7 +112,7 @@ architecture top_level of Kcu105Pgp3 is
          connectivity => X"0001"),
       PROM_AXIL_C     => (
          baseAddr     => X"00002000",
-         addrBits     => 8,
+         addrBits     => 12,
          connectivity => X"0001"),
       PRBS_AXIL_C     => (
          baseAddr     => X"10000000",
