@@ -38,6 +38,11 @@ entity Kcu105Pgp3 is
       -- Misc. IOs
       --extRst  : in  sl;
       led     : out slv(7 downto 0) := (others => '0');
+      -- PROM Port
+      csL     : out sl;
+      sck     : out sl;
+      mosi    : out sl;
+      miso    : in  sl;
       -- XADC Ports
 --       vPIn    : in  sl;
 --       vNIn    : in  sl;
@@ -62,6 +67,7 @@ architecture top_level of Kcu105Pgp3 is
    signal pgpRefClkDiv2 : sl;
    signal clk           : sl;
    signal rst           : sl;
+   signal rstL           : sl;   
 
    -- PGP2b
    constant PGP_NUM_VC_C : positive := 4;
@@ -88,22 +94,51 @@ architecture top_level of Kcu105Pgp3 is
    signal pgp3RxMasters : AxiStreamMasterArray(PGP3_NUM_VC_C-1 downto 0);  -- [out]
    signal pgp3RxCtrl    : AxiStreamCtrlArray(PGP3_NUM_VC_C-1 downto 0);    -- [in]
 
+   constant XBAR_MASTERS_C : integer := 4;
 
-   constant XBAR_CFG_C : AxiLiteCrossbarMasterConfigArray(PGP3_NUM_VC_C*2+1 downto 0) :=
-      genAxiLiteConfig(PGP3_NUM_VC_C*2+2, X"10000000", 24, 16);
+   constant VERSION_AXIL_C : integer := 0;
+   constant PGP3_AXIL_C    : integer := 1;
+   constant PRBS_AXIL_C    : integer := 2;
+   constant PROM_AXIL_C    : integer := 3;
 
-   signal appAxilWriteMaster : AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
-   signal appAxilWriteSlave  : AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_INIT_C;
-   signal appAxilReadMaster  : AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
-   signal appAxilReadSlave   : AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_INIT_C;
+   constant XBAR_CFG_C : AxiLiteCrossbarMasterConfigArray(XBAR_MASTERS_C-1 downto 0) := (
+      VERSION_AXIL_C  => (
+         baseAddr     => X"00000000",
+         addrBits     => 12,
+         connectivity => X"0001"),
+      PGP3_AXIL_C     => (
+         baseAddr     => X"00001000",
+         addrBits     => 8,
+         connectivity => X"0001"),
+      PROM_AXIL_C     => (
+         baseAddr     => X"00002000",
+         addrBits     => 8,
+         connectivity => X"0001"),
+      PRBS_AXIL_C     => (
+         baseAddr     => X"10000000",
+         addrBits     => 24,
+         connectivity => X"0001")
+      );
 
-   signal prbsAxilWriteMasters : AxiLiteWriteMasterArray(PGP3_NUM_VC_C*2+1 downto 0);
-   signal prbsAxilWriteSlaves  : AxiLiteWriteSlaveArray(PGP3_NUM_VC_C*2+1 downto 0);
-   signal prbsAxilReadMasters  : AxiLiteReadMasterArray(PGP3_NUM_VC_C*2+1 downto 0);
-   signal prbsAxilReadSlaves   : AxiLiteReadSlaveArray(PGP3_NUM_VC_C*2+1 downto 0);
+   signal srpAxilWriteMaster : AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
+   signal srpAxilWriteSlave  : AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_INIT_C;
+   signal srpAxilReadMaster  : AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
+   signal srpAxilReadSlave   : AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_INIT_C;
+
+   signal locAxilWriteMasters : AxiLiteWriteMasterArray(PGP3_NUM_VC_C*2+1 downto 0);
+   signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(PGP3_NUM_VC_C*2+1 downto 0);
+   signal locAxilReadMasters  : AxiLiteReadMasterArray(PGP3_NUM_VC_C*2+1 downto 0);
+   signal locAxilReadSlaves   : AxiLiteReadSlaveArray(PGP3_NUM_VC_C*2+1 downto 0);
 
    signal prbsClk : slv(7 downto 0);
    signal prbsRst : slv(7 downto 0);
+
+   signal bootCsL  : sl;
+   signal bootSck  : sl;
+   signal bootMosi : sl;
+   signal bootMiso : sl;
+   signal di       : slv(3 downto 0);
+   signal do       : slv(3 downto 0);
 
 begin
 
@@ -259,10 +294,10 @@ begin
          mAxisSlave       => pgpTxSlaves(0),      -- [in]
          axilClk          => clk,                 -- [in]
          axilRst          => rst,                 -- [in]
-         mAxilWriteMaster => appAxilWriteMaster,  -- [out]
-         mAxilWriteSlave  => appAxilWriteSlave,   -- [in]
-         mAxilReadMaster  => appAxilReadMaster,   -- [out]
-         mAxilReadSlave   => appAxilReadSlave);   -- [in]
+         mAxilWriteMaster => srpAxilWriteMaster,  -- [out]
+         mAxilWriteSlave  => srpAxilWriteSlave,   -- [in]
+         mAxilReadMaster  => srpAxilReadMaster,   -- [out]
+         mAxilReadSlave   => srpAxilReadSlave);   -- [in]
 
    U_Pgp3GthUs_2 : entity work.Pgp3GthUs
       generic map (
@@ -302,13 +337,35 @@ begin
          pgpRxCtrl       => pgp3RxCtrl,     -- [in]
          axilClk         => clk,            -- [in]
          axilRst         => rst,            -- [in]
-         axilWriteMaster => prbsAxilWriteMasters(PGP3_NUM_VC_C*2),
-         axilWriteSlave  => prbsAxilWriteSlaves(PGP3_NUM_VC_C*2),
-         axilReadMaster  => prbsAxilReadMasters(PGP3_NUM_VC_C*2),
-         axilReadSlave   => prbsAxilReadSlaves(PGP3_NUM_VC_C*2));
+         axilWriteMaster => locAxilWriteMasters(PGP3_AXIL_C),
+         axilWriteSlave  => locAxilWriteSlaves(PGP3_AXIL_C),
+         axilReadMaster  => locAxilReadMasters(PGP3_AXIL_C),
+         axilReadSlave   => locAxilReadSlaves(PGP3_AXIL_C));
 
    led(2) <= pgp3TxOut.linkReady;
    led(3) <= pgp3RxOut.linkReady;
+
+   U_PrbsChannels_1 : entity work.PrbsChannels
+      generic map (
+         TPD_G            => TPD_G,
+         AXIL_BASE_ADDR_G => XBAR_CFG_C(PRBS_AXIL_C).baseAddr,
+         CHANNELS_G       => PGP3_NUM_VC_C)
+      port map (
+         txClk          => pgp3Clk,                          -- [in]
+         txRst          => pgp3ClkRst,                       -- [in]
+         txMasters      => pgp3TxMasters,                    -- [out]
+         txSlaves       => pgp3TxSlaves,                     -- [in]
+         rxClk          => pgp3Clk,                          -- [in]
+         rxRst          => pgp3ClkRst,                       -- [in]
+         rxMasters      => pgp3RxMasters,                    -- [in]
+         rxSlaves       => open,                             -- [in]
+         rxCtrl         => pgp3RxCtrl,                       -- [out]
+         axilClk        => axilClk,                          -- [in]
+         axilRst        => axilRst,                          -- [in]
+         axiReadMaster  => locAxilReadMaster(PRBS_AXIL_C),   -- [in]
+         axiReadSlave   => locAxilReadSlave(PRBS_AXIL_C),    -- [out]
+         axiWriteMaster => locAxilWriteMaster(PRBS_AXIL_C),  -- [in]
+         axiWriteSlave  => locAxilWriteSlave(PRBS_AXIL_C));  -- [out]
 
 
    U_XBAR : entity work.AxiLiteCrossbar
@@ -316,77 +373,22 @@ begin
          TPD_G              => TPD_G,
          DEC_ERROR_RESP_G   => AXI_RESP_DECERR_C,
          NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => PGP3_NUM_VC_C*2+2,
+         NUM_MASTER_SLOTS_G => XBAR_MASTERS_C,
          MASTERS_CONFIG_G   => XBAR_CFG_C)
       port map (
          axiClk              => clk,
          axiClkRst           => rst,
-         sAxiWriteMasters(0) => appAxilWriteMaster,
-         sAxiWriteSlaves(0)  => appAxilWriteSlave,
-         sAxiReadMasters(0)  => appAxilReadMaster,
-         sAxiReadSlaves(0)   => appAxilReadSlave,
-         mAxiWriteMasters    => prbsAxilWriteMasters,
-         mAxiWriteSlaves     => prbsAxilWriteSlaves,
-         mAxiReadMasters     => prbsAxilReadMasters,
-         mAxiReadSlaves      => prbsAxilReadSlaves);
+         sAxiWriteMasters(0) => srpAxilWriteMaster,
+         sAxiWriteSlaves(0)  => srpAxilWriteSlave,
+         sAxiReadMasters(0)  => srpAxilReadMaster,
+         sAxiReadSlaves(0)   => srpAxilReadSlave,
+         mAxiWriteMasters    => locAxilWriteMasters,
+         mAxiWriteSlaves     => locAxilWriteSlaves,
+         mAxiReadMasters     => locAxilReadMasters,
+         mAxiReadSlaves      => locAxilReadSlaves);
 
 
-   PRBS_GEN : for i in 0 to PGP3_NUM_VC_C-1 generate
-      U_SsiPrbsTx_1 : entity work.SsiPrbsTx
-         generic map (
-            TPD_G                      => TPD_G,
-            GEN_SYNC_FIFO_G            => false,
-            PRBS_INCREMENT_G           => false,
-            PRBS_SEED_SIZE_G           => 64,
-            PRBS_TAPS_G                => (0 => 63, 1 => 3, 2 => 2),
-            MASTER_AXI_STREAM_CONFIG_G => PGP3_AXIS_CONFIG_C)
-         port map (
-            mAxisClk        => pgp3Clk,                    -- [in]
-            mAxisRst        => pgp3ClkRst,                 -- [in]
-            mAxisMaster     => pgp3TxMasters(i),           -- [out]
-            mAxisSlave      => pgp3TxSlaves(i),            -- [in]
-            locClk          => clk,                        -- [in]
-            locRst          => rst,                        -- [in]
-            trig            => '1',                        -- [in]
-            packetLength    => X"0000FFFF",                -- [in]
-            forceEofe       => '0',                        -- [in]
-            busy            => open,                       -- [out]
-            tDest           => toSlv(i, 8),                -- [in]
-            tId             => X"00",                      -- [in]
-            axilReadMaster  => prbsAxilReadMasters(2*i),   -- [in]
-            axilReadSlave   => prbsAxilReadSlaves(2*i),    -- [out]
-            axilWriteMaster => prbsAxilWriteMasters(2*i),  -- [in]
-            axilWriteSlave  => prbsAxilWriteSlaves(2*i));  -- [out]
 
-
-      U_SsiPrbsRx_1 : entity work.SsiPrbsRx
-         generic map (
-            TPD_G                     => TPD_G,
-            BRAM_EN_G                 => true,
-            GEN_SYNC_FIFO_G           => false,
-            FIFO_ADDR_WIDTH_G         => 9,
---            FIFO_PAUSE_THRESH_G        => FIFO_PAUSE_THRESH_G,
-            PRBS_SEED_SIZE_G           => 64,
-            PRBS_TAPS_G                => (0 => 63, 1 => 3, 2 => 2),
-            SLAVE_AXI_STREAM_CONFIG_G => PGP3_AXIS_CONFIG_C,
-            SLAVE_AXI_PIPE_STAGES_G   => 1)
-         port map (
-            sAxisClk       => pgp3Clk,                      -- [in]
-            sAxisRst       => pgp3ClkRst,                   -- [in]
-            sAxisMaster    => pgp3RxMasters(i),             -- [in]
-            sAxisSlave     => open,                         -- [out]
-            sAxisCtrl      => pgp3RxCtrl(i),                -- [out]
-            mAxisClk       => clk,                          -- [in]
-            mAxisRst       => rst,                          -- [in]
-            axiClk         => clk,                          -- [in]
-            axiRst         => rst,                          -- [in]
-            axiReadMaster  => prbsAxilReadMasters(2*i+1),   -- [in]
-            axiReadSlave   => prbsAxilReadSlaves(2*i+1),    -- [out]
-            axiWriteMaster => prbsAxilWriteMasters(2*i+1),  -- [in]
-            axiWriteSlave  => prbsAxilWriteSlaves(2*i+1));  -- [out]
-
-
-   end generate PRBS_GEN;
 
 
    U_PwrUpRst : entity work.PwrUpRst
@@ -455,12 +457,59 @@ begin
 --         BUFR_CLK_DIV_G     => BUFR_CLK_DIV_G,
 
       port map (
-         axiClk         => clk,                                      -- [in]
-         axiRst         => rst,                                      -- [in]
-         axiReadMaster  => prbsAxilReadMasters(PGP3_NUM_VC_C*2+1),   -- [in]
-         axiReadSlave   => prbsAxilReadSlaves(PGP3_NUM_VC_C*2+1),    -- [out]
-         axiWriteMaster => prbsAxilWriteMasters(PGP3_NUM_VC_C*2+1),  -- [in]
-         axiWriteSlave  => prbsAxilWriteSlaves(PGP3_NUM_VC_C*2+1));  -- [out]
+         axiClk         => clk,                                  -- [in]
+         axiRst         => rst,                                  -- [in]
+         axiReadMaster  => locAxilReadMasters(VERSION_AXIL_C),   -- [in]
+         axiReadSlave   => locAxilReadSlaves(VERSION_AXIL_C),    -- [out]
+         axiWriteMaster => locAxilWriteMasters(VERSION_AXIL_C),  -- [in]
+         axiWriteSlave  => locAxilWriteSlaves(VERSION_AXIL_C));  -- [out]
+
+   U_AxiMicronN25QCore_1 : entity work.AxiMicronN25QCore
+      generic map (
+         TPD_G            => TPD_G,
+--         MEM_ADDR_MASK_G  => MEM_ADDR_MASK_G,
+         AXI_CLK_FREQ_G   => 156.25e6,
+--         SPI_CLK_FREQ_G   => SPI_CLK_FREQ_G,
+         AXI_ERROR_RESP_G => AXI_RESP_DECERR_C)
+      port map (
+         csL            => bootCsL,                           -- [out]
+         sck            => bootCck,                           -- [out]
+         mosi           => bootMosi,                          -- [out]
+         miso           => bootMiso,                          -- [in]
+         axiReadMaster  => locAxilReadMasters(PROM_AXIL_C),   -- [in]
+         axiReadSlave   => locAxilReadSlaves(PROM_AXIL_C),    -- [out]
+         axiWriteMaster => locAxilWriteMasters(PROM_AXIL_C),  -- [in]
+         axiWriteSlave  => locAxilWriteSlaves(PROM_AXIL_C),   -- [out]
+         axiClk         => axiClk,                            -- [in]
+         axiRst         => axiRst);                           -- [in]
+
+   U_STARTUPE3 : STARTUPE3
+      generic map (
+         PROG_USR      => "FALSE",  -- Activate program event security feature. Requires encrypted bitstreams.
+         SIM_CCLK_FREQ => 0.0)          -- Set the Configuration Clock Frequency(ns) for simulation
+      port map (
+         CFGCLK    => open,             -- 1-bit output: Configuration main clock output
+         CFGMCLK   => open,  -- 1-bit output: Configuration internal oscillator clock output
+         DI        => di,               -- 4-bit output: Allow receiving on the D[3:0] input pins
+         EOS       => open,  -- 1-bit output: Active high output signal indicating the End Of Startup.
+         PREQ      => open,             -- 1-bit output: PROGRAM request to fabric output
+         DO        => do,               -- 4-bit input: Allows control of the D[3:0] pin outputs
+         DTS       => "1110",           -- 4-bit input: Allows tristate of the D[3:0] pins
+         FCSBO     => bootCsL,          -- 1-bit input: Contols the FCS_B pin for flash access
+         FCSBTS    => '0',              -- 1-bit input: Tristate the FCS_B pin
+         GSR       => '0',  -- 1-bit input: Global Set/Reset input (GSR cannot be used for the port name)
+         GTS       => '0',  -- 1-bit input: Global 3-state input (GTS cannot be used for the port name)
+         KEYCLEARB => '0',  -- 1-bit input: Clear AES Decrypter Key input from Battery-Backed RAM (BBRAM)
+         PACK      => '0',              -- 1-bit input: PROGRAM acknowledge input
+         USRCCLKO  => bootSck,          -- 1-bit input: User CCLK input
+         USRCCLKTS => '0',              -- 1-bit input: User CCLK 3-state enable input
+         USRDONEO  => axilRstL,         -- 1-bit input: User DONE pin output control
+         USRDONETS => '0');             -- 1-bit input: User DONE 3-state enable output
+
+   rstL <= not(rst);            -- IPMC uses DONE to determine if FPGA is ready
+   do       <= "111" & bootMosi;
+   bootMiso <= di(1);
+
 
 
    U_Heartbeat_1 : entity work.Heartbeat
