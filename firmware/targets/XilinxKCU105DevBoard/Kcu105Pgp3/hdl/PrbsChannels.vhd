@@ -4,6 +4,7 @@ use ieee.std_logic_1164.all;
 use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
 use work.AxiLitePkg.all;
+use work.Pgp3Pkg.all;
 
 entity PrbsChannels is
 
@@ -21,11 +22,11 @@ entity PrbsChannels is
       rxClk     : in  sl;
       rxRst     : in  sl;
       rxMasters : in  AxiStreamMasterArray(CHANNELS_G-1 downto 0);
-      rxSlaves  : out  AxiStreamSlaveArray(CHANNELS_G-1 downto 0);
+      rxSlaves  : out AxiStreamSlaveArray(CHANNELS_G-1 downto 0);
       rxCtrl    : out AxiStreamCtrlArray(CHANNELS_G-1 downto 0);
 
-      axilClk        : in  sl;
-      axilRst        : in  sl;
+      axilClk         : in  sl;
+      axilRst         : in  sl;
       axilReadMaster  : in  AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
@@ -43,8 +44,9 @@ architecture rtl of PrbsChannels is
    signal prbsAxilWriteSlaves  : AxiLiteWriteSlaveArray(CHANNELS_G*2-1 downto 0);
    signal prbsAxilReadMasters  : AxiLiteReadMasterArray(CHANNELS_G*2-1 downto 0);
    signal prbsAxilReadSlaves   : AxiLiteReadSlaveArray(CHANNELS_G*2-1 downto 0);
+
 begin
-   
+
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
@@ -58,12 +60,12 @@ begin
          sAxiWriteMasters(0) => axilWriteMaster,
          sAxiWriteSlaves(0)  => axilWriteSlave,
          sAxiReadMasters(0)  => axilReadMaster,
-         sAxiReadSlaves(0)   => srpAxilReadSlave,
+         sAxiReadSlaves(0)   => axilReadSlave,
          mAxiWriteMasters    => prbsAxilWriteMasters,
          mAxiWriteSlaves     => prbsAxilWriteSlaves,
          mAxiReadMasters     => prbsAxilReadMasters,
          mAxiReadSlaves      => prbsAxilReadSlaves);
-   
+
    PRBS_GEN : for i in 0 to CHANNELS_G-1 generate
       U_SsiPrbsTx_1 : entity work.SsiPrbsTx
          generic map (
@@ -118,10 +120,5 @@ begin
             axiWriteMaster => prbsAxilWriteMasters(2*i+1),  -- [in]
             axiWriteSlave  => prbsAxilWriteSlaves(2*i+1));  -- [out]
 
-
-   end architecture rtl;
-
-
-
-
-end generate PRBS_GEN;
+   end generate PRBS_GEN;
+end architecture rtl;

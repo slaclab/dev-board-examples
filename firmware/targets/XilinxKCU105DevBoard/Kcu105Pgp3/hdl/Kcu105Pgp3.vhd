@@ -67,7 +67,7 @@ architecture top_level of Kcu105Pgp3 is
    signal pgpRefClkDiv2 : sl;
    signal clk           : sl;
    signal rst           : sl;
-   signal rstL           : sl;   
+   signal rstL          : sl;
 
    -- PGP2b
    constant PGP_NUM_VC_C : positive := 4;
@@ -125,10 +125,10 @@ architecture top_level of Kcu105Pgp3 is
    signal srpAxilReadMaster  : AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
    signal srpAxilReadSlave   : AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_INIT_C;
 
-   signal locAxilWriteMasters : AxiLiteWriteMasterArray(PGP3_NUM_VC_C*2+1 downto 0);
-   signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(PGP3_NUM_VC_C*2+1 downto 0);
-   signal locAxilReadMasters  : AxiLiteReadMasterArray(PGP3_NUM_VC_C*2+1 downto 0);
-   signal locAxilReadSlaves   : AxiLiteReadSlaveArray(PGP3_NUM_VC_C*2+1 downto 0);
+   signal locAxilWriteMasters : AxiLiteWriteMasterArray(XBAR_MASTERS_C-1 downto 0);
+   signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(XBAR_MASTERS_C-1 downto 0);
+   signal locAxilReadMasters  : AxiLiteReadMasterArray(XBAR_MASTERS_C-1 downto 0);
+   signal locAxilReadSlaves   : AxiLiteReadSlaveArray(XBAR_MASTERS_C-1 downto 0);
 
    signal prbsClk : slv(7 downto 0);
    signal prbsRst : slv(7 downto 0);
@@ -351,21 +351,21 @@ begin
          AXIL_BASE_ADDR_G => XBAR_CFG_C(PRBS_AXIL_C).baseAddr,
          CHANNELS_G       => PGP3_NUM_VC_C)
       port map (
-         txClk          => pgp3Clk,                          -- [in]
-         txRst          => pgp3ClkRst,                       -- [in]
-         txMasters      => pgp3TxMasters,                    -- [out]
-         txSlaves       => pgp3TxSlaves,                     -- [in]
-         rxClk          => pgp3Clk,                          -- [in]
-         rxRst          => pgp3ClkRst,                       -- [in]
-         rxMasters      => pgp3RxMasters,                    -- [in]
-         rxSlaves       => open,                             -- [in]
-         rxCtrl         => pgp3RxCtrl,                       -- [out]
-         axilClk        => axilClk,                          -- [in]
-         axilRst        => axilRst,                          -- [in]
-         axiReadMaster  => locAxilReadMaster(PRBS_AXIL_C),   -- [in]
-         axiReadSlave   => locAxilReadSlave(PRBS_AXIL_C),    -- [out]
-         axiWriteMaster => locAxilWriteMaster(PRBS_AXIL_C),  -- [in]
-         axiWriteSlave  => locAxilWriteSlave(PRBS_AXIL_C));  -- [out]
+         txClk           => pgp3Clk,                           -- [in]
+         txRst           => pgp3ClkRst,                        -- [in]
+         txMasters       => pgp3TxMasters,                     -- [out]
+         txSlaves        => pgp3TxSlaves,                      -- [in]
+         rxClk           => pgp3Clk,                           -- [in]
+         rxRst           => pgp3ClkRst,                        -- [in]
+         rxMasters       => pgp3RxMasters,                     -- [in]
+         rxSlaves        => open,                              -- [in]
+         rxCtrl          => pgp3RxCtrl,                        -- [out]
+         axilClk         => clk,                               -- [in]
+         axilRst         => rst,                               -- [in]
+         axilReadMaster  => locAxilReadMasters(PRBS_AXIL_C),   -- [in]
+         axilReadSlave   => locAxilReadSlaves(PRBS_AXIL_C),    -- [out]
+         axilWriteMaster => locAxilWriteMasters(PRBS_AXIL_C),  -- [in]
+         axilWriteSlave  => locAxilWriteSlaves(PRBS_AXIL_C));  -- [out]
 
 
    U_XBAR : entity work.AxiLiteCrossbar
@@ -473,15 +473,15 @@ begin
          AXI_ERROR_RESP_G => AXI_RESP_DECERR_C)
       port map (
          csL            => bootCsL,                           -- [out]
-         sck            => bootCck,                           -- [out]
+         sck            => bootSck,                           -- [out]
          mosi           => bootMosi,                          -- [out]
          miso           => bootMiso,                          -- [in]
          axiReadMaster  => locAxilReadMasters(PROM_AXIL_C),   -- [in]
          axiReadSlave   => locAxilReadSlaves(PROM_AXIL_C),    -- [out]
          axiWriteMaster => locAxilWriteMasters(PROM_AXIL_C),  -- [in]
          axiWriteSlave  => locAxilWriteSlaves(PROM_AXIL_C),   -- [out]
-         axiClk         => axiClk,                            -- [in]
-         axiRst         => axiRst);                           -- [in]
+         axiClk         => clk,                               -- [in]
+         axiRst         => rst);                              -- [in]
 
    U_STARTUPE3 : STARTUPE3
       generic map (
@@ -503,10 +503,10 @@ begin
          PACK      => '0',              -- 1-bit input: PROGRAM acknowledge input
          USRCCLKO  => bootSck,          -- 1-bit input: User CCLK input
          USRCCLKTS => '0',              -- 1-bit input: User CCLK 3-state enable input
-         USRDONEO  => axilRstL,         -- 1-bit input: User DONE pin output control
+         USRDONEO  => rstL,             -- 1-bit input: User DONE pin output control
          USRDONETS => '0');             -- 1-bit input: User DONE 3-state enable output
 
-   rstL <= not(rst);            -- IPMC uses DONE to determine if FPGA is ready
+   rstL     <= not(rst);                -- IPMC uses DONE to determine if FPGA is ready
    do       <= "111" & bootMosi;
    bootMiso <= di(1);
 
