@@ -337,6 +337,8 @@ begin
             TPD_G                      => TPD_G,
             GEN_SYNC_FIFO_G            => false,
             PRBS_INCREMENT_G           => false,
+            PRBS_SEED_SIZE_G           => 64,
+            PRBS_TAPS_G                => (0 => 63, 1 => 3, 2 => 2),
             MASTER_AXI_STREAM_CONFIG_G => PGP3_AXIS_CONFIG_C)
          port map (
             mAxisClk        => pgp3Clk,                    -- [in]
@@ -364,6 +366,8 @@ begin
             GEN_SYNC_FIFO_G           => false,
             FIFO_ADDR_WIDTH_G         => 9,
 --            FIFO_PAUSE_THRESH_G        => FIFO_PAUSE_THRESH_G,
+            PRBS_SEED_SIZE_G           => 64,
+            PRBS_TAPS_G                => (0 => 63, 1 => 3, 2 => 2),
             SLAVE_AXI_STREAM_CONFIG_G => PGP3_AXIS_CONFIG_C,
             SLAVE_AXI_PIPE_STAGES_G   => 1)
          port map (
