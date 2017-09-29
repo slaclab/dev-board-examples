@@ -2,7 +2,7 @@
 -- File       : Kcu105Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-09
--- Last update: 2017-09-28
+-- Last update: 2017-09-29
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -346,7 +346,7 @@ begin
             locClk          => clk,                        -- [in]
             locRst          => rst,                        -- [in]
             trig            => '1',                        -- [in]
-            packetLength    => X"00000FFF",                -- [in]
+            packetLength    => X"0000FFFF",                -- [in]
             forceEofe       => '0',                        -- [in]
             busy            => open,                       -- [out]
             tDest           => toSlv(i, 8),                -- [in]
