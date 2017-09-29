@@ -33,7 +33,7 @@ import PyQt4.QtGui
 import PyQt4.QtCore
 import sys
 
-rogue.Logging.setFilter('pyrogue.SrpV3', rogue.Logging.Debug)
+#rogue.Logging.setFilter('pyrogue.SrpV3', rogue.Logging.Debug)
 
 class PrbsChannels(pr.Device):
     def __init__(self, channels=4, **kwargs):
