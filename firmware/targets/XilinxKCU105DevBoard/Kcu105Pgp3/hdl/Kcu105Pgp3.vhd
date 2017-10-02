@@ -29,11 +29,12 @@ use unisim.vcomponents.all;
 
 entity Kcu105Pgp3 is
    generic (
-      TPD_G         : time    := 1 ns;
-      BUILD_INFO_G  : BuildInfoType;
-      SIM_SPEEDUP_G : boolean := false;
-      SIMULATION_G  : boolean := false;
-      NO_PGP2B_G    : boolean := false);
+      TPD_G           : time    := 1 ns;
+      BUILD_INFO_G    : BuildInfoType;
+      RESET_RX_TIME_G : time    := 50 us;
+      SIM_SPEEDUP_G   : boolean := false;
+      SIMULATION_G    : boolean := false;
+      NO_PGP2B_G      : boolean := false);
    port (
       -- Misc. IOs
       --extRst  : in  sl;
@@ -80,9 +81,9 @@ architecture top_level of Kcu105Pgp3 is
 
    signal pgp3Clk       : sl;
    signal pgp3ClkRst    : sl;
-   signal pgp3RxIn      : Pgp3RxInType;                                    -- [in]
+   signal pgp3RxIn      : Pgp3RxInType := PGP3_RX_IN_INIT_C;               -- [in]
    signal pgp3RxOut     : Pgp3RxOutType;                                   -- [out]
-   signal pgp3TxIn      : Pgp3TxInType;                                    -- [in]
+   signal pgp3TxIn      : Pgp3TxInType := PGP3_TX_IN_INIT_C;               -- [in]
    signal pgp3TxOut     : Pgp3TxOutType;                                   -- [out]
    signal pgp3TxMasters : AxiStreamMasterArray(PGP3_NUM_VC_C-1 downto 0);  -- [in]
    signal pgp3TxSlaves  : AxiStreamSlaveArray(PGP3_NUM_VC_C-1 downto 0);   -- [out]
@@ -186,6 +187,18 @@ begin
 --    prbsClk(0) <= clk;
 --    prbsRst(0) <= rst;
 
+   SIM_RESET_RX : if (SIMULATION_G) generate
+      test : process is
+      begin
+         pgp3RxIn.resetRx <= '0';
+         wait for RESET_RX_TIME_G;
+         wait until clk = '1';
+         pgp3RxIn.resetRx <= '1' after 1 ns;
+         wait until clk = '1';
+         pgp3RxIn.resetRx <= '0' after 1 ns;
+         wait;
+      end process test;
+   end generate SIM_RESET_RX;
 
    GEN_PGP : if (not NO_PGP2B_G) generate
 

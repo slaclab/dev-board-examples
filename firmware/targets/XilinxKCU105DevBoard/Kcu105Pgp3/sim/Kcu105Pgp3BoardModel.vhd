@@ -29,6 +29,7 @@ use work.Pgp3Pkg.all;
 entity Kcu105Pgp3BoardModel is
    generic(
       TPD_G             : time := 1 ns;
+      RESET_RX_TIME_G : time := 50 us;
       CLK_START_DELAY_G : time := 1 ns);
    port (
       pgp3RxP : in  sl;                 -- 
@@ -66,6 +67,7 @@ begin
    U_Kcu105Pgp3 : entity work.Kcu105Pgp3
       generic map (
          TPD_G         => TPD_G,
+         RESET_RX_TIME_G => RESET_RX_TIME_G,
          BUILD_INFO_G  => BUILD_INFO_G,
          SIM_SPEEDUP_G => SIM_SPEEDUP_G,
          SIMULATION_G  => SIMULATION_G)

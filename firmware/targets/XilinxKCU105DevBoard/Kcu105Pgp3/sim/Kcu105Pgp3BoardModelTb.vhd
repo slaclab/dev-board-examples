@@ -46,7 +46,8 @@ begin
    U_Kcu105Pgp3BoardModel_0 : entity work.Kcu105Pgp3BoardModel
       generic map (
          TPD_G             => TPD_G,
-         CLK_START_DELAY_G => 1 ns)
+         CLK_START_DELAY_G => 1 ns,
+         RESET_RX_TIME_G => 50 us)
       port map (
          pgp3RxP => pgp3RxP,            -- [in]
          pgp3RxN => pgp3RxN,            -- [in]
@@ -56,13 +57,13 @@ begin
    U_Kcu105Pgp3BoardModel_1 : entity work.Kcu105Pgp3BoardModel
       generic map (
          TPD_G             => TPD_G,
-         CLK_START_DELAY_G => 1.111 ns)
+         CLK_START_DELAY_G => 1.111 ns,
+         RESET_RX_TIME_G => 500 us)
       port map (
          pgp3RxP => pgp3TxP,            -- [in]
          pgp3RxN => pgp3TxN,            -- [in]
          pgp3TxP => pgp3RxP,            -- [out]
          pgp3TxN => pgp3RxN);           -- [out]
-
 
 
 end architecture;
