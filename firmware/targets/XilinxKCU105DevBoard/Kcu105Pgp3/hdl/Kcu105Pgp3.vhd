@@ -2,7 +2,7 @@
 -- File       : Kcu105Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-09
--- Last update: 2017-09-29
+-- Last update: 2017-10-02
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -38,11 +38,6 @@ entity Kcu105Pgp3 is
       -- Misc. IOs
       --extRst  : in  sl;
       led     : out slv(7 downto 0) := (others => '0');
-      -- PROM Port
-      csL     : out sl;
-      sck     : out sl;
-      mosi    : out sl;
-      miso    : in  sl;
       -- XADC Ports
 --       vPIn    : in  sl;
 --       vNIn    : in  sl;
