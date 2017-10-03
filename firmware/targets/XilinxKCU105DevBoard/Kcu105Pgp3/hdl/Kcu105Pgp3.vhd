@@ -2,7 +2,7 @@
 -- File       : Kcu105Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-09
--- Last update: 2017-10-02
+-- Last update: 2017-10-03
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -104,7 +104,7 @@ architecture top_level of Kcu105Pgp3 is
          connectivity => X"0001"),
       PGP3_AXIL_C     => (
          baseAddr     => X"00001000",
-         addrBits     => 8,
+         addrBits     => 12,
          connectivity => X"0001"),
       PROM_AXIL_C     => (
          baseAddr     => X"00002000",
