@@ -74,6 +74,11 @@ architecture top_level of Kcu105Pgp3 is
    signal pgpRxMasters : AxiStreamMasterArray(PGP_NUM_VC_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
    signal pgpRxSlaves  : AxiStreamSlaveArray(PGP_NUM_VC_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_INIT_C);
    signal pgpRxCtrl    : AxiStreamCtrlArray(PGP_NUM_VC_C-1 downto 0)   := (others => AXI_STREAM_CTRL_UNUSED_C);
+   
+   signal rxMasters0 : AxiStreamMasterArray(PGP_NUM_VC_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal rxSlaves0  : AxiStreamSlaveArray(PGP_NUM_VC_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_INIT_C);
+   signal rxMasters1 : AxiStreamMasterArray(PGP_NUM_VC_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal rxSlaves1  : AxiStreamSlaveArray(PGP_NUM_VC_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_INIT_C);
 
    -- PGP3
    constant PGP3_NUM_VC_C : integer := 4;
@@ -262,48 +267,45 @@ begin
          mAxilReadMaster  => appAxilReadMaster,   -- [out]
          mAxilReadSlave   => appAxilReadSlave);   -- [in]
 
-   U_Pgp3GthUs_2 : entity work.Pgp3GthUs
+   U_Pgp3GthUs_2 : entity work.Pgp3GthUsWrapper
       generic map (
          TPD_G           => TPD_G,
-         PGP_RX_ENABLE_G => true,
---          RX_ALIGN_GOOD_COUNT_G           => RX_ALIGN_GOOD_COUNT_G,
---          RX_ALIGN_BAD_COUNT_G            => RX_ALIGN_BAD_COUNT_G,
---          RX_ALIGN_SLIP_WAIT_G            => RX_ALIGN_SLIP_WAIT_G,
-         PGP_TX_ENABLE_G => true,
+         REFCLK_G        => true,-- TRUE: pgpRefClkIn
+         NUM_LANE_G      => 1,
          NUM_VC_G        => PGP3_NUM_VC_C)
---          TX_CELL_WORDS_MAX_G             => TX_CELL_WORDS_MAX_G,
---          TX_SKP_INTERVAL_G               => TX_SKP_INTERVAL_G,
---          TX_SKP_BURST_SIZE_G             => TX_SKP_BURST_SIZE_G,
---          TX_MUX_MODE_G                   => TX_MUX_MODE_G,
---          TX_MUX_TDEST_ROUTES_G           => TX_MUX_TDEST_ROUTES_G,
---          TX_MUX_TDEST_LOW_G              => TX_MUX_TDEST_LOW_G,
---          TX_MUX_INTERLEAVE_EN_G          => TX_MUX_INTERLEAVE_EN_G,
---          TX_MUX_INTERLEAVE_ON_NOTVALID_G => TX_MUX_INTERLEAVE_ON_NOTVALID_G)
       port map (
+         -- Stable Clock and Reset
          stableClk       => clk,            -- [in]
          stableRst       => rst,            -- [in]
-         gtRefClk        => pgpRefClk,      -- [in]
-         pgpGtTxP        => pgp3TxP,        -- [out]
-         pgpGtTxN        => pgp3TxN,        -- [out]
-         pgpGtRxP        => pgp3RxP,        -- [in]
-         pgpGtRxN        => pgp3RxN,        -- [in]
-         pgpClk          => pgp3Clk,        -- [out]
-         pgpClkRst       => pgp3ClkRst,     -- [out]
-         pgpRxIn         => pgp3RxIn,       -- [in]
-         pgpRxOut        => pgp3RxOut,      -- [out]
-         pgpTxIn         => pgp3TxIn,       -- [in]
-         pgpTxOut        => pgp3TxOut,      -- [out]
+         -- Gt Serial IO
+         pgpGtTxP(0)     => pgp3TxP,        -- [out]
+         pgpGtTxN(0)     => pgp3TxN,        -- [out]
+         pgpGtRxP(0)     => pgp3RxP,        -- [in]
+         pgpGtRxN(0)     => pgp3RxN,        -- [in]
+         -- GT Clocking
+         pgpRefClkIn     => pgpRefClk,
+         -- Clocking
+         pgpClk(0)       => pgp3Clk,        -- [out]
+         pgpClkRst(0)    => pgp3ClkRst,     -- [out]
+         -- Non VC Rx Signals
+         pgpRxIn(0)         => pgp3RxIn,    -- [in]
+         pgpRxOut(0)        => pgp3RxOut,   -- [out]
+         -- Non VC Tx Signals
+         pgpTxIn(0)         => pgp3TxIn,    -- [in]
+         pgpTxOut(0)        => pgp3TxOut,   -- [out]
+          -- Frame Transmit Interface
          pgpTxMasters    => pgp3TxMasters,  -- [in]
          pgpTxSlaves     => pgp3TxSlaves,   -- [out]
+         -- Frame Receive Interface
          pgpRxMasters    => pgp3RxMasters,  -- [out]
          pgpRxCtrl       => pgp3RxCtrl,     -- [in]
-         axilClk         => clk,            -- [in]
-         axilRst         => rst,            -- [in]
-         axilWriteMaster => prbsAxilWriteMasters(PGP3_NUM_VC_C*2),
-         axilWriteSlave  => prbsAxilWriteSlaves(PGP3_NUM_VC_C*2),
-         axilReadMaster  => prbsAxilReadMasters(PGP3_NUM_VC_C*2),
-         axilReadSlave   => prbsAxilReadSlaves(PGP3_NUM_VC_C*2));
-
+         -- AXI-Lite Register Interface (axilClk domain)
+         axilClk             => clk,        -- [in]
+         axilRst             => rst,        -- [in]
+         axilWriteMasters(0) => prbsAxilWriteMasters(PGP3_NUM_VC_C*2),
+         axilWriteSlaves(0)  => prbsAxilWriteSlaves(PGP3_NUM_VC_C*2),
+         axilReadMasters(0)  => prbsAxilReadMasters(PGP3_NUM_VC_C*2),
+         axilReadSlaves(0)   => prbsAxilReadSlaves(PGP3_NUM_VC_C*2));
 
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
@@ -349,23 +351,65 @@ begin
             axilReadSlave   => prbsAxilReadSlaves(2*i),    -- [out]
             axilWriteMaster => prbsAxilWriteMasters(2*i),  -- [in]
             axilWriteSlave  => prbsAxilWriteSlaves(2*i));  -- [out]
-
-
+            
+      PGP_FIFO : entity work.AxiStreamFifoV2
+         generic map (
+            -- General Configurations
+            TPD_G               => TPD_G,
+            INT_PIPE_STAGES_G   => 1,
+            PIPE_STAGES_G       => 1,
+            SLAVE_READY_EN_G    => false,
+            VALID_THOLD_G       => 1,
+            -- FIFO configurations
+            BRAM_EN_G           => true,
+            GEN_SYNC_FIFO_G     => true,
+            FIFO_ADDR_WIDTH_G   => 9,
+            FIFO_FIXED_THRESH_G => true,
+            FIFO_PAUSE_THRESH_G => 256,
+            -- AXI Stream Port Configurations
+            SLAVE_AXI_CONFIG_G  => PGP3_AXIS_CONFIG_C,
+            MASTER_AXI_CONFIG_G => PGP3_AXIS_CONFIG_C)
+         port map (
+            -- Slave Port
+            sAxisClk    => pgp3Clk,
+            sAxisRst    => pgp3ClkRst,
+            sAxisMaster => pgp3RxMasters(i),
+            sAxisCtrl   => pgp3RxCtrl(i),
+            -- Master Port
+            mAxisClk    => pgp3Clk,
+            mAxisRst    => pgp3ClkRst,
+            mAxisMaster => rxMasters0(i),
+            mAxisSlave  => rxSlaves0(i));            
+            
+      U_PrbsFlowCtrl : entity work.AxiStreamPrbsFlowCtrl
+         generic map (
+            TPD_G         => TPD_G,
+            PIPE_STAGES_G => 1)
+         port map (
+            clk         => pgp3Clk,
+            rst         => pgp3ClkRst,
+            threshold   => x"8000_0000",
+            -- Slave Port
+            sAxisMaster => rxMasters0(i),
+            sAxisSlave  => rxSlaves0(i),
+            -- Master Port
+            mAxisMaster => rxMasters1(i),
+            mAxisSlave  => rxSlaves1(i));
+         
       U_SsiPrbsRx_1 : entity work.SsiPrbsRx
          generic map (
             TPD_G                     => TPD_G,
             BRAM_EN_G                 => true,
-            GEN_SYNC_FIFO_G           => false,
+            GEN_SYNC_FIFO_G           => true,
             FIFO_ADDR_WIDTH_G         => 9,
---            FIFO_PAUSE_THRESH_G        => FIFO_PAUSE_THRESH_G,
             SLAVE_AXI_STREAM_CONFIG_G => PGP3_AXIS_CONFIG_C,
             SLAVE_AXI_PIPE_STAGES_G   => 1)
          port map (
             sAxisClk       => pgp3Clk,                      -- [in]
             sAxisRst       => pgp3ClkRst,                   -- [in]
-            sAxisMaster    => pgp3RxMasters(i),             -- [in]
-            sAxisSlave     => open,                         -- [out]
-            sAxisCtrl      => pgp3RxCtrl(i),                -- [out]
+            sAxisMaster    => rxMasters1(i),                -- [in]
+            sAxisSlave     => rxSlaves1(i),                 -- [out]
+            sAxisCtrl      => open,                         -- [out]
             mAxisClk       => clk,                          -- [in]
             mAxisRst       => rst,                          -- [in]
             axiClk         => clk,                          -- [in]
@@ -374,7 +418,6 @@ begin
             axiReadSlave   => prbsAxilReadSlaves(2*i+1),    -- [out]
             axiWriteMaster => prbsAxilWriteMasters(2*i+1),  -- [in]
             axiWriteSlave  => prbsAxilWriteSlaves(2*i+1));  -- [out]
-
 
    end generate PRBS_GEN;
 
