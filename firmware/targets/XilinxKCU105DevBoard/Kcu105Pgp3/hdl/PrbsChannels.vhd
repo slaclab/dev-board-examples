@@ -45,6 +45,12 @@ architecture rtl of PrbsChannels is
    signal prbsAxilReadMasters  : AxiLiteReadMasterArray(CHANNELS_G*2-1 downto 0);
    signal prbsAxilReadSlaves   : AxiLiteReadSlaveArray(CHANNELS_G*2-1 downto 0);
 
+   signal rxFifoMasters : AxiStreamMasterArray(CHANNELS_G-1 downto 0);
+   signal rxFifoSlaves  : AxiStreamSlaveArray(CHANNELS_G-1 downto 0);
+   signal rxFlowMasters : AxiStreamMasterArray(CHANNELS_G-1 downto 0);
+   signal rxFlowSlaves  : AxiStreamSlaveArray(CHANNELS_G-1 downto 0);
+
+
 begin
 
    U_XBAR : entity work.AxiLiteCrossbar
@@ -94,6 +100,50 @@ begin
             axilWriteSlave  => prbsAxilWriteSlaves(2*i));  -- [out]
 
 
+      PGP_FIFO : entity work.AxiStreamFifoV2
+         generic map (
+            -- General Configurations
+            TPD_G               => TPD_G,
+            INT_PIPE_STAGES_G   => 1,
+            PIPE_STAGES_G       => 1,
+            SLAVE_READY_EN_G    => false,
+            VALID_THOLD_G       => 1,
+            -- FIFO configurations
+            BRAM_EN_G           => true,
+            GEN_SYNC_FIFO_G     => true,
+            FIFO_ADDR_WIDTH_G   => 9,
+            FIFO_FIXED_THRESH_G => true,
+            FIFO_PAUSE_THRESH_G => 256,
+            -- AXI Stream Port Configurations
+            SLAVE_AXI_CONFIG_G  => PGP3_AXIS_CONFIG_C,
+            MASTER_AXI_CONFIG_G => PGP3_AXIS_CONFIG_C)
+         port map (
+            -- Slave Port
+            sAxisClk    => rxClk,
+            sAxisRst    => rxRst,
+            sAxisMaster => rxMasters(i),
+            sAxisCtrl   => rxCtrl(i),
+            -- Master Port
+            mAxisClk    => rxClk,
+            mAxisRst    => rxRst,
+            mAxisMaster => rxFifoMasters(i),
+            mAxisSlave  => rxFifoSlaves(i));
+
+      U_PrbsFlowCtrl : entity work.AxiStreamPrbsFlowCtrl
+         generic map (
+            TPD_G         => TPD_G,
+            PIPE_STAGES_G => 1)
+         port map (
+            clk         => rxClk,
+            rst         => rxRst,
+            threshold   => x"8000_0000",
+            -- Slave Port
+            sAxisMaster => rxFifoMasters(i),
+            sAxisSlave  => rxFifoSlaves(i),
+            -- Master Port
+            mAxisMaster => rxFlowMasters(i),
+            mAxisSlave  => rxFlowSlaves(i));
+
       U_SsiPrbsRx_1 : entity work.SsiPrbsRx
          generic map (
             TPD_G                     => TPD_G,
@@ -108,9 +158,9 @@ begin
          port map (
             sAxisClk       => rxClk,                        -- [in]
             sAxisRst       => rxRst,                        -- [in]
-            sAxisMaster    => rxMasters(i),                 -- [in]
-            sAxisSlave     => rxSlaves(i),                  -- [out]
-            sAxisCtrl      => rxCtrl(i),                    -- [out]
+            sAxisMaster    => rxFlowMasters(i),             -- [in]
+            sAxisSlave     => rxFlowSlaves(i),              -- [out]
+            sAxisCtrl      => open,                         -- [out]
             mAxisClk       => axilClk,                      -- [in]
             mAxisRst       => axilRst,                      -- [in]
             axiClk         => axilClk,                      -- [in]

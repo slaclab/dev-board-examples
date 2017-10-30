@@ -2,7 +2,7 @@
 -- File       : Kcu105Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-09
--- Last update: 2017-10-03
+-- Last update: 2017-10-30
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -75,6 +75,11 @@ architecture top_level of Kcu105Pgp3 is
    signal pgpRxMasters : AxiStreamMasterArray(PGP_NUM_VC_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
    signal pgpRxSlaves  : AxiStreamSlaveArray(PGP_NUM_VC_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_INIT_C);
    signal pgpRxCtrl    : AxiStreamCtrlArray(PGP_NUM_VC_C-1 downto 0)   := (others => AXI_STREAM_CTRL_UNUSED_C);
+   
+   signal rxMasters0 : AxiStreamMasterArray(PGP_NUM_VC_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal rxSlaves0  : AxiStreamSlaveArray(PGP_NUM_VC_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_INIT_C);
+   signal rxMasters1 : AxiStreamMasterArray(PGP_NUM_VC_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal rxSlaves1  : AxiStreamSlaveArray(PGP_NUM_VC_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_INIT_C);
 
    -- PGP3
    constant PGP3_NUM_VC_C : integer := 4;
@@ -307,48 +312,44 @@ begin
          mAxilReadMaster  => srpAxilReadMaster,   -- [out]
          mAxilReadSlave   => srpAxilReadSlave);   -- [in]
 
-   U_Pgp3GthUs_2 : entity work.Pgp3GthUs
+   U_Pgp3GthUs_2 : entity work.Pgp3GthUsWrapper
       generic map (
          TPD_G           => TPD_G,
-         PGP_RX_ENABLE_G => true,
---          RX_ALIGN_GOOD_COUNT_G           => RX_ALIGN_GOOD_COUNT_G,
---          RX_ALIGN_BAD_COUNT_G            => RX_ALIGN_BAD_COUNT_G,
---          RX_ALIGN_SLIP_WAIT_G            => RX_ALIGN_SLIP_WAIT_G,
-         PGP_TX_ENABLE_G => true,
-         NUM_VC_G        => PGP3_NUM_VC_C,
-         AXIL_CLK_FREQ_G => 156.25e6)
---          TX_CELL_WORDS_MAX_G             => TX_CELL_WORDS_MAX_G,
---          TX_SKP_INTERVAL_G               => TX_SKP_INTERVAL_G,
---          TX_SKP_BURST_SIZE_G             => TX_SKP_BURST_SIZE_G,
---          TX_MUX_MODE_G                   => TX_MUX_MODE_G,
---          TX_MUX_TDEST_ROUTES_G           => TX_MUX_TDEST_ROUTES_G,
---          TX_MUX_TDEST_LOW_G              => TX_MUX_TDEST_LOW_G,
---          TX_MUX_INTERLEAVE_EN_G          => TX_MUX_INTERLEAVE_EN_G,
---          TX_MUX_INTERLEAVE_ON_NOTVALID_G => TX_MUX_INTERLEAVE_ON_NOTVALID_G)
+         REFCLK_G        => true,-- TRUE: pgpRefClkIn
+         NUM_LANE_G      => 1,
+         NUM_VC_G        => PGP3_NUM_VC_C)
       port map (
+         -- Stable Clock and Reset
          stableClk       => clk,            -- [in]
          stableRst       => rst,            -- [in]
-         gtRefClk        => pgpRefClk,      -- [in]
-         pgpGtTxP        => pgp3TxP,        -- [out]
-         pgpGtTxN        => pgp3TxN,        -- [out]
-         pgpGtRxP        => pgp3RxP,        -- [in]
-         pgpGtRxN        => pgp3RxN,        -- [in]
-         pgpClk          => pgp3Clk,        -- [out]
-         pgpClkRst       => pgp3ClkRst,     -- [out]
-         pgpRxIn         => pgp3RxIn,       -- [in]
-         pgpRxOut        => pgp3RxOut,      -- [out]
-         pgpTxIn         => pgp3TxIn,       -- [in]
-         pgpTxOut        => pgp3TxOut,      -- [out]
+         -- Gt Serial IO
+         pgpGtTxP(0)     => pgp3TxP,        -- [out]
+         pgpGtTxN(0)     => pgp3TxN,        -- [out]
+         pgpGtRxP(0)     => pgp3RxP,        -- [in]
+         pgpGtRxN(0)     => pgp3RxN,        -- [in]
+         -- GT Clocking
+         pgpRefClkIn     => pgpRefClk,
+         -- Clocking
+         pgpClk(0)       => pgp3Clk,        -- [out]
+         pgpClkRst(0)    => pgp3ClkRst,     -- [out]
+         -- Non VC Rx Signals
+         pgpRxIn(0)         => pgp3RxIn,    -- [in]
+         pgpRxOut(0)        => pgp3RxOut,   -- [out]
+         -- Non VC Tx Signals
+         pgpTxIn(0)         => pgp3TxIn,    -- [in]
+         pgpTxOut(0)        => pgp3TxOut,   -- [out]
+          -- Frame Transmit Interface
          pgpTxMasters    => pgp3TxMasters,  -- [in]
          pgpTxSlaves     => pgp3TxSlaves,   -- [out]
+         -- Frame Receive Interface
          pgpRxMasters    => pgp3RxMasters,  -- [out]
          pgpRxCtrl       => pgp3RxCtrl,     -- [in]
          axilClk         => clk,            -- [in]
          axilRst         => rst,            -- [in]
-         axilWriteMaster => locAxilWriteMasters(PGP3_AXIL_C),
-         axilWriteSlave  => locAxilWriteSlaves(PGP3_AXIL_C),
-         axilReadMaster  => locAxilReadMasters(PGP3_AXIL_C),
-         axilReadSlave   => locAxilReadSlaves(PGP3_AXIL_C));
+         axilWriteMasters(0) => locAxilWriteMasters(PGP3_AXIL_C),
+         axilWriteSlaves(0)  => locAxilWriteSlaves(PGP3_AXIL_C),
+         axilReadMasters(0)  => locAxilReadMasters(PGP3_AXIL_C),
+         axilReadSlaves(0)   => locAxilReadSlaves(PGP3_AXIL_C));
 
    led(2) <= pgp3TxOut.linkReady;
    led(3) <= pgp3RxOut.linkReady;
@@ -375,7 +376,6 @@ begin
          axilWriteMaster => locAxilWriteMasters(PRBS_AXIL_C),  -- [in]
          axilWriteSlave  => locAxilWriteSlaves(PRBS_AXIL_C));  -- [out]
 
-
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
@@ -394,9 +394,6 @@ begin
          mAxiWriteSlaves     => locAxilWriteSlaves,
          mAxiReadMasters     => locAxilReadMasters,
          mAxiReadSlaves      => locAxilReadSlaves);
-
-
-
 
 
    U_PwrUpRst : entity work.PwrUpRst
