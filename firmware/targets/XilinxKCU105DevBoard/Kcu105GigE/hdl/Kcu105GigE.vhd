@@ -267,7 +267,7 @@ begin
          dataOut   => phyIrq
       );
 
-   U_1GigE : entity work.GigEthLVDSUltraScaleWrapper
+   U_1GigE : entity work.GigEthLvdsUltraScaleWrapper
       generic map (
          TPD_G              => TPD_G,
          -- DMA/MAC Configurations
