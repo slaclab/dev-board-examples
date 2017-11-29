@@ -2,10 +2,10 @@ The example can be built for two different variants of
 gigabit-ethernet connections:
 
 1.) Using the GTH transceiver which is connected to the SFP0
-    cage (the one closest to the RG-45).
+    cage (the one closest to the RJ-45).
     For this option you need an appropriate SFP module.
 
-2.) Using the on-board RG-45 connector which is driven by
+2.) Using the on-board RJ-45 connector which is driven by
     a dedicated PHY chip (also on-board). The FPGA uses
     SERDES resources and an sgmii link to this PHY.
 
