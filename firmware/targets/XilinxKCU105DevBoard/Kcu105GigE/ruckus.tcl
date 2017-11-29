@@ -8,8 +8,8 @@ loadRuckusTcl $::env(PROJ_DIR)/../../../
 loadSource      -dir "$::DIR_PATH/hdl/"
 
 if { "$::env(USE_RJ45_ETH)" == "true" } {
-   loadConstraints -path "$::DIR_PATH/hdl/Kcu105GigE_SGMII.xdc"
+   loadConstraints -path "$::DIR_PATH/hdl/Kcu105GigE_Sgmii.xdc"
 } else {
-   loadConstraints -path "$::DIR_PATH/hdl/Kcu105GigE_GTH.xdc"
+   loadConstraints -path "$::DIR_PATH/hdl/Kcu105GigE_Gth.xdc"
 }
 loadConstraints -path "$::DIR_PATH/hdl/Kcu105GigE.xdc"
