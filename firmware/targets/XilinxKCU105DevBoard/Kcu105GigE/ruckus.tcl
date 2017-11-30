@@ -6,4 +6,10 @@ loadRuckusTcl $::env(PROJ_DIR)/../../../
 
 # Load local source Code and constraints
 loadSource      -dir "$::DIR_PATH/hdl/"
-loadConstraints -dir "$::DIR_PATH/hdl/"
+
+if { "$::env(USE_RJ45_ETH)" == "true" } {
+   loadConstraints -path "$::DIR_PATH/hdl/Kcu105GigE_Sgmii.xdc"
+} else {
+   loadConstraints -path "$::DIR_PATH/hdl/Kcu105GigE_Gth.xdc"
+}
+loadConstraints -path "$::DIR_PATH/hdl/Kcu105GigE.xdc"

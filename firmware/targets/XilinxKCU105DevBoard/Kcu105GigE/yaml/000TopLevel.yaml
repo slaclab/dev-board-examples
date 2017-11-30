@@ -1,0 +1,140 @@
+##############################################################################
+## This file is part of 'LCLS2 Common Carrier Core'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'LCLS2 Common Carrier Core', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+#schemaversion 3.0.0
+#once 000TopLevel.yaml
+#
+#include AxiVersion.yaml
+#include AxiSysMonUltraScale.yaml
+#include SsiPrbsTx.yaml
+#include SsiPrbsRx.yaml
+
+AppCore: &AppCore
+  size: 0x00100000
+  class: MMIODev
+  children:
+    AxiVersion:
+      <<: *AxiVersion
+      at: { offset: 0x00000000 }
+    AxiSysMonUltraScale:
+      <<: *AxiSysMonUltraScale
+      at: { offset: 0x00020000 }
+    GenericMemory:
+      description: Memory Array
+      class:       IntField
+      at: { offset: 0x00030000, nelms: 256 }
+    SsiPrbsTx:
+      <<: *SsiPrbsTx
+      at: { offset: 0x00040000 }
+    SsiPrbsRx:
+      <<: *SsiPrbsRx
+      at: { offset: 0x00050000 }
+    HLS:
+      class: MMIODev
+      size:  0x10000
+      at: { offset: 0x00060000 }
+      children:
+        AP_Ctrl:
+          class: IntField
+          description: "AP Control"
+          at: { offset: 0x00 }
+        C_Ctrl:
+          class: IntField
+          mode:  RO
+          description: "Control Sig"
+          at: { offset: 0x2c }
+        C_Readback:
+          class: IntField
+          mode:  RO
+          description: "Result"
+          at: { offset: 0x28 }
+        C_Setpoint:
+          class: IntField
+          mode:  RW
+          description: "Result"
+          at: { offset: 0x20 }
+        B:
+          class: IntField
+          mode:  RW
+          description: "Addend 1"
+          at: { offset: 0x18 }
+        A:
+          class: IntField
+          mode:  RW
+          description: "Addend 2"
+          at: { offset: 0x10 }
+
+
+#MMIO range, will be attached to FPGA
+mmio: &mmio
+  size: 0x100000000 # 4GB of address space
+  class: MMIODev
+  configPrio: 1
+  ########
+  children:
+  ########
+    AppCore:
+        <<: *AppCore
+        at:
+          offset: 0x00000000  
+  
+stream: &stream
+    SRP:
+      protocolVersion: SRP_UDP_NONE
+    UDP:
+      port: 8192
+      numRxThreads: 2
+    RSSI: yes
+    depack:
+      useDepack: yes
+    TDESTMux:
+      TDEST: 0x80
+      stripHeader: yes
+
+IpAddr: &IpAddr 192.168.2.10
+
+NetIODev:
+  ipAddr: *IpAddr
+  class: NetIODev
+  configPrio: 1
+  children:
+     mmio:
+       <<: *mmio
+       at:
+         SRP:
+           protocolVersion: SRP_UDP_V3
+           dynTimeout:      false
+           timeoutUS:       800000
+         UDP:
+           port: 8192
+         RSSI:
+         depack:
+         TDESTMux:
+           TDEST: 0
+     Stream0:
+       class: Field 
+       description: "PBRS Stream"
+       at:
+         <<: *stream
+         TDESTMux:
+           TDEST: 0x01
+     Stream1:
+       class: Field 
+       description: "HLS Stream"
+       at:
+         <<: *stream
+         TDESTMux:
+           TDEST: 0x02
+     Stream2:
+       class: Field 
+       description: "MicroBlaze Stream"
+       at:
+         <<: *stream
+         TDESTMux:
+           TDEST: 0x03
