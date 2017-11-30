@@ -24,3 +24,11 @@ example for option 2) then you must change the corresponding
 line in the Makefile to
 
 export USE_RJ45_ETH=true
+
+For 2. The ethernet link status is reported by LEDs 5..7:
+       (for the connections of other LEDs consult the vhdl)
+
+led[7]:    link up (1) / down (0)
+led[6][5]: 11: 1000 Mbps, 
+           01:  100 Mbps,
+           00:   10 Mbps
