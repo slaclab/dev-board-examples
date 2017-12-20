@@ -2,8 +2,8 @@
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
 # Load the Core
-loadRuckusTcl "$::DIR_PATH/core"
-loadRuckusTcl "$::DIR_PATH/VivadoHls"
+# loadRuckusTcl "$::DIR_PATH/core"
+# loadRuckusTcl "$::DIR_PATH/VivadoHls"
 
 # Get the family type
 set family [getFpgaFamily]

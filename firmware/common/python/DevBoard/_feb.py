@@ -22,6 +22,9 @@ import pyrogue as pr
 
 import surf.axi
 
+from surf.protocols.ssi._SsiPrbsTx import *
+from surf.protocols.ssi._SsiPrbsRx import *
+
 class feb(pr.Device):                         
     def __init__( self,       
         name        = "feb",
@@ -42,5 +45,17 @@ class feb(pr.Device):
         #############
         # Add devices
         #############
-        self.add(surf.axi.AxiVersion(offset=0x00000000,expand=False))
-     
+        self.add(surf.axi.AxiVersion(
+            offset = 0x00000000,
+            expand = False,
+        ))
+        
+        self.add(SsiPrbsTx(
+            offset = 0x40000,
+            expand = False,
+        )) 
+
+        self.add(SsiPrbsRx(
+            offset = 0x40000,
+            expand = False,
+        ))         
