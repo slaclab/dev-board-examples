@@ -32,33 +32,23 @@ CreateDebugCore ${ilaName}
 #######################
 ## Set the record depth
 #######################
-set_property C_DATA_DEPTH 8192 [get_debug_cores ${ilaName}]
+set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
 
 #################################
 ## Set the clock for the ILA core
 #################################
 SetDebugCoreClk ${ilaName} {clk}
-#SetDebugCoreClk ${ilaName} {Core_Inst/CommonCore_Inst/ADC0_Inst/adcClk}
 
 #######################
 ## Set the debug Probes
 #######################
 
-#ConfigProbe ${ilaName} {[*]}
-#ConfigProbe ${ilaName} {u_Filter/AdcDataIn[*]}
-#ConfigProbe ${ilaName} {u_Filter/Dec5}
-#ConfigProbe ${ilaName} {u_Filter/iDataOut[*]}
-#ConfigProbe ${ilaName} {u_Filter/Accumulator[*]}
-#ConfigProbe ${ilaName} {u_Filter/AccumulatorM1[*]}
-#ConfigProbe ${ilaName} {u_Filter/DecimationOut[*]}
-#ConfigProbe ${ilaName} {u_Filter/iBoxCarDataOut[*]}
-#ConfigProbe ${ilaName} {u_Filter/DACOut[*]}
-#ConfigProbe ${ilaName} {u_Filter/iDACOut[*]}
-#ConfigProbe ${ilaName} {u_Filter/iMult[*]}
-
-
+ConfigProbe ${ilaName} {U_App/txMasters[*][tValid]}
+ConfigProbe ${ilaName} {U_App/txMasters[*][tLast]}
+ConfigProbe ${ilaName} {U_App/txSlaves[*][tReady]}
 
 ##########################
 ## Write the port map file
 ##########################
-WriteDebugProbes ${ilaName} ${PROJ_DIR}/images/debug_probes_${PRJ_VERSION}.ltx
+# WriteDebugProbes ${ilaName} ${PROJ_DIR}/images/debug_probes_${PRJ_VERSION}.ltx
+WriteDebugProbes ${ilaName}
