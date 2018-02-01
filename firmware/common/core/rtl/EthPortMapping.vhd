@@ -2,7 +2,7 @@
 -- File       : EthPortMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-30
--- Last update: 2017-03-17
+-- Last update: 2018-01-31
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -144,6 +144,7 @@ begin
             1                => X"01",
             2                => X"02",
             3                => X"03"),
+         APP_ILEAVE_EN_G     => true,    -- true = AxiStreamPacketizer2
          CLK_FREQUENCY_G     => CLK_FREQUENCY_G,
          TIMEOUT_UNIT_G      => 1.0E-3,  -- In units of seconds
          SERVER_G            => true,
