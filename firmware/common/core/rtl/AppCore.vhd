@@ -2,7 +2,7 @@
 -- File       : AppCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2017-03-17
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -29,7 +29,6 @@ entity AppCore is
       XIL_DEVICE_G     : string           := "7SERIES";
       APP_TYPE_G       : string           := "ETH";
       AXIS_SIZE_G      : positive         := 1;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       MAC_ADDR_G       : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01 (ETH only)
       IP_ADDR_G        : slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10 (ETH only)
       DHCP_G           : boolean          := true;
@@ -157,8 +156,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          BUILD_INFO_G     => BUILD_INFO_G,
-         XIL_DEVICE_G     => XIL_DEVICE_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         XIL_DEVICE_G     => XIL_DEVICE_G)
       port map (
          -- Clock and Reset
          clk             => clk,

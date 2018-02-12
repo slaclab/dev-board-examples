@@ -2,7 +2,7 @@
 -- File       : AxiXadcWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-30
--- Last update: 2017-03-17
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -23,8 +23,7 @@ use work.AxiLitePkg.all;
 
 entity AxiXadcWrapper is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G            : time            := 1 ns);
    port (
       axiClk : in sl;
       axiRst : in sl;
