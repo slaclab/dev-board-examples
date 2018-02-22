@@ -86,7 +86,7 @@ elif ( args.type == 'eth' ):
         host    = args.ip,
         port    = 8192,
         size    = 1400,
-        packVer = 2, # Version2 is Interleaving support
+        packVer = 2,
         )    
 
     # Map the AxiStream.TDEST
