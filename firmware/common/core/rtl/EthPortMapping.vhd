@@ -136,6 +136,7 @@ begin
    U_RssiServer : entity work.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
+         APP_ILEAVE_EN_G     => true,    -- true = AxiStreamPacketizer2
          MAX_SEG_SIZE_G      => 1024,
          SEGMENT_ADDR_SIZE_G => 7,
          APP_STREAMS_G       => RSSI_SIZE_C,
@@ -144,7 +145,6 @@ begin
             1                => X"01",
             2                => X"02",
             3                => X"03"),
-         APP_ILEAVE_EN_G     => true,    -- true = AxiStreamPacketizer2
          CLK_FREQUENCY_G     => CLK_FREQUENCY_G,
          TIMEOUT_UNIT_G      => 1.0E-3,  -- In units of seconds
          SERVER_G            => true,

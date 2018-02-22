@@ -2,7 +2,7 @@
 -- File       : Kcu105DspFloatTest.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-15
--- Last update: 2018-02-15
+-- Last update: 2018-02-21
 -------------------------------------------------------------------------------
 -- Description: Hardware Testbed for checking VHDL-2008 DSP Float
 -------------------------------------------------------------------------------
@@ -56,14 +56,16 @@ architecture top_level of Kcu105DspFloatTest is
    signal rst       : sl;
    signal heartBeat : sl;
 
-   signal cnt : float32 := (others => '0');
-   signal add : float32 := (others => '0');
-   signal sub : float32 := (others => '0');
+   signal cnt     : float32          := (others => '0');
+   signal counter : slv(31 downto 0) := (others => '0');
+   signal add     : slv(31 downto 0) := (others => '0');
+   signal sub     : slv(31 downto 0) := (others => '0');
 
    attribute dont_touch              : string;
    attribute dont_touch of rst       : signal is "TRUE";
    attribute dont_touch of heartBeat : signal is "TRUE";
    attribute dont_touch of cnt       : signal is "TRUE";
+   attribute dont_touch of counter   : signal is "TRUE";
    attribute dont_touch of add       : signal is "TRUE";
    attribute dont_touch of sub       : signal is "TRUE";
 
@@ -126,13 +128,15 @@ begin
       end if;
    end process;
 
+   counter <= to_slv(cnt);
+
    U_Add : entity work.DspFp32AddSub
       generic map (
          TPD_G => TPD_G)
       port map (
          clk  => clk,
          ain  => (others => '0'),
-         bin  => cnt,
+         bin  => counter,
          add  => '1',
          pOut => add);
 
@@ -142,7 +146,7 @@ begin
       port map (
          clk  => clk,
          ain  => (others => '0'),
-         bin  => cnt,
+         bin  => counter,
          add  => '0',
          pOut => sub);
 

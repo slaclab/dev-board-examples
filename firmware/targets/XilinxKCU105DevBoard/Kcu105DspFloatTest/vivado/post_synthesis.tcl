@@ -48,6 +48,7 @@ SetDebugCoreClk ${ilaName} {clk}
 
 ConfigProbe ${ilaName} {rst}
 ConfigProbe ${ilaName} {cnt[*]}
+ConfigProbe ${ilaName} {counter[*]}
 ConfigProbe ${ilaName} {add[*]}
 ConfigProbe ${ilaName} {sub[*]}
 
