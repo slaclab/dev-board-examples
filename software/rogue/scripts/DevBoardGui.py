@@ -18,19 +18,16 @@
 # copied, modified, propagated, or distributed except according to the terms 
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
-import rogue.hardware.pgp
+
 import pyrogue as pr
-import pyrogue.utilities.fileio
+import DevBoard as devBoard
 import pyrogue.gui
 import pyrogue.protocols
-import DevBoard
-import threading
-import signal
-import atexit
-import yaml
-import time
-import sys
+import pyrogue.utilities.prbs
 import PyQt4.QtGui
+import rogue.hardware.pgp
+import rogue.hardware.data
+import sys
 import argparse
 
 #################################################################
@@ -52,6 +49,22 @@ parser.add_argument(
     required = False,
     default  = '/dev/datadev_0',
     help     = "true to show gui",
+)
+
+parser.add_argument(
+    "--ip", 
+    type     = str,
+    required = False,
+    default  = '192.168.2.10',
+    help     = "IP address",
+) 
+
+parser.add_argument(
+    "--lane", 
+    type     = int,
+    required = False,
+    default  = 0,
+    help     = "PGP Lane",
 ) 
 
 # Get the arguments
@@ -59,76 +72,75 @@ args = parser.parse_args()
 
 #################################################################
 
-# Set base
-system = pr.Root(name='System',description='Front End Board')
+# DataDev PCIe Card
+if ( args.type == 'datadev' ):
 
-# File writer
-dataWriter = pr.utilities.fileio.StreamWriter(name='dataWriter')
-system.add(dataWriter)
-
-if ( args.type == 'pcie-datadev' ):
-
-    pgpVc0    = rogue.hardware.data.DataCard(args.dev,0)
-    pgpVc1    = rogue.hardware.data.DataCard(args.dev,1)
+    vc0Srp  = rogue.hardware.data.DataCard(args.dev,(args.lane*32)+0)
+    vc1Prbs = rogue.hardware.data.DataCard(args.dev,(args.lane*32)+1)
     
-    # Create and Connect SRPv3 to VC1
-    srp = rogue.protocols.srp.SrpV3()
-    # srp = rogue.protocols.srp.SrpV0()
-    pr.streamConnectBiDir(pgpVc0,srp)
-    
-    # Add data stream to file as channel 1
-    pr.streamConnect(pgpVc1,dataWriter.getChannel(0x1))        
-
-elif ( args.type == 'pcie-pgp' ):
-
-    pgpVc0 = rogue.hardware.pgp.PgpCard(args.dev,0,0) # Registers
-    pgpVc1 = rogue.hardware.pgp.PgpCard(args.dev,0,1) # Data
-    
-    # Create and Connect SRPv3 to VC1
-    srp = rogue.protocols.srp.SrpV3()
-    # srp = rogue.protocols.srp.SrpV0()
-    pr.streamConnectBiDir(pgpVc0,srp)
-    
-    # Add data stream to file as channel 1
-    pr.streamConnect(pgpVc1,dataWriter.getChannel(0x1))    
-
+# RUDP Ethernet
 elif ( args.type == 'eth' ):
 
     # Create the ETH interface @ IP Address = args.dev
-    ethLink = pr.protocols.UdpRssiPack(host=args.dev,port=8192,size=1400)    
+    ethLink = pr.protocols.UdpRssiPack(
+        host    = args.ip,
+        port    = 8192,
+        size    = 1400,
+        packVer = 2, # Version2 is Interleaving support
+        )    
 
-    # Create and Connect SrpV3 to AxiStream.tDest = 0x0
-    srp = rogue.protocols.srp.SrpV3()  
-    pr.streamConnectBiDir(srp,ethLink.application(0))
-
-    # Add data stream to file as channel 1 to tDest = 0x1
-    pr.streamConnect(ethLink.application(1),dataWriter.getChannel(0x1))
+    # Map the AxiStream.TDEST
+    vc0Srp  = ethLink.application(0); # AxiStream.tDest = 0x0
+    vc1Prbs = ethLink.application(1); # AxiStream.tDest = 0x1
     
+# Legacy PGP PCIe Card
+elif ( args.type == 'pgp' ):
+
+    vc0Srp  = rogue.hardware.pgp.PgpCard(args.dev,args.lane,0) # Registers
+    vc1Prbs = rogue.hardware.pgp.PgpCard(args.dev,args.lane,1) # Data
+
+# Undefined device type
 else:
     raise ValueError("Invalid type (%s)" % (args.type) )
     
+#################################################################    
+
+# Set base
+rootTop = pr.Root(name='System',description='Front End Board')
+    
+# Connect VC0 to SRPv3
+srp = rogue.protocols.srp.SrpV3()
+pr.streamConnectBiDir(vc0Srp,srp)  
+
+# Connect VC1 to PRBS
+prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx')
+pyrogue.streamConnect(vc1Prbs,prbsRx)
+rootTop.add(prbsRx)  
+    
 # Add registers
-system.add(DevBoard.feb(memBase=srp))
+rootTop.add(devBoard.Fpga(memBase=srp))
+
+#################################################################    
 
 # Start the system
-# system.start(pollEn=False)    
-system.start(pollEn=True)    
-system.ReadAll()
-   
-# system.add(pyrogue.RunControl('runControl',
-                            # rates={1:'1 Hz', 10:'10 Hz',100:'100 Hz'}, 
-                            # #cmd=system.feb.sysReg.softTrig()))
-                            # #cmd=None))
-                            # cmd=runTest))
+rootTop.start(pollEn=True)    
+rootTop.ReadAll()
 
 # Create GUI
 appTop = PyQt4.QtGui.QApplication(sys.argv)
 guiTop = pr.gui.GuiTop(group='PyRogueGui')
 guiTop.resize(800, 1000)
-guiTop.addTree(system)
+guiTop.addTree(rootTop)
+
+print("Starting GUI...\n");
 
 # Run gui
 appTop.exec_()
 
+#################################################################    
+
 # Stop mesh after gui exits
-system.stop()
+rootTop.stop()
+exit()
+
+#################################################################
