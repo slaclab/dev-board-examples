@@ -82,16 +82,16 @@ if ( args.type == 'datadev' ):
 elif ( args.type == 'eth' ):
 
     # Create the ETH interface @ IP Address = args.dev
-    ethLink = pr.protocols.UdpRssiPack(
+    rudp = pr.protocols.UdpRssiPack(
         host    = args.ip,
         port    = 8192,
         size    = 1400,
-        packVer = 2,
+        packVer = 2, # Interleaving RSSI
         )    
 
     # Map the AxiStream.TDEST
-    vc0Srp  = ethLink.application(0); # AxiStream.tDest = 0x0
-    vc1Prbs = ethLink.application(1); # AxiStream.tDest = 0x1
+    vc0Srp  = rudp.application(0); # AxiStream.tDest = 0x0
+    vc1Prbs = rudp.application(1); # AxiStream.tDest = 0x1
     
 # Legacy PGP PCIe Card
 elif ( args.type == 'pgp' ):
