@@ -67,6 +67,14 @@ parser.add_argument(
     help     = "PGP Lane",
 ) 
 
+parser.add_argument(
+    "--pollEn", 
+    type     = bool,
+    required = False,
+    default  = True,
+    help     = "auto-polling",
+)  
+
 # Get the arguments
 args = parser.parse_args()
 
@@ -112,10 +120,15 @@ rootTop = pr.Root(name='System',description='Front End Board')
 srp = rogue.protocols.srp.SrpV3()
 pr.streamConnectBiDir(vc0Srp,srp)  
 
-# Connect VC1 to PRBS
+# Connect VC1 to FW TX PRBS
 prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx')
 pyrogue.streamConnect(vc1Prbs,prbsRx)
 rootTop.add(prbsRx)  
+    
+# Connect VC1 to FW RX PRBS
+prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx")
+pyrogue.streamConnect(prbTx, vc1Prbs)
+rootTop.add(prbTx)  
     
 # Add registers
 rootTop.add(devBoard.Fpga(memBase=srp))
@@ -123,13 +136,14 @@ rootTop.add(devBoard.Fpga(memBase=srp))
 #################################################################    
 
 # Start the system
-rootTop.start(pollEn=True)    
+rootTop.start(pollEn=args.pollEn)    
+# rootTop.start(pollEn=False)    
 rootTop.ReadAll()
 
 # Create GUI
 appTop = PyQt4.QtGui.QApplication(sys.argv)
 guiTop = pr.gui.GuiTop(group='PyRogueGui')
-guiTop.resize(800, 1000)
+guiTop.resize(1600, 1200)
 guiTop.addTree(rootTop)
 
 print("Starting GUI...\n");

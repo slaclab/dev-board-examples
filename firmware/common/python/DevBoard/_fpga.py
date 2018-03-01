@@ -45,15 +45,15 @@ class Fpga(pr.Device):
         #############
         self.add(axi.AxiVersion(
             offset = 0x00000000,
-            expand = False,
+            # expand = False,
         ))
         
         self.add(ssi.SsiPrbsTx(
             offset = 0x40000,
-            expand = False,
+            # expand = False,
         )) 
 
         self.add(ssi.SsiPrbsRx(
             offset = 0x50000,
-            expand = False,
+            # expand = False,
         ))         

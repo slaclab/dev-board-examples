@@ -2,7 +2,7 @@
 -- File       : MyAxiStreamPacketizer2Tb.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-01-29
--- Last update: 2018-02-23
+-- Last update: 2018-03-01
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -28,14 +28,15 @@ entity MyAxiStreamPacketizer2Tb is end MyAxiStreamPacketizer2Tb;
 
 architecture testbed of MyAxiStreamPacketizer2Tb is
 
-   constant CLK_PERIOD_C  : time             := 10 ns;
-   constant TPD_G         : time             := CLK_PERIOD_C/4;
-   constant CRC_POLY_C    : slv(31 downto 0) := x"04C11DB7";
-   constant PKT_SIZE_C    : positive         := 12;
-   constant TKEEP_TLAST_C : slv(15 downto 0) := genTKeep(7);
+   constant CLK_PERIOD_C       : time             := 10 ns;
+   constant TPD_G              : time             := CLK_PERIOD_C/4;
+   constant PKT_SIZE_C         : positive         := 128;
+   constant MAX_PACKET_BYTES_C : positive         := 3+(8*PKT_SIZE_C)/8;
+   -- constant MAX_PACKET_BYTES_C : positive         := 1024;
+   constant TKEEP_TLAST_C      : slv(15 downto 0) := genTKeep(1);
 
    type RegType is record
-      cnt         : slv(7 downto 0);
+      cnt         : slv(31 downto 0);
       sAxisMaster : AxiStreamMasterType;
    end record RegType;
    constant REG_INIT_C : RegType := (
@@ -72,10 +73,10 @@ begin
    U_Packetizer : entity work.AxiStreamPacketizer2
       generic map (
          TPD_G                => TPD_G,
-         CRC_EN_G             => true,
-         CRC_POLY_G           => CRC_POLY_C,
-         MAX_PACKET_BYTES_G   => 64,
-         OUTPUT_SSI_G         => true,
+         BRAM_EN_G            => true,
+         CRC_MODE_G           => "FULL",
+         CRC_POLY_G           => x"04C11DB7",
+         MAX_PACKET_BYTES_G   => MAX_PACKET_BYTES_C,
          INPUT_PIPE_STAGES_G  => 0,
          OUTPUT_PIPE_STAGES_G => 0)
       port map (
@@ -89,8 +90,9 @@ begin
    U_Depacketizer : entity work.AxiStreamDepacketizer2
       generic map (
          TPD_G                => TPD_G,
-         CRC_EN_G             => true,
-         CRC_POLY_G           => CRC_POLY_C,
+         BRAM_EN_G            => true,
+         CRC_MODE_G           => "FULL",
+         CRC_POLY_G           => x"04C11DB7",
          INPUT_PIPE_STAGES_G  => 0,
          OUTPUT_PIPE_STAGES_G => 0)
       port map (
@@ -118,16 +120,16 @@ begin
          v.sAxisMaster.tLast    := '0';
          v.sAxisMaster.tUser(1) := '0';
       end if;
-      
+
       -- Check if ready to move data
       if v.sAxisMaster.tValid = '0' then
          -- Increment the counter
          v.cnt := r.cnt + 1;
          -- Generate a packet
          if (r.cnt < PKT_SIZE_C) then
-            v.sAxisMaster.tValid            := '1';
-            v.sAxisMaster.tData(7 downto 0) := r.cnt;
-            if r.cnt = x"00" then
+            v.sAxisMaster.tValid             := '1';
+            v.sAxisMaster.tData(31 downto 0) := r.cnt;
+            if r.cnt = 0 then
                v.sAxisMaster.tUser(1) := '1';
                v.sAxisMaster.tKeep    := x"00FF";
             end if;
@@ -135,6 +137,9 @@ begin
                v.sAxisMaster.tLast := '1';
                v.sAxisMaster.tKeep := TKEEP_TLAST_C;
             end if;
+         end if;
+         if (r.cnt = 4*PKT_SIZE_C) then
+            v.cnt := (others => '0');
          end if;
       end if;
 
