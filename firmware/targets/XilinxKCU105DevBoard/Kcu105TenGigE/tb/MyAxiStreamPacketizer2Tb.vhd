@@ -35,6 +35,18 @@ architecture testbed of MyAxiStreamPacketizer2Tb is
    -- constant MAX_PACKET_BYTES_C : positive         := 1024;
    constant TKEEP_TLAST_C      : slv(15 downto 0) := genTKeep(1);
 
+
+   -- constant BRAM_EN_C : boolean := true;
+   constant BRAM_EN_C : boolean := false;
+
+   
+   
+   constant CRC_MODE_C : string := "FULL";
+   -- constant CRC_MODE_C : string := "DATA";
+   -- constant CRC_MODE_C : string := "NONE";
+
+   
+   
    type RegType is record
       cnt         : slv(31 downto 0);
       sAxisMaster : AxiStreamMasterType;
@@ -73,8 +85,8 @@ begin
    U_Packetizer : entity work.AxiStreamPacketizer2
       generic map (
          TPD_G                => TPD_G,
-         BRAM_EN_G            => true,
-         CRC_MODE_G           => "FULL",
+         BRAM_EN_G            => BRAM_EN_C,
+         CRC_MODE_G           => CRC_MODE_C,
          CRC_POLY_G           => x"04C11DB7",
          MAX_PACKET_BYTES_G   => MAX_PACKET_BYTES_C,
          INPUT_PIPE_STAGES_G  => 0,
@@ -90,8 +102,8 @@ begin
    U_Depacketizer : entity work.AxiStreamDepacketizer2
       generic map (
          TPD_G                => TPD_G,
-         BRAM_EN_G            => true,
-         CRC_MODE_G           => "FULL",
+         BRAM_EN_G            => BRAM_EN_C,
+         CRC_MODE_G           => CRC_MODE_C,
          CRC_POLY_G           => x"04C11DB7",
          INPUT_PIPE_STAGES_G  => 0,
          OUTPUT_PIPE_STAGES_G => 0)
