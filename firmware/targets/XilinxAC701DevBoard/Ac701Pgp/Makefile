@@ -9,8 +9,8 @@ export PRJ_VERSION = 0x00000001
 # Define target part
 export PRJ_PART = XC7A200TFBG676-2
 
-# Define the Microblaze source path
-export SDK_SRC_PATH = $(PROJ_DIR)/../../../common/core/src
+# # Define the Microblaze source path
+# export SDK_SRC_PATH = $(PROJ_DIR)/../../../common/core/src
 
 # Using a non-standard target directory structure, 
 # which requires me to define the TOP_DIR path

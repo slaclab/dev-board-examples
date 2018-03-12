@@ -1,2 +1,2 @@
 #!/usr/bin/env python
-from DevBoard._feb    import *
+from DevBoard._fpga    import *

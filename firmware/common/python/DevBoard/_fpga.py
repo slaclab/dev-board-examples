@@ -18,17 +18,14 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
+import pyrogue            as pr
+import surf.axi           as axi
+import surf.protocols.ssi as ssi
 
-import surf.axi
-
-from surf.protocols.ssi._SsiPrbsTx import *
-from surf.protocols.ssi._SsiPrbsRx import *
-
-class feb(pr.Device):                         
+class Fpga(pr.Device):                         
     def __init__( self,       
-        name        = "feb",
-        description = "feb Module",
+        name        = "Fpga",
+        description = "Fpga Container ",
         memBase     =  None,
         offset      =  0x00,
         hidden      =  False,
@@ -42,20 +39,21 @@ class feb(pr.Device):
             hidden      = hidden,
             expand      = expand,
         )        
+        
         #############
         # Add devices
         #############
-        self.add(surf.axi.AxiVersion(
+        self.add(axi.AxiVersion(
             offset = 0x00000000,
-            expand = False,
+            # expand = False,
         ))
         
-        self.add(SsiPrbsTx(
+        self.add(ssi.SsiPrbsTx(
             offset = 0x40000,
-            expand = False,
+            # expand = False,
         )) 
 
-        self.add(SsiPrbsRx(
-            offset = 0x40000,
-            expand = False,
+        self.add(ssi.SsiPrbsRx(
+            offset = 0x50000,
+            # expand = False,
         ))         

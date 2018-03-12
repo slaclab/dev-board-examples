@@ -5,9 +5,9 @@ source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 loadRuckusTcl $::env(PROJ_DIR)/../../../
 
 # Load local source Code and constraints
-loadSource      -dir "$::DIR_PATH/hdl/"
+loadSource      -dir "$::DIR_PATH/hdl/" -fileType "VHDL 2008"
 loadConstraints -dir "$::DIR_PATH/hdl/"
 
-# Load local SIM source Code
-loadSource -sim_only -dir  "$::DIR_PATH/tb"
-set_property top {MyAxiStreamPacketizer2Tb} [get_filesets sim_1]
+# Load Simulation
+loadSource -sim_only -path "$::DIR_PATH/tb/Kcu105DspFloatTestTb.vhd" -fileType "VHDL 2008"
+set_property top "Kcu105DspFloatTestTb" [get_filesets sim_1]

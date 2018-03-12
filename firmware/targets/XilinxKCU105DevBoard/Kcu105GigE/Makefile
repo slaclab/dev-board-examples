@@ -1,3 +1,4 @@
+export GIT_BYPASS = 0
 
 # Define target output
 target: prom
@@ -8,13 +9,14 @@ export PRJ_VERSION = 0x00000001
 # Define target part
 export PRJ_PART = XCKU040-FFVA1156-2-E
 
-# Define the Microblaze source path
-export SDK_SRC_PATH = $(PROJ_DIR)/../../../common/core/src
+# # Define the Microblaze source path
+# export SDK_SRC_PATH = $(PROJ_DIR)/../../../common/core/src
 
 # Whether to use the on-board PHY (connected to the RJ-45 jack)
 # or an SFP module for ethernet connectivity.
 # Must be true or false
 export USE_RJ45_ETH = false
+export INCLUDE_ETH_SGMII_LVDS = 1
 
 # Using a non-standard target directory structure, 
 # which requires me to define the TOP_DIR path
