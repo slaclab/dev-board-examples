@@ -2,7 +2,7 @@
 -- File       : Kcu105Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-09
--- Last update: 2017-10-30
+-- Last update: 2018-03-01
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ architecture top_level of Kcu105Pgp3 is
    signal pgpRxMasters : AxiStreamMasterArray(PGP_NUM_VC_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
    signal pgpRxSlaves  : AxiStreamSlaveArray(PGP_NUM_VC_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_INIT_C);
    signal pgpRxCtrl    : AxiStreamCtrlArray(PGP_NUM_VC_C-1 downto 0)   := (others => AXI_STREAM_CTRL_UNUSED_C);
-   
+
    signal rxMasters0 : AxiStreamMasterArray(PGP_NUM_VC_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
    signal rxSlaves0  : AxiStreamSlaveArray(PGP_NUM_VC_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_INIT_C);
    signal rxMasters1 : AxiStreamMasterArray(PGP_NUM_VC_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
@@ -224,11 +224,11 @@ begin
                pgpGtRxP        => pgpRxP,
                pgpGtRxN        => pgpRxN,
                pgpTxReset      => rst,
-               pgpTxRecClk     => open,
+               pgpTxOutClk     => open,
                pgpTxClk        => clk,
                pgpTxMmcmLocked => '1',
                pgpRxReset      => rst,
-               pgpRxRecClk     => open,
+               pgpRxOutClk     => open,
                pgpRxClk        => clk,
                pgpRxMmcmLocked => '1',
                pgpTxIn         => PGP2B_TX_IN_INIT_C,
@@ -314,10 +314,10 @@ begin
 
    U_Pgp3GthUs_2 : entity work.Pgp3GthUsWrapper
       generic map (
-         TPD_G           => TPD_G,
-         REFCLK_G        => true,-- TRUE: pgpRefClkIn
-         NUM_LANE_G      => 1,
-         NUM_VC_G        => PGP3_NUM_VC_C)
+         TPD_G       => TPD_G,
+         REFCLK_G    => true,               -- TRUE: pgpRefClkIn
+         NUM_LANES_G => 1,
+         NUM_VC_G    => PGP3_NUM_VC_C)
       port map (
          -- Stable Clock and Reset
          stableClk       => clk,            -- [in]
@@ -333,12 +333,12 @@ begin
          pgpClk(0)       => pgp3Clk,        -- [out]
          pgpClkRst(0)    => pgp3ClkRst,     -- [out]
          -- Non VC Rx Signals
-         pgpRxIn(0)         => pgp3RxIn,    -- [in]
-         pgpRxOut(0)        => pgp3RxOut,   -- [out]
+         pgpRxIn(0)      => pgp3RxIn,       -- [in]
+         pgpRxOut(0)     => pgp3RxOut,      -- [out]
          -- Non VC Tx Signals
-         pgpTxIn(0)         => pgp3TxIn,    -- [in]
-         pgpTxOut(0)        => pgp3TxOut,   -- [out]
-          -- Frame Transmit Interface
+         pgpTxIn(0)      => pgp3TxIn,       -- [in]
+         pgpTxOut(0)     => pgp3TxOut,      -- [out]
+         -- Frame Transmit Interface
          pgpTxMasters    => pgp3TxMasters,  -- [in]
          pgpTxSlaves     => pgp3TxSlaves,   -- [out]
          -- Frame Receive Interface
@@ -346,10 +346,10 @@ begin
          pgpRxCtrl       => pgp3RxCtrl,     -- [in]
          axilClk         => clk,            -- [in]
          axilRst         => rst,            -- [in]
-         axilWriteMasters(0) => locAxilWriteMasters(PGP3_AXIL_C),
-         axilWriteSlaves(0)  => locAxilWriteSlaves(PGP3_AXIL_C),
-         axilReadMasters(0)  => locAxilReadMasters(PGP3_AXIL_C),
-         axilReadSlaves(0)   => locAxilReadSlaves(PGP3_AXIL_C));
+         axilWriteMaster => locAxilWriteMasters(PGP3_AXIL_C),
+         axilWriteSlave  => locAxilWriteSlaves(PGP3_AXIL_C),
+         axilReadMaster  => locAxilReadMasters(PGP3_AXIL_C),
+         axilReadSlave   => locAxilReadSlaves(PGP3_AXIL_C));
 
    led(2) <= pgp3TxOut.linkReady;
    led(3) <= pgp3RxOut.linkReady;
