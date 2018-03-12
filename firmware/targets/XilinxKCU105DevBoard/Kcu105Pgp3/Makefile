@@ -16,7 +16,8 @@ export PRJ_PART = XCKU040-FFVA1156-2-E
 # which requires me to define the TOP_DIR path
 export TOP_DIR = $(abspath $(PWD)/../../..)
 
-export REMOVE_UNUSED_CODE = 1
+#export REMOVE_UNUSED_CODE = 1
+export GIT_BYPASS = 1
 
 # Use top level makefile
 include $(TOP_DIR)/submodules/ruckus/system_vivado.mk
