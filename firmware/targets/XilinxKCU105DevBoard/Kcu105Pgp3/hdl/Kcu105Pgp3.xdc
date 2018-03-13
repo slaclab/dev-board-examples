@@ -23,10 +23,10 @@ set_property -dict { PACKAGE_PIN M22 IOSTANDARD LVCMOS18 } [get_ports { led[5] }
 set_property -dict { PACKAGE_PIN R23 IOSTANDARD LVCMOS18 } [get_ports { led[6] }]
 set_property -dict { PACKAGE_PIN P23 IOSTANDARD LVCMOS18 } [get_ports { led[7] }]
 
-set_property PACKAGE_PIN U4 [get_ports pgpTxP]
-set_property PACKAGE_PIN U3 [get_ports pgpTxN]
-set_property PACKAGE_PIN T2 [get_ports pgpRxP]
-set_property PACKAGE_PIN T1 [get_ports pgpRxN]
+#set_property PACKAGE_PIN U4 [get_ports pgpTxP]
+#set_property PACKAGE_PIN U3 [get_ports pgpTxN]
+#set_property PACKAGE_PIN T2 [get_ports pgpRxP]
+#set_property PACKAGE_PIN T1 [get_ports pgpRxN]
 
 set_property PACKAGE_PIN W4 [get_ports pgp3TxP]
 set_property PACKAGE_PIN W3 [get_ports pgp3TxN]

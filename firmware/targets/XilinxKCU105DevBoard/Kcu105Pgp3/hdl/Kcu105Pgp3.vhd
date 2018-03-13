@@ -2,7 +2,7 @@
 -- File       : Kcu105Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-09
--- Last update: 2018-03-01
+-- Last update: 2018-03-13
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -45,10 +45,10 @@ entity Kcu105Pgp3 is
       -- Pgp GT Pins
       pgpClkP : in  sl;
       pgpClkN : in  sl;
-      pgpRxP  : in  sl;
-      pgpRxN  : in  sl;
-      pgpTxP  : out sl;
-      pgpTxN  : out sl;
+--       pgpRxP  : in  sl;
+--       pgpRxN  : in  sl;
+--       pgpTxP  : out sl;
+--       pgpTxN  : out sl;
 
       -- PGP3 GT Pins
       pgp3RxP : in  sl;
@@ -205,85 +205,85 @@ begin
       end process test;
    end generate SIM_RESET_RX;
 
-   GEN_PGP : if (not NO_PGP2B_G) generate
+--    GEN_PGP : if (not NO_PGP2B_G) generate
 
-      REAL_PGP : if (not SIMULATION_G) generate
+--       REAL_PGP : if (not SIMULATION_G) generate
 
-         U_PGP : entity work.Pgp2bGthUltra
-            generic map (
-               TPD_G             => TPD_G,
-               PAYLOAD_CNT_TOP_G => 7,
-               VC_INTERLEAVE_G   => 1,
-               NUM_VC_EN_G       => 1)
-            port map (
-               stableClk       => clk,
-               stableRst       => rst,
-               gtRefClk        => pgpRefClk,
-               pgpGtTxP        => pgpTxP,
-               pgpGtTxN        => pgpTxN,
-               pgpGtRxP        => pgpRxP,
-               pgpGtRxN        => pgpRxN,
-               pgpTxReset      => rst,
-               pgpTxOutClk     => open,
-               pgpTxClk        => clk,
-               pgpTxMmcmLocked => '1',
-               pgpRxReset      => rst,
-               pgpRxOutClk     => open,
-               pgpRxClk        => clk,
-               pgpRxMmcmLocked => '1',
-               pgpTxIn         => PGP2B_TX_IN_INIT_C,
-               pgpTxOut        => pgpTxOut,
-               pgpRxIn         => PGP2B_RX_IN_INIT_C,
-               pgpRxOut        => pgpRxOut,
-               pgpTxMasters    => pgpTxMasters,
-               pgpTxSlaves     => pgpTxSlaves,
-               pgpRxMasters    => pgpRxMasters,
-               pgpRxCtrl       => pgpRxCtrl);
+--          U_PGP : entity work.Pgp2bGthUltra
+--             generic map (
+--                TPD_G             => TPD_G,
+--                PAYLOAD_CNT_TOP_G => 7,
+--                VC_INTERLEAVE_G   => 1,
+--                NUM_VC_EN_G       => 1)
+--             port map (
+--                stableClk       => clk,
+--                stableRst       => rst,
+--                gtRefClk        => pgpRefClk,
+--                pgpGtTxP        => pgpTxP,
+--                pgpGtTxN        => pgpTxN,
+--                pgpGtRxP        => pgpRxP,
+--                pgpGtRxN        => pgpRxN,
+--                pgpTxReset      => rst,
+--                pgpTxOutClk     => open,
+--                pgpTxClk        => clk,
+--                pgpTxMmcmLocked => '1',
+--                pgpRxReset      => rst,
+--                pgpRxOutClk     => open,
+--                pgpRxClk        => clk,
+--                pgpRxMmcmLocked => '1',
+--                pgpTxIn         => PGP2B_TX_IN_INIT_C,
+--                pgpTxOut        => pgpTxOut,
+--                pgpRxIn         => PGP2B_RX_IN_INIT_C,
+--                pgpRxOut        => pgpRxOut,
+--                pgpTxMasters    => pgpTxMasters,
+--                pgpTxSlaves     => pgpTxSlaves,
+--                pgpRxMasters    => pgpRxMasters,
+--                pgpRxCtrl       => pgpRxCtrl);
 
-         pgpRxSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
-      end generate REAL_PGP;
+--          pgpRxSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
+--       end generate REAL_PGP;
 
-      SIM_PGP : if (SIMULATION_G) generate
+--       SIM_PGP : if (SIMULATION_G) generate
 
-         GEN_AXIS_LANE : for i in 3 downto 0 generate
-            U_RogueStreamSimWrap_PGP_VC : entity work.RogueStreamSimWrap
-               generic map (
-                  TPD_G         => TPD_G,
-                  DEST_ID_G     => i,
-                  AXIS_CONFIG_G => SSI_PGP2B_CONFIG_C)
-               port map (
-                  clk         => clk,              -- [in]
-                  rst         => rst,              -- [in]
-                  sAxisClk    => clk,              -- [in]
-                  sAxisRst    => rst,              -- [in]
-                  sAxisMaster => pgpTxMasters(i),  -- [in]
-                  sAxisSlave  => pgpTxSlaves(i),   -- [out]
-                  mAxisClk    => clk,              -- [in]
-                  mAxisRst    => rst,              -- [in]
-                  mAxisMaster => pgpRxMasters(i),  -- [out]
-                  mAxisSlave  => pgpRxSlaves(i));  -- [in]
-         end generate GEN_AXIS_LANE;
+--          GEN_AXIS_LANE : for i in 3 downto 0 generate
+--             U_RogueStreamSimWrap_PGP_VC : entity work.RogueStreamSimWrap
+--                generic map (
+--                   TPD_G         => TPD_G,
+--                   DEST_ID_G     => i,
+--                   AXIS_CONFIG_G => SSI_PGP2B_CONFIG_C)
+--                port map (
+--                   clk         => clk,              -- [in]
+--                   rst         => rst,              -- [in]
+--                   sAxisClk    => clk,              -- [in]
+--                   sAxisRst    => rst,              -- [in]
+--                   sAxisMaster => pgpTxMasters(i),  -- [in]
+--                   sAxisSlave  => pgpTxSlaves(i),   -- [out]
+--                   mAxisClk    => clk,              -- [in]
+--                   mAxisRst    => rst,              -- [in]
+--                   mAxisMaster => pgpRxMasters(i),  -- [out]
+--                   mAxisSlave  => pgpRxSlaves(i));  -- [in]
+--          end generate GEN_AXIS_LANE;
 
-         pgpRxOut.phyRxReady   <= '1';
-         pgpRxOut.linkReady    <= '1';
-         pgpRxOut.linkPolarity <= (others => '0');
-         pgpRxOut.frameRx      <= '0';
-         pgpRxOut.frameRxErr   <= '0';
-         pgpRxOut.linkDown     <= '0';
-         pgpRxOut.linkError    <= '0';
-         pgpRxOut.remLinkReady <= '1';
-         pgpRxOut.remOverflow  <= (others => '0');
-         pgpRxOut.remPause     <= (others => '0');
+--          pgpRxOut.phyRxReady   <= '1';
+--          pgpRxOut.linkReady    <= '1';
+--          pgpRxOut.linkPolarity <= (others => '0');
+--          pgpRxOut.frameRx      <= '0';
+--          pgpRxOut.frameRxErr   <= '0';
+--          pgpRxOut.linkDown     <= '0';
+--          pgpRxOut.linkError    <= '0';
+--          pgpRxOut.remLinkReady <= '1';
+--          pgpRxOut.remOverflow  <= (others => '0');
+--          pgpRxOut.remPause     <= (others => '0');
 
-         pgpTxOut.locOverflow <= (others => '0');
-         pgpTxOut.locPause    <= (others => '0');
-         pgpTxOut.phyTxReady  <= '1';
-         pgpTxOut.linkReady   <= '1';
-         pgpTxOut.frameTx     <= '0';
-         pgpTxOut.frameTxErr  <= '0';
+--          pgpTxOut.locOverflow <= (others => '0');
+--          pgpTxOut.locPause    <= (others => '0');
+--          pgpTxOut.phyTxReady  <= '1';
+--          pgpTxOut.linkReady   <= '1';
+--          pgpTxOut.frameTx     <= '0';
+--          pgpTxOut.frameTxErr  <= '0';
 
-      end generate SIM_PGP;
-   end generate GEN_PGP;
+--       end generate SIM_PGP;
+--    end generate GEN_PGP;
 
    led(0) <= pgpTxOut.linkReady;
    led(1) <= pgpRxOut.linkReady;
@@ -296,15 +296,15 @@ begin
          AXIL_CLK_FREQ_G     => 156.25e+6,
          AXI_STREAM_CONFIG_G => SSI_PGP2B_CONFIG_C)
       port map (
-         sAxisClk         => clk,                 -- [in]
-         sAxisRst         => rst,                 -- [in]
-         sAxisMaster      => pgpRxMasters(0),     -- [in]
-         sAxisSlave       => pgpRxSlaves(0),      -- [out]
-         sAxisCtrl        => open,                -- [out]
-         mAxisClk         => clk,                 -- [in]
-         mAxisRst         => rst,                 -- [in]
-         mAxisMaster      => pgpTxMasters(0),     -- [out]
-         mAxisSlave       => pgpTxSlaves(0),      -- [in]
+         sAxisClk         => pgp3Clk,             -- [in]
+         sAxisRst         => pgp3ClkRst,          -- [in]
+         sAxisMaster      => pgp3RxMasters(0),    -- [in]
+         sAxisSlave       => open,                -- [out]
+         sAxisCtrl        => pgp3RxCtrl(0),       -- [out]
+         mAxisClk         => pgp3Clk,             -- [in]
+         mAxisRst         => pgp3ClkRst,          -- [in]
+         mAxisMaster      => pgp3TxMasters(0),    -- [out]
+         mAxisSlave       => pgp3TxSlaves(0),     -- [in]
          axilClk          => clk,                 -- [in]
          axilRst          => rst,                 -- [in]
          mAxilWriteMaster => srpAxilWriteMaster,  -- [out]
@@ -358,17 +358,17 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXIL_BASE_ADDR_G => XBAR_CFG_C(PRBS_AXIL_C).baseAddr,
-         CHANNELS_G       => PGP3_NUM_VC_C)
+         CHANNELS_G       => PGP3_NUM_VC_C-1)
       port map (
          txClk           => pgp3Clk,                           -- [in]
          txRst           => pgp3ClkRst,                        -- [in]
-         txMasters       => pgp3TxMasters,                     -- [out]
-         txSlaves        => pgp3TxSlaves,                      -- [in]
+         txMasters       => pgp3TxMasters(PGP3_NUM_VC_C-1 downto 1),                     -- [out]
+         txSlaves        => pgp3TxSlaves(PGP3_NUM_VC_C-1 downto 1),                      -- [in]
          rxClk           => pgp3Clk,                           -- [in]
          rxRst           => pgp3ClkRst,                        -- [in]
-         rxMasters       => pgp3RxMasters,                     -- [in]
+         rxMasters       => pgp3RxMasters(PGP3_NUM_VC_C-1 downto 1),                     -- [in]
          rxSlaves        => open,                              -- [in]
-         rxCtrl          => pgp3RxCtrl,                        -- [out]
+         rxCtrl          => pgp3RxCtrl(PGP3_NUM_VC_C-1 downto 1),                        -- [out]
          axilClk         => clk,                               -- [in]
          axilRst         => rst,                               -- [in]
          axilReadMaster  => locAxilReadMasters(PRBS_AXIL_C),   -- [in]
