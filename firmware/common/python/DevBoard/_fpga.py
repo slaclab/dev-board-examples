@@ -57,3 +57,38 @@ class Fpga(pr.Device):
             offset = 0x50000,
             # expand = False,
         ))         
+
+    # Normal register rate tester
+    def varRateTest(self):
+        cnt = 0
+        inc = 0
+        last = time.localtime()
+
+        while True:
+            evalBoard.AxiVersion.ScratchPad.get()
+            curr = time.localtime()
+            cnt += 1
+            inc += 1
+
+            if curr != last:
+                print("Cnt={}, rate={}, val={}".format(cnt,inc,val))
+                last = curr
+                inc = 0
+
+    # Raw register rate tester
+    def rawRateTest(self):
+        cnt = 0
+        inc = 0
+        last = time.localtime()
+
+        while True:
+            val = evalBoard.AxiVersion._rawRead(0x4)
+            curr = time.localtime()
+            cnt += 1
+            inc += 1
+
+            if curr != last:
+                print("Cnt={}, rate={}, val={}".format(cnt,inc,val))
+                last = curr
+                inc = 0
+
