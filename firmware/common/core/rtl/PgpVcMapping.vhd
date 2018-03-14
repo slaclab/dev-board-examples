@@ -2,7 +2,7 @@
 -- File       : PgpVcMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-30
--- Last update: 2017-12-07
+-- Last update: 2018-03-13
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -23,10 +23,12 @@ use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 use work.AxiLitePkg.all;
 use work.Pgp2bPkg.all;
+use work.Pgp3Pkg.all;
 
 entity PgpVcMapping is
    generic (
-      TPD_G : time := 1 ns);
+      TPD_G      : time   := 1 ns;
+      APP_TYPE_G : string := "PGP");
    port (
       -- Clock and Reset
       clk             : in  sl;
@@ -59,6 +61,8 @@ end PgpVcMapping;
 
 architecture mapping of PgpVcMapping is
 
+   constant AXIS_CONFIG_C : AxiStreamConfigType := ite(APP_TYPE_G = "PGP", SSI_PGP2B_CONFIG_C, PGP3_AXIS_CONFIG_C);
+
    constant MB_STREAM_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
       TDATA_BYTES_C => 4,
@@ -70,13 +74,16 @@ architecture mapping of PgpVcMapping is
 
 begin
 
+   assert ((APP_TYPE_G = "PGP") or (APP_TYPE_G = "PGP3"))
+      report "APP_TYPE_G must be PGP or PGP3" severity error;
+
    -- VC0 RX/TX, SRPv3 register Module
-      U_SRPv3 : entity work.SrpV3AxiLite
+   U_SRPv3 : entity work.SrpV3AxiLite
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => false,
          GEN_SYNC_FIFO_G     => true,
-         AXI_STREAM_CONFIG_G => SSI_PGP2B_CONFIG_C)
+         AXI_STREAM_CONFIG_G => AXIS_CONFIG_C)
       port map (
          -- Streaming Slave (Rx) Interface (sAxisClk domain) 
          sAxisClk         => clk,
@@ -96,31 +103,6 @@ begin
          mAxilWriteMaster => axilWriteMaster,
          mAxilWriteSlave  => axilWriteSlave);
 
-   -- -- U_SRPv0 : entity work.SrpV0AxiLite
-   -- generic map (
-   -- TPD_G               => TPD_G,
-   -- SLAVE_READY_EN_G    => false,
-   -- GEN_SYNC_FIFO_G     => true,
-   -- AXI_STREAM_CONFIG_G => SSI_PGP2B_CONFIG_C)
-   -- port map (
-   -- -- Streaming Slave (Rx) Interface (sAxisClk domain) 
-   -- sAxisClk         => clk,
-   -- sAxisRst         => rst,
-   -- sAxisMaster      => rxMasters(0),
-   -- sAxisCtrl        => rxCtrl(0),
-   -- -- Streaming Master (Tx) Data Interface (mAxisClk domain)
-   -- mAxisClk         => clk,
-   -- mAxisRst         => rst,
-   -- mAxisMaster      => txMasters(0),
-   -- mAxisSlave       => txSlaves(0),
-   -- -- Master AXI-Lite Interface (axilClk domain)
-   -- axiLiteClk          => clk,
-   -- axiLiteRst          => rst,
-   -- mAxiLiteReadMaster  => axilReadMaster,
-   -- mAxiLiteReadSlave   => axilReadSlave,
-   -- mAxiLiteWriteMaster => axilWriteMaster,
-   -- mAxiLiteWriteSlave  => axilWriteSlave);
-
    -- VC1 TX, PBRS
    VCTX1 : entity work.AxiStreamFifo
       generic map (
@@ -139,7 +121,7 @@ begin
          FIFO_PAUSE_THRESH_G => 128,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => ssiAxiStreamConfig(4),
-         MASTER_AXI_CONFIG_G => SSI_PGP2B_CONFIG_C)
+         MASTER_AXI_CONFIG_G => AXIS_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => clk,
@@ -169,7 +151,7 @@ begin
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 128,
          -- AXI Stream Port Configurations
-         SLAVE_AXI_CONFIG_G  => SSI_PGP2B_CONFIG_C,
+         SLAVE_AXI_CONFIG_G  => AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(4))
       port map (
          -- Slave Port
@@ -201,7 +183,7 @@ begin
          FIFO_PAUSE_THRESH_G => 128,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => ssiAxiStreamConfig(4),
-         MASTER_AXI_CONFIG_G => SSI_PGP2B_CONFIG_C)
+         MASTER_AXI_CONFIG_G => AXIS_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => clk,
@@ -231,7 +213,7 @@ begin
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 128,
          -- AXI Stream Port Configurations
-         SLAVE_AXI_CONFIG_G  => SSI_PGP2B_CONFIG_C,
+         SLAVE_AXI_CONFIG_G  => AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(4))
       port map (
          -- Slave Port
@@ -266,7 +248,7 @@ begin
          FIFO_PAUSE_THRESH_G => 128,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => MB_STREAM_CONFIG_C,
-         MASTER_AXI_CONFIG_G => SSI_PGP2B_CONFIG_C)
+         MASTER_AXI_CONFIG_G => AXIS_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => clk,

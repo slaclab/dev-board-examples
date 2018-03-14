@@ -2,7 +2,7 @@
 -- File       : AppCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2017-03-17
+-- Last update: 2018-03-13
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -71,6 +71,9 @@ architecture mapping of AppCore is
 
 begin
 
+   assert ((APP_TYPE_G = "ETH") or (APP_TYPE_G = "PGP") or (APP_TYPE_G = "PGP3"))
+      report "APP_TYPE_G must be ETH or PGP or PGP3" severity error;
+
    GEN_ETH : if (APP_TYPE_G = "ETH") generate
       --------------------------
       -- UDP Port Mapping Module
@@ -113,13 +116,14 @@ begin
 
    end generate;
 
-   GEN_PGP : if (APP_TYPE_G = "PGP") generate
+   GEN_PGP : if (APP_TYPE_G = "PGP") or (APP_TYPE_G = "PGP3") generate
       ---------------------------------
       -- Virtual Channel Mapping Module
       ---------------------------------         
       U_PgpVcMapping : entity work.PgpVcMapping
          generic map (
-            TPD_G => TPD_G)
+            TPD_G      => TPD_G,
+            APP_TYPE_G => APP_TYPE_G)
          port map (
             -- Clock and Reset
             clk             => clk,
