@@ -41,18 +41,23 @@ set_property PACKAGE_PIN P5 [get_ports pgpClkN]
 create_clock -name pgpRefClk -period  6.400 [get_ports {pgpClkP}]
 
 create_clock -name pgp3PhyRxOutClk -period 3.200 \
-    [get_pins {U_Pgp3GthUs_2/GEN_LANE[0].U_Pgp/U_Pgp3GthCoreWrapper_2/U_Pgp3GthUsIp_1/inst/gen_gtwizard_gthe3_top.Pgp3GthUsIp_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[2].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/RXOUTCLK}]
+    [get_pins {U_Pgp3GthUs_2/GEN_LANE[0].U_Pgp/U_Pgp3GthUsIpWrapper_1/U_Pgp3GthUsIp_1/inst/gen_gtwizard_gthe3_top.Pgp3GthUsIp_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[2].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/RXOUTCLK}]
+#	U_Pgp3GthUs_2/GEN_LANE[0].U_Pgp/U_Pgp3GthCoreWrapper_1/U_Pgp3GthUsIp_1/inst/gen_gtwizard_gthe3_top.Pgp3GthUsIp_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[2].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/RXOUTCLK}]
 
 create_clock -name pgp3PhyTxOutClk -period 3.200 \
-    [get_pins {U_Pgp3GthUs_2/GEN_LANE[0].U_Pgp/U_Pgp3GthCoreWrapper_2/U_Pgp3GthUsIp_1/inst/gen_gtwizard_gthe3_top.Pgp3GthUsIp_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[2].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/TXOUTCLK}]    
+    [get_pins {U_Pgp3GthUs_2/GEN_LANE[0].U_Pgp/U_Pgp3GthUsIpWrapper_1/U_Pgp3GthUsIp_1/inst/gen_gtwizard_gthe3_top.Pgp3GthUsIp_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[2].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/TXOUTCLK}]
+#	U_Pgp3GthUs_2/GEN_LANE[0].U_Pgp/U_Pgp3GthCoreWrapper_1/U_Pgp3GthUsIp_1/inst/gen_gtwizard_gthe3_top.Pgp3GthUsIp_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[2].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/TXOUTCLK}]    
 
-create_generated_clock -name dnaClk [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_ULTRA_SCALE.DeviceDnaUltraScale_Inst/BUFGCE_DIV_Inst/O}]
+create_generated_clock -name dnaClk [get_pins {U_AxiVersion_1/GEN_DEVICE_DNA.DeviceDna_1/GEN_ULTRA_SCALE.DeviceDnaUltraScale_Inst/BUFGCE_DIV_Inst/O}]
 
 set_clock_groups -asynchronous \
     -group [get_clocks -include_generated_clocks {pgpRefClk}] \
     -group [get_clocks -include_generated_clocks {pgp3PhyTxOutClk}] \
-    -group [get_clocks -include_generated_clocks {pgp3PhyRxOutClk}] \        
-    -group [get_clocks {dnaClk}]
+    -group [get_clocks -include_generated_clocks {pgp3PhyRxOutClk}]
+
+set_clock_groups -asynchronous \
+    -group [get_clocks {dnaClk}] \
+    -group [get_clocks -include_generated_clocks {pgpRefClk}]
  
  # BITSTREAM Configurations
 set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design] 

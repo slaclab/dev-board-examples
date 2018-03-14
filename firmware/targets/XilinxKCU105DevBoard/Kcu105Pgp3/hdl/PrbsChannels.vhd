@@ -129,20 +129,20 @@ begin
             mAxisMaster => rxFifoMasters(i),
             mAxisSlave  => rxFifoSlaves(i));
 
-      U_PrbsFlowCtrl : entity work.AxiStreamPrbsFlowCtrl
-         generic map (
-            TPD_G         => TPD_G,
-            PIPE_STAGES_G => 1)
-         port map (
-            clk         => rxClk,
-            rst         => rxRst,
-            threshold   => x"8000_0000",
-            -- Slave Port
-            sAxisMaster => rxFifoMasters(i),
-            sAxisSlave  => rxFifoSlaves(i),
-            -- Master Port
-            mAxisMaster => rxFlowMasters(i),
-            mAxisSlave  => rxFlowSlaves(i));
+--       U_PrbsFlowCtrl : entity work.AxiStreamPrbsFlowCtrl
+--          generic map (
+--             TPD_G         => TPD_G,
+--             PIPE_STAGES_G => 1)
+--          port map (
+--             clk         => rxClk,
+--             rst         => rxRst,
+--             threshold   => x"8000_0000",
+--             -- Slave Port
+--             sAxisMaster => rxFifoMasters(i),
+--             sAxisSlave  => rxFifoSlaves(i),
+--             -- Master Port
+--             mAxisMaster => rxFlowMasters(i),
+--             mAxisSlave  => rxFlowSlaves(i));
 
       U_SsiPrbsRx_1 : entity work.SsiPrbsRx
          generic map (
@@ -158,8 +158,8 @@ begin
          port map (
             sAxisClk       => rxClk,                        -- [in]
             sAxisRst       => rxRst,                        -- [in]
-            sAxisMaster    => rxFlowMasters(i),             -- [in]
-            sAxisSlave     => rxFlowSlaves(i),              -- [out]
+            sAxisMaster    => rxFifoMasters(i),             -- [in]
+            sAxisSlave     => rxFifoSlaves(i),              -- [out]
             sAxisCtrl      => open,                         -- [out]
             mAxisClk       => axilClk,                      -- [in]
             mAxisRst       => axilRst,                      -- [in]
