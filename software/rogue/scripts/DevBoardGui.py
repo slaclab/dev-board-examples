@@ -30,6 +30,8 @@ import rogue.hardware.data
 import sys
 import argparse
 
+#rogue.Logging.setLevel(rogue.Logging.Debug)
+
 #################################################################
 
 # Set the argument parser
@@ -75,6 +77,19 @@ parser.add_argument(
     help     = "auto-polling",
 )  
 
+parser.add_argument(
+    "--rawRate", 
+    action   = "store_true",
+    help     = "Run raw register rate test"
+)  
+
+parser.add_argument(
+    "--varRate", 
+    action   = "store_true",
+    help     = "Run variable register rate test"
+)  
+
+parser.add_argument('--html', help='Use html for tables', action="store_true")
 # Get the arguments
 args = parser.parse_args()
 
@@ -117,7 +132,8 @@ else:
 rootTop = pr.Root(name='System',description='Front End Board')
     
 # Connect VC0 to SRPv3
-srp = rogue.protocols.srp.SrpV3()
+#srp = rogue.protocols.srp.SrpV3()
+srp = rogue.protocols.srp.SrpV0()
 pr.streamConnectBiDir(vc0Srp,srp)  
 
 # Connect VC1 to FW TX PRBS
@@ -139,6 +155,10 @@ rootTop.add(devBoard.Fpga(memBase=srp))
 rootTop.start(pollEn=args.pollEn)    
 # rootTop.start(pollEn=False)    
 rootTop.ReadAll()
+
+# Rate testers
+if args.varRate: rootTop.Fpga.varRateTest()
+if args.rawRate: rootTop.Fpga.rawRateTest()
 
 # Create GUI
 appTop = PyQt4.QtGui.QApplication(sys.argv)

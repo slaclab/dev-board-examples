@@ -21,6 +21,7 @@
 import pyrogue            as pr
 import surf.axi           as axi
 import surf.protocols.ssi as ssi
+import time
 
 class Fpga(pr.Device):                         
     def __init__( self,       
@@ -60,35 +61,45 @@ class Fpga(pr.Device):
 
     # Normal register rate tester
     def varRateTest(self):
+        print("Running variable rate test")
         cnt = 0
         inc = 0
         last = time.localtime()
 
-        while True:
-            evalBoard.AxiVersion.ScratchPad.get()
-            curr = time.localtime()
-            cnt += 1
-            inc += 1
+        try:
+            while True:
+                val = self.AxiVersion.ScratchPad.get()
+                curr = time.localtime()
+                cnt += 1
+                inc += 1
 
-            if curr != last:
-                print("Cnt={}, rate={}, val={}".format(cnt,inc,val))
-                last = curr
-                inc = 0
+                if curr != last:
+                    print("Cnt={}, rate={}, val={}".format(cnt,inc,val))
+                    last = curr
+                    inc = 0
+
+        except KeyboardInterrupt:
+            return
 
     # Raw register rate tester
     def rawRateTest(self):
+        print("Running raw rate test")
         cnt = 0
         inc = 0
         last = time.localtime()
 
-        while True:
-            val = evalBoard.AxiVersion._rawRead(0x4)
-            curr = time.localtime()
-            cnt += 1
-            inc += 1
+        try:
+            while True:
+                val = self.AxiVersion._rawRead(0x4)
+                curr = time.localtime()
+                cnt += 1
+                inc += 1
 
-            if curr != last:
-                print("Cnt={}, rate={}, val={}".format(cnt,inc,val))
-                last = curr
-                inc = 0
+                if curr != last:
+                    print("Cnt={}, rate={}, val={}".format(cnt,inc,val))
+                    last = curr
+                    inc = 0
+
+        except KeyboardInterrupt:
+            return
 
