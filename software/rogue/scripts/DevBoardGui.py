@@ -132,8 +132,8 @@ else:
 rootTop = pr.Root(name='System',description='Front End Board')
     
 # Connect VC0 to SRPv3
-#srp = rogue.protocols.srp.SrpV3()
-srp = rogue.protocols.srp.SrpV0()
+srp = rogue.protocols.srp.SrpV3()
+#srp = rogue.protocols.srp.SrpV0()
 pr.streamConnectBiDir(vc0Srp,srp)  
 
 # Connect VC1 to FW TX PRBS
