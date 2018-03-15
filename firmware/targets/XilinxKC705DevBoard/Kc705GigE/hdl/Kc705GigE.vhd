@@ -2,7 +2,7 @@
 -- File       : Kc705GigE.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-02-02
--- Last update: 2016-05-11
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: Example using 1000BASE-SX Protocol
 -------------------------------------------------------------------------------
@@ -78,8 +78,6 @@ begin
          DIVCLK_DIVIDE_G    => 1,
          CLKFBOUT_MULT_F_G  => 8.0,
          CLKOUT0_DIVIDE_F_G => 8.0,
-         -- AXI-Lite Configurations
-         AXI_ERROR_RESP_G   => AXI_RESP_SLVERR_C,
          -- AXI Streaming Configurations
          AXIS_CONFIG_G      => (others => EMAC_AXIS_CONFIG_C))
       port map (
