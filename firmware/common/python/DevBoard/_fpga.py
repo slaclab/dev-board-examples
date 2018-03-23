@@ -21,42 +21,46 @@
 import pyrogue            as pr
 import surf.axi           as axi
 import surf.protocols.ssi as ssi
+import surf.xilinx        as xil
 import time
 
 class Fpga(pr.Device):                         
     def __init__( self,       
-        name        = "Fpga",
-        description = "Fpga Container ",
-        memBase     =  None,
-        offset      =  0x00,
-        hidden      =  False,
-        expand      =  True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )        
+        name        = 'Fpga',
+        fpgaType    = '',
+        description = 'Fpga Container',
+        **kwargs):
+        
+        super().__init__(name=name,description=description, **kwargs)
         
         #############
         # Add devices
         #############
         self.add(axi.AxiVersion(
             offset = 0x00000000,
-            # expand = False,
+            expand = False,
         ))
         
+        if(fpgaType=='7series'):
+            self.add(xil.Xadc(
+                offset = 0x00010000,
+                expand = False,
+            )) 
+
+        if(fpgaType=='ultrascale'):
+            self.add(xil.AxiSysMonUltraScale(
+                offset = 0x00020000,
+                expand = False,
+            ))             
+        
         self.add(ssi.SsiPrbsTx(
-            offset = 0x40000,
-            # expand = False,
+            offset = 0x00040000,
+            expand = False,
         )) 
 
         self.add(ssi.SsiPrbsRx(
-            offset = 0x50000,
-            # expand = False,
+            offset = 0x00050000,
+            expand = False,
         ))         
 
     # Normal register rate tester

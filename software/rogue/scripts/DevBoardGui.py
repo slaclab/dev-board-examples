@@ -34,6 +34,9 @@ import argparse
 
 #################################################################
 
+# Convert str to bool
+argBool = lambda s: s.lower() in ['true', 't', 'yes', '1']
+
 # Set the argument parser
 parser = argparse.ArgumentParser()
 
@@ -70,8 +73,16 @@ parser.add_argument(
 ) 
 
 parser.add_argument(
+    "--fpgaType", 
+    type     = str,
+    required = False,
+    default  = '',
+    help     = "fpgaType = [empty_string,7series,ultrascale]",
+) 
+
+parser.add_argument(
     "--pollEn", 
-    type     = bool,
+    type     = argBool,
     required = False,
     default  = True,
     help     = "auto-polling",
@@ -108,7 +119,6 @@ elif ( args.type == 'eth' ):
     rudp = pr.protocols.UdpRssiPack(
         host    = args.ip,
         port    = 8192,
-        size    = 1400,
         packVer = 2, # Interleaving RSSI
         )    
 
@@ -147,7 +157,10 @@ pyrogue.streamConnect(prbTx, vc1Prbs)
 rootTop.add(prbTx)  
     
 # Add registers
-rootTop.add(devBoard.Fpga(memBase=srp))
+rootTop.add(devBoard.Fpga(
+    memBase  = srp,
+    fpgaType = args.fpgaType,
+))
 
 #################################################################    
 
@@ -163,8 +176,8 @@ if args.rawRate: rootTop.Fpga.rawRateTest()
 # Create GUI
 appTop = PyQt4.QtGui.QApplication(sys.argv)
 guiTop = pr.gui.GuiTop(group='PyRogueGui')
-guiTop.resize(1600, 1200)
 guiTop.addTree(rootTop)
+guiTop.resize(800, 1200)
 
 print("Starting GUI...\n");
 
