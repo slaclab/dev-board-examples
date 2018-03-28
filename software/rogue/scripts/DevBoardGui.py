@@ -73,6 +73,14 @@ parser.add_argument(
 ) 
 
 parser.add_argument(
+    "--packVer", 
+    type     = int,
+    required = False,
+    default  = 2,
+    help     = "RSSI's Packetizer Version",
+) 
+
+parser.add_argument(
     "--fpgaType", 
     type     = str,
     required = False,
@@ -119,7 +127,7 @@ elif ( args.type == 'eth' ):
     rudp = pr.protocols.UdpRssiPack(
         host    = args.ip,
         port    = 8192,
-        packVer = 2, # Interleaving RSSI
+        packVer = args.packVer,
         )    
 
     # Map the AxiStream.TDEST

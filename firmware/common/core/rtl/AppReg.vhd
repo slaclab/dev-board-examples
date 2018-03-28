@@ -2,7 +2,7 @@
 -- File       : AppReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2018-02-12
+-- Last update: 2018-03-28
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -27,9 +27,9 @@ use work.SsiPkg.all;
 
 entity AppReg is
    generic (
-      TPD_G            : time            := 1 ns;
-      BUILD_INFO_G     : BuildInfoType;
-      XIL_DEVICE_G     : string          := "7SERIES");
+      TPD_G        : time   := 1 ns;
+      BUILD_INFO_G : BuildInfoType;
+      XIL_DEVICE_G : string := "7SERIES");
    port (
       -- Clock and Reset
       clk             : in  sl;
@@ -39,6 +39,11 @@ entity AppReg is
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       axilReadMaster  : in  AxiLiteReadMasterType;
       axilReadSlave   : out AxiLiteReadSlaveType;
+      -- Communication AXI-Lite Interface
+      commWriteMaster : out AxiLiteWriteMasterType;
+      commWriteSlave  : in  AxiLiteWriteSlaveType;
+      commReadMaster  : out AxiLiteReadMasterType;
+      commReadSlave   : in  AxiLiteReadSlaveType;
       -- PBRS Interface
       pbrsTxMaster    : out AxiStreamMasterType;
       pbrsTxSlave     : in  AxiStreamSlaveType;
@@ -59,10 +64,10 @@ end AppReg;
 
 architecture mapping of AppReg is
 
-   constant SHARED_MEM_WIDTH_C : positive                           := 10;
+   constant SHARED_MEM_WIDTH_C : positive                           := 13;
    constant IRQ_ADDR_C         : slv(SHARED_MEM_WIDTH_C-1 downto 0) := (others => '1');
 
-   constant NUM_AXI_MASTERS_C : natural := 7;
+   constant NUM_AXI_MASTERS_C : natural := 8;
 
    constant VERSION_INDEX_C : natural := 0;
    constant XADC_INDEX_C    : natural := 1;
@@ -71,36 +76,9 @@ architecture mapping of AppReg is
    constant PRBS_TX_INDEX_C : natural := 4;
    constant PRBS_RX_INDEX_C : natural := 5;
    constant HLS_INDEX_C     : natural := 6;
+   constant COMM_INDEX_C    : natural := 7;
 
-   constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
-      VERSION_INDEX_C => (
-         baseAddr     => x"0000_0000",
-         addrBits     => 16,
-         connectivity => X"FFFF"),
-      XADC_INDEX_C    => (
-         baseAddr     => x"0001_0000",
-         addrBits     => 16,
-         connectivity => X"FFFF"),
-      SYS_MON_INDEX_C => (
-         baseAddr     => x"0002_0000",
-         addrBits     => 16,
-         connectivity => X"FFFF"),
-      MEM_INDEX_C     => (
-         baseAddr     => x"0003_0000",
-         addrBits     => 16,
-         connectivity => X"FFFF"),
-      PRBS_TX_INDEX_C => (
-         baseAddr     => x"0004_0000",
-         addrBits     => 16,
-         connectivity => X"FFFF"),
-      PRBS_RX_INDEX_C => (
-         baseAddr     => x"0005_0000",
-         addrBits     => 16,
-         connectivity => X"FFFF"),
-      HLS_INDEX_C     => (
-         baseAddr     => x"0006_0000",
-         addrBits     => 16,
-         connectivity => X"FFFF"));
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, x"0000_0000", 20, 16);
 
    signal mAxilWriteMaster : AxiLiteWriteMasterType;
    signal mAxilWriteSlave  : AxiLiteWriteSlaveType;
@@ -110,7 +88,7 @@ architecture mapping of AppReg is
    signal mAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal mAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
    signal mAxilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal mAxilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_READ_SLAVE_EMPTY_DECERR_C);
+   signal mAxilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_DECERR_C);
 
    signal axiWrValid : sl;
    signal axiWrAddr  : slv(SHARED_MEM_WIDTH_C-1 downto 0);
@@ -120,6 +98,9 @@ architecture mapping of AppReg is
 
 begin
 
+   ----------------------------
+   -- Microblaze Wrapper Module
+   ----------------------------   
    U_CPU : entity work.MicroblazeBasicCoreWrapper
       generic map (
          TPD_G => TPD_G)
@@ -168,7 +149,7 @@ begin
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 2,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
-         MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
+         MASTERS_CONFIG_G   => AXI_CONFIG_C)
       port map (
          sAxiWriteMasters(0) => axilWriteMaster,
          sAxiWriteMasters(1) => mAxilWriteMaster,
@@ -190,10 +171,10 @@ begin
    ---------------------------            
    U_AxiVersion : entity work.AxiVersion
       generic map (
-         TPD_G            => TPD_G,
-         BUILD_INFO_G     => BUILD_INFO_G,
-         XIL_DEVICE_G     => XIL_DEVICE_G,
-         EN_DEVICE_DNA_G  => true)
+         TPD_G           => TPD_G,
+         BUILD_INFO_G    => BUILD_INFO_G,
+         XIL_DEVICE_G    => XIL_DEVICE_G,
+         EN_DEVICE_DNA_G => true)
       port map (
          axiReadMaster  => mAxilReadMasters(VERSION_INDEX_C),
          axiReadSlave   => mAxilReadSlaves(VERSION_INDEX_C),
@@ -208,7 +189,7 @@ begin
       ------------------------
       U_XADC : entity work.AxiXadcWrapper
          generic map (
-            TPD_G            => TPD_G)
+            TPD_G => TPD_G)
          port map (
             axiReadMaster  => mAxilReadMasters(XADC_INDEX_C),
             axiReadSlave   => mAxilReadSlaves(XADC_INDEX_C),
@@ -249,7 +230,7 @@ begin
          REG_EN_G     => true,
          AXI_WR_EN_G  => true,
          SYS_WR_EN_G  => false,
-         COMMON_CLK_G => false,
+         COMMON_CLK_G => true,
          ADDR_WIDTH_G => SHARED_MEM_WIDTH_C,
          DATA_WIDTH_G => 32)
       port map (
@@ -337,5 +318,13 @@ begin
          -- Master Port
          mAxisMaster => hlsTxMaster,
          mAxisSlave  => hlsTxSlave);
+
+   -----------------------------------------------
+   -- Map the AXI-Lite to Communication Monitoring
+   -----------------------------------------------
+   commReadMaster                 <= mAxilReadMasters(COMM_INDEX_C);
+   mAxilReadSlaves(COMM_INDEX_C)  <= commReadSlave;
+   commWriteMaster                <= mAxilWriteMasters(COMM_INDEX_C);
+   mAxilWriteSlaves(COMM_INDEX_C) <= commWriteSlave;
 
 end mapping;

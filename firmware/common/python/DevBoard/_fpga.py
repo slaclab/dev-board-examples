@@ -23,6 +23,7 @@ import surf.axi           as axi
 import surf.protocols.ssi as ssi
 import surf.xilinx        as xil
 import time
+import click 
 
 class Fpga(pr.Device):                         
     def __init__( self,       
@@ -51,7 +52,12 @@ class Fpga(pr.Device):
             self.add(xil.AxiSysMonUltraScale(
                 offset = 0x00020000,
                 expand = False,
-            ))             
+            ))
+        
+        self.add(MbSharedMem(
+            offset = 0x00030000,
+            expand = False,
+        ))
         
         self.add(ssi.SsiPrbsTx(
             offset = 0x00040000,
@@ -107,3 +113,24 @@ class Fpga(pr.Device):
         except KeyboardInterrupt:
             return
 
+class MbSharedMem(pr.Device):                         
+    def __init__( self,       
+        name        = 'MbSharedMem',
+        description = 'MbSharedMem Container',
+        **kwargs):
+        
+        super().__init__(name=name,description=description, size=0x00010000, **kwargs)
+        
+        @self.command(description='rawBurstWriteTest')    
+        def rawBurstWriteTest():
+            click.secho( 'MbSharedMem.rawBurstWriteTest()', fg='green')
+            data = []
+            for i in range(16384):
+                data.append(int(i))    
+            self._rawWrite(
+                offset      = 0x00000000,
+                data        = data,
+                base        = pr.Int,
+                stride      = 2,
+                wordBitSize = 16,
+            )

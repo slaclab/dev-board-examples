@@ -2,7 +2,7 @@
 -- File       : AppCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2018-03-13
+-- Last update: 2018-03-28
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -24,15 +24,15 @@ use work.AxiLitePkg.all;
 
 entity AppCore is
    generic (
-      TPD_G            : time             := 1 ns;
-      BUILD_INFO_G     : BuildInfoType;
-      XIL_DEVICE_G     : string           := "7SERIES";
-      APP_TYPE_G       : string           := "ETH";
-      AXIS_SIZE_G      : positive         := 1;
-      MAC_ADDR_G       : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01 (ETH only)
-      IP_ADDR_G        : slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10 (ETH only)
-      DHCP_G           : boolean          := true;
-      JUMBO_G          : boolean          := false);
+      TPD_G        : time             := 1 ns;
+      BUILD_INFO_G : BuildInfoType;
+      XIL_DEVICE_G : string           := "7SERIES";
+      APP_TYPE_G   : string           := "ETH";
+      AXIS_SIZE_G  : positive         := 1;
+      MAC_ADDR_G   : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01 (ETH only)
+      IP_ADDR_G    : slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10 (ETH only)
+      DHCP_G       : boolean          := true;
+      JUMBO_G      : boolean          := false);
    port (
       -- Clock and Reset
       clk       : in  sl;
@@ -55,6 +55,11 @@ architecture mapping of AppCore is
    signal axilWriteMaster : AxiLiteWriteMasterType;
    signal axilWriteSlave  : AxiLiteWriteSlaveType;
 
+   signal commReadMaster  : AxiLiteReadMasterType;
+   signal commReadSlave   : AxiLiteReadSlaveType;
+   signal commWriteMaster : AxiLiteWriteMasterType;
+   signal commWriteSlave  : AxiLiteWriteSlaveType;
+
    signal pbrsTxMaster : AxiStreamMasterType;
    signal pbrsTxSlave  : AxiStreamSlaveType;
    signal pbrsRxMaster : AxiStreamMasterType;
@@ -73,10 +78,10 @@ begin
    assert ((APP_TYPE_G = "ETH") or (APP_TYPE_G = "PGP") or (APP_TYPE_G = "PGP3"))
       report "APP_TYPE_G must be ETH or PGP or PGP3" severity error;
 
+   --------------------------
+   -- UDP Port Mapping Module
+   --------------------------
    GEN_ETH : if (APP_TYPE_G = "ETH") generate
-      --------------------------
-      -- UDP Port Mapping Module
-      --------------------------
       U_EthPortMapping : entity work.EthPortMapping
          generic map (
             TPD_G      => TPD_G,
@@ -86,71 +91,80 @@ begin
             JUMBO_G    => JUMBO_G)
          port map (
             -- Clock and Reset
-            clk             => clk,
-            rst             => rst,
+            clk              => clk,
+            rst              => rst,
             -- AXIS interface
-            txMaster        => txMasters(0),
-            txSlave         => txSlaves(0),
-            rxMaster        => rxMasters(0),
-            rxSlave         => rxSlaves(0),
-            rxCtrl          => rxCtrl(0),
+            txMaster         => txMasters(0),
+            txSlave          => txSlaves(0),
+            rxMaster         => rxMasters(0),
+            rxSlave          => rxSlaves(0),
+            rxCtrl           => rxCtrl(0),
             -- PBRS Interface
-            pbrsTxMaster    => pbrsTxMaster,
-            pbrsTxSlave     => pbrsTxSlave,
-            pbrsRxMaster    => pbrsRxMaster,
-            pbrsRxSlave     => pbrsRxSlave,
+            pbrsTxMaster     => pbrsTxMaster,
+            pbrsTxSlave      => pbrsTxSlave,
+            pbrsRxMaster     => pbrsRxMaster,
+            pbrsRxSlave      => pbrsRxSlave,
             -- HLS Interface
-            hlsTxMaster     => hlsTxMaster,
-            hlsTxSlave      => hlsTxSlave,
-            hlsRxMaster     => hlsRxMaster,
-            hlsRxSlave      => hlsRxSlave,
-            -- AXI-Lite interface
-            axilWriteMaster => axilWriteMaster,
-            axilWriteSlave  => axilWriteSlave,
-            axilReadMaster  => axilReadMaster,
-            axilReadSlave   => axilReadSlave,
+            hlsTxMaster      => hlsTxMaster,
+            hlsTxSlave       => hlsTxSlave,
+            hlsRxMaster      => hlsRxMaster,
+            hlsRxSlave       => hlsRxSlave,
             -- Microblaze stream
-            mbTxMaster      => mbTxMaster,
-            mbTxSlave       => mbTxSlave);
-
+            mbTxMaster       => mbTxMaster,
+            mbTxSlave        => mbTxSlave,
+            -- SRPv3 Master AXI-Lite Interface
+            mAxilWriteMaster => axilWriteMaster,
+            mAxilWriteSlave  => axilWriteSlave,
+            mAxilReadMaster  => axilReadMaster,
+            mAxilReadSlave   => axilReadSlave,
+            -- Communication Slave AXI-Lite Interface
+            commWriteMaster  => commWriteMaster,
+            commWriteSlave   => commWriteSlave,
+            commReadMaster   => commReadMaster,
+            commReadSlave    => commReadSlave);
    end generate;
 
+   ---------------------------------
+   -- Virtual Channel Mapping Module
+   ---------------------------------
    GEN_PGP : if (APP_TYPE_G = "PGP") or (APP_TYPE_G = "PGP3") generate
-      ---------------------------------
-      -- Virtual Channel Mapping Module
-      ---------------------------------         
       U_PgpVcMapping : entity work.PgpVcMapping
          generic map (
             TPD_G      => TPD_G,
             APP_TYPE_G => APP_TYPE_G)
          port map (
             -- Clock and Reset
-            clk             => clk,
-            rst             => rst,
+            clk              => clk,
+            rst              => rst,
             -- AXIS interface
-            txMasters       => txMasters,
-            txSlaves        => txSlaves,
-            rxMasters       => rxMasters,
-            rxSlaves        => rxSlaves,
-            rxCtrl          => rxCtrl,
+            txMasters        => txMasters,
+            txSlaves         => txSlaves,
+            rxMasters        => rxMasters,
+            rxSlaves         => rxSlaves,
+            rxCtrl           => rxCtrl,
             -- PBRS Interface
-            pbrsTxMaster    => pbrsTxMaster,
-            pbrsTxSlave     => pbrsTxSlave,
-            pbrsRxMaster    => pbrsRxMaster,
-            pbrsRxSlave     => pbrsRxSlave,
+            pbrsTxMaster     => pbrsTxMaster,
+            pbrsTxSlave      => pbrsTxSlave,
+            pbrsRxMaster     => pbrsRxMaster,
+            pbrsRxSlave      => pbrsRxSlave,
             -- HLS Interface
-            hlsTxMaster     => hlsTxMaster,
-            hlsTxSlave      => hlsTxSlave,
-            hlsRxMaster     => hlsRxMaster,
-            hlsRxSlave      => hlsRxSlave,
-            -- AXI-Lite interface
-            axilWriteMaster => axilWriteMaster,
-            axilWriteSlave  => axilWriteSlave,
-            axilReadMaster  => axilReadMaster,
-            axilReadSlave   => axilReadSlave,
+            hlsTxMaster      => hlsTxMaster,
+            hlsTxSlave       => hlsTxSlave,
+            hlsRxMaster      => hlsRxMaster,
+            hlsRxSlave       => hlsRxSlave,
             -- Microblaze stream
-            mbTxMaster      => mbTxMaster,
-            mbTxSlave       => mbTxSlave);
+            mbTxMaster       => mbTxMaster,
+            mbTxSlave        => mbTxSlave,
+            -- SRPv3 Master AXI-Lite Interface
+            mAxilWriteMaster => axilWriteMaster,
+            mAxilWriteSlave  => axilWriteSlave,
+            mAxilReadMaster  => axilReadMaster,
+            mAxilReadSlave   => axilReadSlave,
+            -- Communication Slave AXI-Lite Interface
+            commWriteMaster  => commWriteMaster,
+            commWriteSlave   => commWriteSlave,
+            commReadMaster   => commReadMaster,
+            commReadSlave    => commReadSlave);
    end generate;
 
    -------------------
@@ -158,18 +172,23 @@ begin
    -------------------
    U_Reg : entity work.AppReg
       generic map (
-         TPD_G            => TPD_G,
-         BUILD_INFO_G     => BUILD_INFO_G,
-         XIL_DEVICE_G     => XIL_DEVICE_G)
+         TPD_G        => TPD_G,
+         BUILD_INFO_G => BUILD_INFO_G,
+         XIL_DEVICE_G => XIL_DEVICE_G)
       port map (
          -- Clock and Reset
          clk             => clk,
          rst             => rst,
-         -- AXI-Lite interface
+         -- SRPv3 AXI-Lite interface
          axilWriteMaster => axilWriteMaster,
          axilWriteSlave  => axilWriteSlave,
          axilReadMaster  => axilReadMaster,
          axilReadSlave   => axilReadSlave,
+         -- Communication AXI-Lite Interface
+         commWriteMaster  => commWriteMaster,
+         commWriteSlave   => commWriteSlave,
+         commReadMaster   => commReadMaster,
+         commReadSlave    => commReadSlave,      
          -- PBRS Interface
          pbrsTxMaster    => pbrsTxMaster,
          pbrsTxSlave     => pbrsTxSlave,

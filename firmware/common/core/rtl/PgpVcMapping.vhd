@@ -2,7 +2,7 @@
 -- File       : PgpVcMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-30
--- Last update: 2018-03-13
+-- Last update: 2018-03-28
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -31,32 +31,37 @@ entity PgpVcMapping is
       APP_TYPE_G : string := "PGP");
    port (
       -- Clock and Reset
-      clk             : in  sl;
-      rst             : in  sl;
+      clk              : in  sl;
+      rst              : in  sl;
       -- AXIS interface
-      txMasters       : out AxiStreamMasterArray(3 downto 0);
-      txSlaves        : in  AxiStreamSlaveArray(3 downto 0);
-      rxMasters       : in  AxiStreamMasterArray(3 downto 0);
-      rxSlaves        : out AxiStreamSlaveArray(3 downto 0);
-      rxCtrl          : out AxiStreamCtrlArray(3 downto 0);
+      txMasters        : out AxiStreamMasterArray(3 downto 0);
+      txSlaves         : in  AxiStreamSlaveArray(3 downto 0);
+      rxMasters        : in  AxiStreamMasterArray(3 downto 0);
+      rxSlaves         : out AxiStreamSlaveArray(3 downto 0);
+      rxCtrl           : out AxiStreamCtrlArray(3 downto 0);
       -- PBRS Interface
-      pbrsTxMaster    : in  AxiStreamMasterType;
-      pbrsTxSlave     : out AxiStreamSlaveType;
-      pbrsRxMaster    : out AxiStreamMasterType;
-      pbrsRxSlave     : in  AxiStreamSlaveType;
+      pbrsTxMaster     : in  AxiStreamMasterType;
+      pbrsTxSlave      : out AxiStreamSlaveType;
+      pbrsRxMaster     : out AxiStreamMasterType;
+      pbrsRxSlave      : in  AxiStreamSlaveType;
       -- HLS Interface
-      hlsTxMaster     : in  AxiStreamMasterType;
-      hlsTxSlave      : out AxiStreamSlaveType;
-      hlsRxMaster     : out AxiStreamMasterType;
-      hlsRxSlave      : in  AxiStreamSlaveType;
+      hlsTxMaster      : in  AxiStreamMasterType;
+      hlsTxSlave       : out AxiStreamSlaveType;
+      hlsRxMaster      : out AxiStreamMasterType;
+      hlsRxSlave       : in  AxiStreamSlaveType;
       -- MB Interface
-      mbTxMaster      : in  AxiStreamMasterType;
-      mbTxSlave       : out AxiStreamSlaveType;
-      -- AXI-Lite Interface
-      axilWriteMaster : out AxiLiteWriteMasterType;
-      axilWriteSlave  : in  AxiLiteWriteSlaveType;
-      axilReadMaster  : out AxiLiteReadMasterType;
-      axilReadSlave   : in  AxiLiteReadSlaveType);
+      mbTxMaster       : in  AxiStreamMasterType;
+      mbTxSlave        : out AxiStreamSlaveType;
+      -- SRPv3 Master AXI-Lite Interface
+      mAxilWriteMaster : out AxiLiteWriteMasterType;
+      mAxilWriteSlave  : in  AxiLiteWriteSlaveType;
+      mAxilReadMaster  : out AxiLiteReadMasterType;
+      mAxilReadSlave   : in  AxiLiteReadSlaveType;
+      -- Communication Slave AXI-Lite Interface
+      commWriteMaster  : in  AxiLiteWriteMasterType;
+      commWriteSlave   : out AxiLiteWriteSlaveType;
+      commReadMaster   : in  AxiLiteReadMasterType;
+      commReadSlave    : out AxiLiteReadSlaveType);
 end PgpVcMapping;
 
 architecture mapping of PgpVcMapping is
@@ -73,6 +78,9 @@ architecture mapping of PgpVcMapping is
       TUSER_MODE_C  => TUSER_LAST_C);
 
 begin
+
+   commWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C;
+   commReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C;
 
    assert ((APP_TYPE_G = "PGP") or (APP_TYPE_G = "PGP3"))
       report "APP_TYPE_G must be PGP or PGP3" severity error;
@@ -98,10 +106,10 @@ begin
          -- Master AXI-Lite Interface (axilClk domain)
          axilClk          => clk,
          axilRst          => rst,
-         mAxilReadMaster  => axilReadMaster,
-         mAxilReadSlave   => axilReadSlave,
-         mAxilWriteMaster => axilWriteMaster,
-         mAxilWriteSlave  => axilWriteSlave);
+         mAxilReadMaster  => mAxilReadMaster,
+         mAxilReadSlave   => mAxilReadSlave,
+         mAxilWriteMaster => mAxilWriteMaster,
+         mAxilWriteSlave  => mAxilWriteSlave);
 
    -- VC1 TX, PBRS
    VCTX1 : entity work.AxiStreamFifo

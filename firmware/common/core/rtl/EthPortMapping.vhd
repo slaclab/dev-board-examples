@@ -2,7 +2,7 @@
 -- File       : EthPortMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-30
--- Last update: 2018-01-31
+-- Last update: 2018-03-28
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -34,32 +34,37 @@ entity EthPortMapping is
       JUMBO_G         : boolean          := false);
    port (
       -- Clock and Reset
-      clk             : in  sl;
-      rst             : in  sl;
+      clk              : in  sl;
+      rst              : in  sl;
       -- ETH interface
-      txMaster        : out AxiStreamMasterType;
-      txSlave         : in  AxiStreamSlaveType;
-      rxMaster        : in  AxiStreamMasterType;
-      rxSlave         : out AxiStreamSlaveType;
-      rxCtrl          : out AxiStreamCtrlType;
+      txMaster         : out AxiStreamMasterType;
+      txSlave          : in  AxiStreamSlaveType;
+      rxMaster         : in  AxiStreamMasterType;
+      rxSlave          : out AxiStreamSlaveType;
+      rxCtrl           : out AxiStreamCtrlType;
       -- PBRS Interface
-      pbrsTxMaster    : in  AxiStreamMasterType;
-      pbrsTxSlave     : out AxiStreamSlaveType;
-      pbrsRxMaster    : out AxiStreamMasterType;
-      pbrsRxSlave     : in  AxiStreamSlaveType;
+      pbrsTxMaster     : in  AxiStreamMasterType;
+      pbrsTxSlave      : out AxiStreamSlaveType;
+      pbrsRxMaster     : out AxiStreamMasterType;
+      pbrsRxSlave      : in  AxiStreamSlaveType;
       -- HLS Interface
-      hlsTxMaster     : in  AxiStreamMasterType;
-      hlsTxSlave      : out AxiStreamSlaveType;
-      hlsRxMaster     : out AxiStreamMasterType;
-      hlsRxSlave      : in  AxiStreamSlaveType;
+      hlsTxMaster      : in  AxiStreamMasterType;
+      hlsTxSlave       : out AxiStreamSlaveType;
+      hlsRxMaster      : out AxiStreamMasterType;
+      hlsRxSlave       : in  AxiStreamSlaveType;
       -- MB Interface
-      mbTxMaster      : in  AxiStreamMasterType;
-      mbTxSlave       : out AxiStreamSlaveType;
-      -- AXI-Lite Interface
-      axilWriteMaster : out AxiLiteWriteMasterType;
-      axilWriteSlave  : in  AxiLiteWriteSlaveType;
-      axilReadMaster  : out AxiLiteReadMasterType;
-      axilReadSlave   : in  AxiLiteReadSlaveType);
+      mbTxMaster       : in  AxiStreamMasterType;
+      mbTxSlave        : out AxiStreamSlaveType;
+      -- SRPv3 Master AXI-Lite Interface
+      mAxilWriteMaster : out AxiLiteWriteMasterType;
+      mAxilWriteSlave  : in  AxiLiteWriteSlaveType;
+      mAxilReadMaster  : out AxiLiteReadMasterType;
+      mAxilReadSlave   : in  AxiLiteReadSlaveType;
+      -- Communication Slave AXI-Lite Interface
+      commWriteMaster  : in  AxiLiteWriteMasterType;
+      commWriteSlave   : out AxiLiteWriteSlaveType;
+      commReadMaster   : in  AxiLiteReadMasterType;
+      commReadSlave    : out AxiLiteReadSlaveType);
 end EthPortMapping;
 
 architecture mapping of EthPortMapping is
@@ -136,8 +141,11 @@ begin
    U_RssiServer : entity work.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
-         APP_ILEAVE_EN_G     => true,       -- true = AxiStreamPacketizer2
+         ------------------------------------------------------------------
+         APP_ILEAVE_EN_G     => true,    -- true = AxiStreamPacketizer2
+         ------------------------------------------------------------------
          -- APP_ILEAVE_EN_G     => false,   -- false = AxiStreamPacketizer1
+         ------------------------------------------------------------------
          MAX_SEG_SIZE_G      => 1024,
          SEGMENT_ADDR_SIZE_G => 7,
          APP_STREAMS_G       => RSSI_SIZE_C,
@@ -169,7 +177,14 @@ begin
          sTspAxisMaster_i  => obServerMasters(0),
          sTspAxisSlave_o   => obServerSlaves(0),
          mTspAxisMaster_o  => ibServerMasters(0),
-         mTspAxisSlave_i   => ibServerSlaves(0));
+         mTspAxisSlave_i   => ibServerSlaves(0),
+         -- AXI-Lite Interface
+         axiClk_i          => clk,
+         axiRst_i          => rst,
+         axilReadMaster    => commReadMaster,
+         axilReadSlave     => commReadSlave,
+         axilWriteMaster   => commWriteMaster,
+         axilWriteSlave    => commWriteSlave);
 
    ---------------------------------------
    -- TDEST = 0x0: Register access control   
@@ -194,10 +209,10 @@ begin
          -- Master AXI-Lite Interface (axilClk domain)
          axilClk          => clk,
          axilRst          => rst,
-         mAxilReadMaster  => axilReadMaster,
-         mAxilReadSlave   => axilReadSlave,
-         mAxilWriteMaster => axilWriteMaster,
-         mAxilWriteSlave  => axilWriteSlave);
+         mAxilReadMaster  => mAxilReadMaster,
+         mAxilReadSlave   => mAxilReadSlave,
+         mAxilWriteMaster => mAxilWriteMaster,
+         mAxilWriteSlave  => mAxilWriteSlave);
 
    --------------------------
    -- TDEST = 0x1: TX/RX PBRS   
