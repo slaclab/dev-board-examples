@@ -97,6 +97,14 @@ parser.add_argument(
 )  
 
 parser.add_argument(
+    "--initRead", 
+    type     = argBool,
+    required = False,
+    default  = True,
+    help     = "Enable read all variables at start",
+)  
+
+parser.add_argument(
     "--rawRate", 
     action   = "store_true",
     help     = "Run raw register rate test"
@@ -151,7 +159,6 @@ rootTop = pr.Root(name='System',description='Front End Board')
     
 # Connect VC0 to SRPv3
 srp = rogue.protocols.srp.SrpV3()
-#srp = rogue.protocols.srp.SrpV0()
 pr.streamConnectBiDir(vc0Srp,srp)  
 
 # Connect VC1 to FW TX PRBS
@@ -167,15 +174,20 @@ rootTop.add(prbTx)
 # Add registers
 rootTop.add(devBoard.Fpga(
     memBase  = srp,
+    commType = args.type,
     fpgaType = args.fpgaType,
 ))
 
 #################################################################    
 
 # Start the system
-rootTop.start(pollEn=args.pollEn)    
-# rootTop.start(pollEn=False)    
-rootTop.ReadAll()
+rootTop.start(
+    pollEn   = args.pollEn,
+    initRead = args.initRead,
+)
+
+# Print the AxiVersion Summary
+rootTop.Fpga.AxiVersion.printStatus()
 
 # Rate testers
 if args.varRate: rootTop.Fpga.varRateTest()

@@ -18,10 +18,11 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue            as pr
-import surf.axi           as axi
-import surf.protocols.ssi as ssi
-import surf.xilinx        as xil
+import pyrogue             as pr
+import surf.axi            as axi
+import surf.protocols.ssi  as ssi
+import surf.protocols.rssi as rssi
+import surf.xilinx         as xil
 import time
 import click 
 
@@ -29,6 +30,7 @@ class Fpga(pr.Device):
     def __init__( self,       
         name        = 'Fpga',
         fpgaType    = '',
+        commType    = '',
         description = 'Fpga Container',
         **kwargs):
         
@@ -68,7 +70,13 @@ class Fpga(pr.Device):
             offset = 0x00050000,
             expand = False,
         ))         
-
+        
+        if ( commType == 'eth' ):
+            self.add(rssi.RssiCore(
+                offset = 0x00070000,
+                expand = False,
+            ))          
+            
     # Normal register rate tester
     def varRateTest(self):
         print("Running variable rate test")
@@ -122,11 +130,17 @@ class MbSharedMem(pr.Device):
         super().__init__(name=name,description=description, size=0x00010000, **kwargs)
         
         @self.command(description='rawBurstWriteTest')    
-        def rawBurstWriteTest():
-            click.secho( 'MbSharedMem.rawBurstWriteTest()', fg='green')
+        def rawBurstWriteTest(arg):
+            if ( arg<1 or arg>16384 ):
+                smpl = 16384
+            else:
+                smpl = int(arg)
+                            
             data = []
-            for i in range(16384):
+            for i in range(smpl):
                 data.append(int(i))    
+
+            click.secho( 'MbSharedMem.rawBurstWriteTest(%d): %d' % (smpl,len(data)), fg='green')            
             self._rawWrite(
                 offset      = 0x00000000,
                 data        = data,
@@ -134,3 +148,11 @@ class MbSharedMem(pr.Device):
                 stride      = 2,
                 wordBitSize = 16,
             )
+            # readBack = self._rawRead(
+                # offset      = 0x00000000,
+                # numWords    = smpl,
+                # base        = pr.Int,
+                # stride      = 2,
+                # wordBitSize = 16,
+            # )
+            
