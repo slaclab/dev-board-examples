@@ -318,6 +318,7 @@ begin
          BUILD_INFO_G => BUILD_INFO_G,
          XIL_DEVICE_G => "ULTRASCALE",
          APP_TYPE_G   => "ETH",
+         DHCP_G       => false,
          AXIS_SIZE_G  => AXIS_SIZE_C,
          MAC_ADDR_G   => MAC_ADDR_C,
          IP_ADDR_G    => IP_ADDR_C)

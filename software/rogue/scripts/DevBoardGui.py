@@ -30,7 +30,9 @@ import rogue.hardware.data
 import sys
 import argparse
 
-#rogue.Logging.setLevel(rogue.Logging.Debug)
+# rogue.Logging.setLevel(rogue.Logging.Warning)
+# # rogue.Logging.setFilter("pyrogue.SrpV3",rogue.Logging.Debug)
+# # rogue.Logging.setLevel(rogue.Logging.Debug)
 
 #################################################################
 
