@@ -25,10 +25,15 @@ set_property PACKAGE_PIN T25 [get_ports {led[2]}]
 set_property PACKAGE_PIN R26 [get_ports {led[3]}]
 set_property IOSTANDARD LVCMOS15 [get_ports led*]
 
-set_property PACKAGE_PIN AD12 [get_ports gtRxN]
-set_property PACKAGE_PIN AC12 [get_ports gtRxP]
-set_property PACKAGE_PIN AD10 [get_ports gtTxN]
-set_property PACKAGE_PIN AC10 [get_ports gtTxP]
+set_property PACKAGE_PIN AC10 [get_ports gtTxP[0]]; # SFP_TX_P
+set_property PACKAGE_PIN AD10 [get_ports gtTxN[0]]; # SFP_TX_N
+set_property PACKAGE_PIN AC12 [get_ports gtRxP[0]]; # SFP_RX_P
+set_property PACKAGE_PIN AD12 [get_ports gtRxN[0]]; # SFP_RX_N
+
+set_property PACKAGE_PIN AE7  [get_ports gtTxP[1]]; # SMA_MGT_TX_P
+set_property PACKAGE_PIN AF7  [get_ports gtTxN[1]]; # SMA_MGT_TX_N
+set_property PACKAGE_PIN AE11 [get_ports gtRxP[1]]; # SMA_MGT_RX_P
+set_property PACKAGE_PIN AF11 [get_ports gtRxN[1]]; # SMA_MGT_RX_N
 
 set_property PACKAGE_PIN AA13 [get_ports gtClkP]
 set_property PACKAGE_PIN AB13 [get_ports gtClkN]

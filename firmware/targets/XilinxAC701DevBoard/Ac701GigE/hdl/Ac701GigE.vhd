@@ -2,7 +2,7 @@
 -- File       : Ac701GigE.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-02-02
--- Last update: 2018-02-12
+-- Last update: 2018-04-05
 -------------------------------------------------------------------------------
 -- Description: Example using 1000BASE-SX Protocol
 -------------------------------------------------------------------------------
@@ -28,10 +28,8 @@ use unisim.vcomponents.all;
 
 entity Ac701GigE is
    generic (
-      TPD_G         : time    := 1 ns;
-      BUILD_INFO_G  : BuildInfoType;
-      SIM_SPEEDUP_G : boolean := false;
-      SIMULATION_G  : boolean := false);
+      TPD_G        : time := 1 ns;
+      BUILD_INFO_G : BuildInfoType);
    port (
       -- LEDs and Reset button
       extRst  : in  sl;
@@ -45,26 +43,24 @@ entity Ac701GigE is
       -- GT Pins
       gtClkP  : in  sl;
       gtClkN  : in  sl;
-      gtRxP   : in  sl;
-      gtRxN   : in  sl;
-      gtTxP   : out sl;
-      gtTxN   : out sl);
+      gtRxP   : in  slv(1 downto 0);
+      gtRxN   : in  slv(1 downto 0);
+      gtTxP   : out slv(1 downto 0);
+      gtTxN   : out slv(1 downto 0));
 end Ac701GigE;
 
 architecture top_level of Ac701GigE is
 
-   constant AXIS_SIZE_C : positive         := 1;
-   constant IP_ADDR_C   : slv(31 downto 0) := x"40_01_A8_C0";  -- 192.168.1.64
-   constant MAC_ADDR_C  : slv(47 downto 0) := x"63_45_00_56_00_08";  -- 08:00:56:00:45:63
-
-   signal txMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
-   signal txSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
-   signal rxMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
-   signal rxSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
+   signal txMasters : AxiStreamMasterArray(1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal txSlaves  : AxiStreamSlaveArray(1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
+   signal rxMasters : AxiStreamMasterArray(1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal rxSlaves  : AxiStreamSlaveArray(1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
 
    signal clk      : sl;
    signal rst      : sl;
-   signal phyReady : sl;
+   signal phyReady : slv(1 downto 0);
+   signal dmaClk   : slv(1 downto 0);
+   signal dmaRst   : slv(1 downto 0);
 
 begin
 
@@ -74,7 +70,7 @@ begin
    U_ETH_PHY_MAC : entity work.GigEthGtp7Wrapper
       generic map (
          TPD_G              => TPD_G,
-         NUM_LANE_G         => 1,
+         NUM_LANE_G         => 2,
          -- Clocking Configurations
          USE_GTREFCLK_G     => false,
          CLKIN_PERIOD_G     => 8.0,
@@ -84,9 +80,11 @@ begin
          -- AXI Streaming Configurations
          AXIS_CONFIG_G      => (others => EMAC_AXIS_CONFIG_C))
       port map (
+         -- Local Configurations
+         localMac     => (others => MAC_ADDR_INIT_C),
          -- Streaming DMA Interface 
-         dmaClk       => (others => clk),
-         dmaRst       => (others => rst),
+         dmaClk       => dmaClk,
+         dmaRst       => dmaRst,
          dmaIbMasters => rxMasters,
          dmaIbSlaves  => rxSlaves,
          dmaObMasters => txMasters,
@@ -95,14 +93,17 @@ begin
          extRst       => extRst,
          phyClk       => clk,
          phyRst       => rst,
-         phyReady(0)  => phyReady,
+         phyReady     => phyReady,
          -- MGT Ports
          gtClkP       => gtClkP,
          gtClkN       => gtClkN,
-         gtTxP(0)     => gtTxP,
-         gtTxN(0)     => gtTxN,
-         gtRxP(0)     => gtRxP,
-         gtRxN(0)     => gtRxN);
+         gtTxP        => gtTxP,
+         gtTxN        => gtTxN,
+         gtRxP        => gtRxP,
+         gtRxN        => gtRxN);
+
+   dmaClk <= (others => clk);
+   dmaRst <= (others => rst);
 
    -------------------
    -- Application Core
@@ -113,18 +114,19 @@ begin
          BUILD_INFO_G => BUILD_INFO_G,
          XIL_DEVICE_G => "7SERIES",
          APP_TYPE_G   => "ETH",
-         AXIS_SIZE_G  => AXIS_SIZE_C,
-         MAC_ADDR_G   => MAC_ADDR_C,
-         IP_ADDR_G    => IP_ADDR_C)
+         AXIS_SIZE_G  => 1,
+         DHCP_G       => false,
+         IP_ADDR_G    => x"0A_02_A8_C0",  -- 192.168.2.10
+         MAC_ADDR_G   => MAC_ADDR_INIT_C)
       port map (
          -- Clock and Reset
          clk       => clk,
          rst       => rst,
          -- AXIS interface
-         txMasters => txMasters,
-         txSlaves  => txSlaves,
-         rxMasters => rxMasters,
-         rxSlaves  => rxSlaves,
+         txMasters => txMasters(0 downto 0),
+         txSlaves  => txSlaves(0 downto 0),
+         rxMasters => rxMasters(0 downto 0),
+         rxSlaves  => rxSlaves(0 downto 0),
          -- ADC Ports
          vPIn      => vPIn,
          vNIn      => vNIn);
@@ -135,8 +137,8 @@ begin
    clkSelA <= "00";
    clkSelB <= "00";
    led(3)  <= '1';
-   led(2)  <= '0';
-   led(1)  <= not(rst);
-   led(0)  <= phyReady;
+   led(2)  <= not(rst);
+   led(1)  <= phyReady(1);
+   led(0)  <= phyReady(0);
 
 end top_level;

@@ -27,3 +27,7 @@ if { ${family} == "zynq" } {
 if { ${family} == "kintexu" } {
    loadRuckusTcl "$::DIR_PATH/UltraScale"
 }
+
+if { ${family} eq {kintexuplus} } {
+   loadRuckusTcl "$::DIR_PATH/UltraScale"
+}
