@@ -14,9 +14,27 @@ Development Board Firmware/Software Examples
 > https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
 
 4) Setup for large filesystems on github
-> $ git lfs install
+
+```
+$ git lfs install
+```
+
+5) Verify that you have git version 2.13.0 (or later) installed 
+
+```
+$ git version
+git version 2.13.0
+```
+
+6) Verify that you have git-lfs version 2.1.1 (or later) installed 
+
+```
+$ git-lfs version
+git-lfs/2.1.1
+```
 
 # Clone the GIT repository
+
 ```
 $ git clone --recursive git@github.com:slaclab/dev-board-examples
 ```
