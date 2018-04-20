@@ -159,7 +159,7 @@ begin
             OUT_POLARITY_G => '1')
          port map (
             clk    => clk,
-            arst   => extRst,
+            arst   => '1',
             rstOut => rst);
 
    end generate SIM_PGP;
