@@ -2,7 +2,7 @@
 -- File       : AppCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2018-03-28
+-- Last update: 2018-05-17
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -24,15 +24,16 @@ use work.AxiLitePkg.all;
 
 entity AppCore is
    generic (
-      TPD_G        : time             := 1 ns;
-      BUILD_INFO_G : BuildInfoType;
-      XIL_DEVICE_G : string           := "7SERIES";
-      APP_TYPE_G   : string           := "ETH";
-      AXIS_SIZE_G  : positive         := 1;
-      MAC_ADDR_G   : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01 (ETH only)
-      IP_ADDR_G    : slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10 (ETH only)
-      DHCP_G       : boolean          := true;
-      JUMBO_G      : boolean          := false);
+      TPD_G           : time             := 1 ns;
+      BUILD_INFO_G    : BuildInfoType;
+      XIL_DEVICE_G    : string           := "7SERIES";
+      APP_TYPE_G      : string           := "ETH";
+      AXIS_SIZE_G     : positive         := 1;
+      MAC_ADDR_G      : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01 (ETH only)
+      IP_ADDR_G       : slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10 (ETH only)
+      APP_ILEAVE_EN_G : boolean          := true;  -- true = AxiStreamPacketizer2, false = AxiStreamPacketizer1
+      DHCP_G          : boolean          := true;
+      JUMBO_G         : boolean          := false);
    port (
       -- Clock and Reset
       clk       : in  sl;
@@ -84,11 +85,12 @@ begin
    GEN_ETH : if (APP_TYPE_G = "ETH") generate
       U_EthPortMapping : entity work.EthPortMapping
          generic map (
-            TPD_G      => TPD_G,
-            MAC_ADDR_G => MAC_ADDR_G,
-            IP_ADDR_G  => IP_ADDR_G,
-            DHCP_G     => DHCP_G,
-            JUMBO_G    => JUMBO_G)
+            TPD_G           => TPD_G,
+            MAC_ADDR_G      => MAC_ADDR_G,
+            IP_ADDR_G       => IP_ADDR_G,
+            APP_ILEAVE_EN_G => APP_ILEAVE_EN_G,
+            DHCP_G          => DHCP_G,
+            JUMBO_G         => JUMBO_G)
          port map (
             -- Clock and Reset
             clk              => clk,
@@ -185,10 +187,10 @@ begin
          axilReadMaster  => axilReadMaster,
          axilReadSlave   => axilReadSlave,
          -- Communication AXI-Lite Interface
-         commWriteMaster  => commWriteMaster,
-         commWriteSlave   => commWriteSlave,
-         commReadMaster   => commReadMaster,
-         commReadSlave    => commReadSlave,      
+         commWriteMaster => commWriteMaster,
+         commWriteSlave  => commWriteSlave,
+         commReadMaster  => commReadMaster,
+         commReadSlave   => commReadSlave,
          -- PBRS Interface
          pbrsTxMaster    => pbrsTxMaster,
          pbrsTxSlave     => pbrsTxSlave,

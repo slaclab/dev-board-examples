@@ -2,7 +2,7 @@
 -- File       : EthPortMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-30
--- Last update: 2018-03-28
+-- Last update: 2018-05-17
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -30,6 +30,7 @@ entity EthPortMapping is
       CLK_FREQUENCY_G : real             := 125.0E+6;
       MAC_ADDR_G      : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01 (ETH only)   
       IP_ADDR_G       : slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10 (ETH only)
+      APP_ILEAVE_EN_G : boolean          := true;  -- true = AxiStreamPacketizer2, false = AxiStreamPacketizer1
       DHCP_G          : boolean          := true;
       JUMBO_G         : boolean          := false);
    port (
@@ -141,11 +142,7 @@ begin
    U_RssiServer : entity work.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
-         ------------------------------------------------------------------
-         APP_ILEAVE_EN_G     => true,    -- true = AxiStreamPacketizer2
-         ------------------------------------------------------------------
-         -- APP_ILEAVE_EN_G     => false,   -- false = AxiStreamPacketizer1
-         ------------------------------------------------------------------
+         APP_ILEAVE_EN_G     => APP_ILEAVE_EN_G,
          MAX_SEG_SIZE_G      => 1024,
          SEGMENT_ADDR_SIZE_G => 7,
          APP_STREAMS_G       => RSSI_SIZE_C,
