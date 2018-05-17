@@ -13,3 +13,6 @@ if { "$::env(USE_RJ45_ETH)" == "true" } {
    loadConstraints -path "$::DIR_PATH/hdl/Kcu105GigE_Gth.xdc"
 }
 loadConstraints -path "$::DIR_PATH/hdl/Kcu105GigE.xdc"
+
+
+set_property top {RssiCoreTb} [get_filesets sim_1]

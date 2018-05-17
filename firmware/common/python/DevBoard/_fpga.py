@@ -57,7 +57,9 @@ class Fpga(pr.Device):
             ))
         
         self.add(MbSharedMem(
+            name   = 'MbSharedMem',
             offset = 0x00030000,
+            size   = 0x10000,
             expand = False,
         ))
         
@@ -75,7 +77,14 @@ class Fpga(pr.Device):
             self.add(rssi.RssiCore(
                 offset = 0x00070000,
                 expand = False,
-            ))          
+            ))                 
+            
+        self.add(MbSharedMem(
+            name   = 'TestEmptyMem',
+            offset = 0x80000000,
+            size   = 0x80000000,
+            expand = False,
+        ))            
             
     # Normal register rate tester
     def varRateTest(self):
@@ -125,34 +134,54 @@ class MbSharedMem(pr.Device):
     def __init__( self,       
         name        = 'MbSharedMem',
         description = 'MbSharedMem Container',
+        size        = 0x10000,
         **kwargs):
         
-        super().__init__(name=name,description=description, size=0x00010000, **kwargs)
-        
+        super().__init__(
+            name        = name, 
+            description = description, 
+            size        = size, 
+            **kwargs)        
+              
         @self.command(description='rawBurstWriteTest')    
         def rawBurstWriteTest(arg):
-            if ( arg<1 or arg>16384 ):
-                smpl = 16384
+            if ( arg<2 ):
+                smpl = 0x4000
             else:
-                smpl = int(arg)
-                            
+                smpl = arg
+            
             data = []
+            smpl &= 0xFFFFFFFFC
             for i in range(smpl):
-                data.append(int(i))    
+                data.append(i)    
 
             click.secho( 'MbSharedMem.rawBurstWriteTest(%d): %d' % (smpl,len(data)), fg='green')            
             self._rawWrite(
                 offset      = 0x00000000,
                 data        = data,
                 base        = pr.Int,
-                stride      = 2,
-                wordBitSize = 16,
+                stride      = 4,
+                wordBitSize = 32,
             )
-            # readBack = self._rawRead(
-                # offset      = 0x00000000,
-                # numWords    = smpl,
-                # base        = pr.Int,
-                # stride      = 2,
-                # wordBitSize = 16,
-            # )
+            
+        @self.command(description='rawBurstReadTest')    
+        def rawBurstReadTest(arg):
+            if ( arg<2 ):
+                smpl = 0x4000
+            else:
+                smpl = arg
+                
+            data = []
+            smpl &= 0xFFFFFFFFC
+            for i in range(smpl):
+                data.append(i)    
+
+            click.secho( 'MbSharedMem.rawBurstReadTest(%d): %d' % (smpl,len(data)), fg='green')            
+            readBack = self._rawRead(
+                offset      = 0x00000000,
+                numWords    = smpl,
+                base        = pr.Int,
+                stride      = 4,
+                wordBitSize = 32,
+            )            
             

@@ -14,8 +14,8 @@
 source -quiet $::env(RUCKUS_DIR)/vivado_env_var.tcl
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
-# # Bypass the debug chipscope generation
-# return
+# Bypass the debug chipscope generation
+return
 
 ############################
 ## Open the synthesis design
@@ -40,15 +40,55 @@ set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
 #################################
 ## Set the clock for the ILA core
 #################################
-SetDebugCoreClk ${ilaName} {GEN_GTH.U_1GigE/GEN_LANE[0].U_GigEthGthUltraScale/sysClk125}
+SetDebugCoreClk ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/clk}
 
 #######################
 ## Set the debug Probes
 #######################
 
-ConfigProbe ${ilaName} {GEN_GTH.U_1GigE/GEN_LANE[0].U_GigEthGthUltraScale/status[coreStatus][*]}
-ConfigProbe ${ilaName} {GEN_GTH.U_1GigE/GEN_LANE[0].U_GigEthGthUltraScale/extRst}
+ConfigProbe ${ilaName} {U_App/U_Reg/U_XBAR/sAxiWriteMasters[0][awvalid]}
+ConfigProbe ${ilaName} {U_App/U_Reg/U_XBAR/sAxiWriteMasters[0][wvalid]}
+ConfigProbe ${ilaName} {U_App/U_Reg/U_XBAR/sAxiWriteMasters[0][bready]}
+ConfigProbe ${ilaName} {U_App/U_Reg/U_XBAR/sAxiWriteSlaves[*}
 
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/sAxisMaster[tValid]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/sAxisMaster[tUser][1]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/sAxisMaster[tLast]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/sAxisSlave[*}
+
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/mAxisMaster[tValid]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/mAxisMaster[tUser][1]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/mAxisMaster[tLast]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/mAxisSlave[*}
+
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/s_rxSeqN[*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/s_rxLastSeqN[*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/s_rxAckN[*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/s_rxLastAckN[*]}
+
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/s_mAppAxisCtrl[pause]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/s_mAppAxisCtrl[overflow]}
+
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/s_mTspAxisCtrl[pause]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/s_mTspAxisCtrl[overflow]}
+
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/Monitor_INST/r[sndResend]}
+
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/chksumValid_i}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[segValid]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[segDrop]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[tspState][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[appState][*]}
+
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxF][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxBufferAddr][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[windowArray][*][occupied]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxHeadLen][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxSeqN][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[inorderSeqN][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/r[rxAckN][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/txWindowSize_i[*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/RxFSM_INST/s_chksumOk}
 
 ##########################
 ## Write the port map file

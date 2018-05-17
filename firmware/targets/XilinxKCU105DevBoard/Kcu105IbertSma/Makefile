@@ -1,14 +1,11 @@
 # Define target output
-target: prom
+target: bit
 
 # Define Firmware Version Number
-export PRJ_VERSION = 0x00000050
+export PRJ_VERSION = 0x00000001
 
 # Define target part
 export PRJ_PART = XCKU040-FFVA1156-2-E
-
-# # Define the Microblaze source path
-# export SDK_SRC_PATH = $(PROJ_DIR)/../../../common/core/src
 
 # Using a non-standard target directory structure, 
 # which requires me to define the TOP_DIR path

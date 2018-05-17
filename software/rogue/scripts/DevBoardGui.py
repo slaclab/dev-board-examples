@@ -143,7 +143,7 @@ elif ( args.type == 'eth' ):
     # Map the AxiStream.TDEST
     vc0Srp  = rudp.application(0); # AxiStream.tDest = 0x0
     vc1Prbs = rudp.application(1); # AxiStream.tDest = 0x1
-    
+        
 # Legacy PGP PCIe Card
 elif ( args.type == 'pgp' ):
 
@@ -180,6 +180,9 @@ rootTop.add(devBoard.Fpga(
     fpgaType = args.fpgaType,
 ))
 
+if ( args.type == 'eth' ):
+    rootTop.add(rudp)
+
 #################################################################    
 
 # Start the system
@@ -187,6 +190,7 @@ rootTop.start(
     pollEn   = args.pollEn,
     initRead = args.initRead,
 )
+rootTop.setTimeout(5)
 
 # Print the AxiVersion Summary
 rootTop.Fpga.AxiVersion.printStatus()

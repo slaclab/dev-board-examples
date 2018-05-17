@@ -2,7 +2,7 @@
 -- File       : AppReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2018-03-28
+-- Last update: 2018-05-14
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ architecture mapping of AppReg is
    constant SHARED_MEM_WIDTH_C : positive                           := 13;
    constant IRQ_ADDR_C         : slv(SHARED_MEM_WIDTH_C-1 downto 0) := (others => '1');
 
-   constant NUM_AXI_MASTERS_C : natural := 8;
+   constant NUM_AXI_MASTERS_C : natural := 9;
 
    constant VERSION_INDEX_C : natural := 0;
    constant XADC_INDEX_C    : natural := 1;
@@ -77,8 +77,46 @@ architecture mapping of AppReg is
    constant PRBS_RX_INDEX_C : natural := 5;
    constant HLS_INDEX_C     : natural := 6;
    constant COMM_INDEX_C    : natural := 7;
+   constant TEST_INDEX_C    : natural := 8;
 
-   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, x"0000_0000", 20, 16);
+   -- constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, x"0000_0000", 20, 16);
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
+      VERSION_INDEX_C => (
+         baseAddr     => x"0000_0000",
+         addrBits     => 16,
+         connectivity => x"FFFF"),
+      XADC_INDEX_C    => (
+         baseAddr     => x"0001_0000",
+         addrBits     => 16,
+         connectivity => x"FFFF"),
+      SYS_MON_INDEX_C => (
+         baseAddr     => x"0002_0000",
+         addrBits     => 16,
+         connectivity => x"FFFF"),
+      MEM_INDEX_C     => (
+         baseAddr     => x"0003_0000",
+         addrBits     => 16,
+         connectivity => x"FFFF"),
+      PRBS_TX_INDEX_C => (
+         baseAddr     => x"0004_0000",
+         addrBits     => 16,
+         connectivity => x"FFFF"),
+      PRBS_RX_INDEX_C => (
+         baseAddr     => x"0005_0000",
+         addrBits     => 16,
+         connectivity => x"FFFF"),
+      HLS_INDEX_C     => (
+         baseAddr     => x"0006_0000",
+         addrBits     => 16,
+         connectivity => x"FFFF"),
+      COMM_INDEX_C    => (
+         baseAddr     => x"0007_0000",
+         addrBits     => 16,
+         connectivity => x"FFFF"),
+      TEST_INDEX_C    => (
+         baseAddr     => x"8000_0000",
+         addrBits     => 31,
+         connectivity => x"FFFF"));
 
    signal mAxilWriteMaster : AxiLiteWriteMasterType;
    signal mAxilWriteSlave  : AxiLiteWriteSlaveType;
@@ -326,5 +364,11 @@ begin
    mAxilReadSlaves(COMM_INDEX_C)  <= commReadSlave;
    commWriteMaster                <= mAxilWriteMasters(COMM_INDEX_C);
    mAxilWriteSlaves(COMM_INDEX_C) <= commWriteSlave;
+
+   -------------------------------------------------------------
+   -- Map the AXI-Lite to Test bus (never respond with an error)
+   -------------------------------------------------------------
+   mAxilReadSlaves(TEST_INDEX_C)  <= AXI_LITE_READ_SLAVE_EMPTY_OK_C;
+   mAxilWriteSlaves(TEST_INDEX_C) <= AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
 
 end mapping;

@@ -35,96 +35,55 @@ CreateDebugCore ${ilaName}
 #######################
 ## Set the record depth
 #######################
-set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
+set_property C_DATA_DEPTH 8192 [get_debug_cores ${ilaName}]
 
 #################################
 ## Set the clock for the ILA core
 #################################
-SetDebugCoreClk ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_DEPACKER.DEPACKER_V1.U_Depacketizer/axisClk}
+SetDebugCoreClk ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/clk}
 
 #######################
 ## Set the debug Probes
 #######################
 
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_DEPACKER.DEPACKER_V1.U_Depacketizer/r[state][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_DEPACKER.DEPACKER_V1.U_Depacketizer/r[packetNumber][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_DEPACKER.DEPACKER_V1.U_Depacketizer/r[frameNumber][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/axisMaster[tValid]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/axisMaster[tLast]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/axisMaster[tUser][1]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/axisMaster[tKeep][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/axisSlave[tReady]}
 
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_DEPACKER.DEPACKER_V1.U_Depacketizer/inputAxisMaster[tKeep][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_DEPACKER.DEPACKER_V1.U_Depacketizer/inputAxisMaster[tUser][1]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_DEPACKER.DEPACKER_V1.U_Depacketizer/inputAxisMaster[tLast]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_DEPACKER.DEPACKER_V1.U_Depacketizer/inputAxisMaster[tValid]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_DEPACKER.DEPACKER_V1.U_Depacketizer/inputAxisSlave[tReady]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tValid]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tLast]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tUser][1]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tKeep][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxSlave[tReady]}
 
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_DEPACKER.DEPACKER_V1.U_Depacketizer/outputAxisMaster[tKeep][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_DEPACKER.DEPACKER_V1.U_Depacketizer/outputAxisMaster[tUser][1]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_DEPACKER.DEPACKER_V1.U_Depacketizer/outputAxisMaster[tLast]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_DEPACKER.DEPACKER_V1.U_Depacketizer/outputAxisMaster[tValid]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_DEPACKER.DEPACKER_V1.U_Depacketizer/outputAxisSlave[tReady]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tValid]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tLast]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tUser][1]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tKeep][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxMaster[tData][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxSlave[tReady]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxTLastTUser[*]}
 
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_PACKER.PACKER_V1.U_Packetizer/r[state][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_PACKER.PACKER_V1.U_Packetizer/r[packetNumber][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_PACKER.PACKER_V1.U_Packetizer/r[frameNumber][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxCtrl[idle]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxCtrl[pause]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/rxCtrl[overflow]}
 
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_PACKER.PACKER_V1.U_Packetizer/inputAxisMaster[tKeep][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_PACKER.PACKER_V1.U_Packetizer/inputAxisMaster[tUser][1]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_PACKER.PACKER_V1.U_Packetizer/inputAxisMaster[tLast]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_PACKER.PACKER_V1.U_Packetizer/inputAxisMaster[tValid]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_PACKER.PACKER_V1.U_Packetizer/inputAxisSlave[tReady]}
-
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_PACKER.PACKER_V1.U_Packetizer/outputAxisMaster[tKeep][*]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_PACKER.PACKER_V1.U_Packetizer/outputAxisMaster[tUser][1]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_PACKER.PACKER_V1.U_Packetizer/outputAxisMaster[tLast]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_PACKER.PACKER_V1.U_Packetizer/outputAxisMaster[tValid]}
-# ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/GEN_PACKER.PACKER_V1.U_Packetizer/outputAxisSlave[tReady]}
-
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/s_sAppAxisMaster[tKeep][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/s_sAppAxisMaster[tUser][1]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/s_sAppAxisMaster[tLast]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/s_sAppAxisMaster[tValid]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/appSsiSlave_o[ready]}
-
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/mTspAxisMaster_o[tKeep][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/mTspAxisMaster_o[tUser][1]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/mTspAxisMaster_o[tLast]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/mTspAxisMaster_o[tValid]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/mTspAxisSlave_i[tReady]}
-
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[firstUnackAddr][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[nextSentAddr][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[lastSentAddr][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[lastAckSeqN][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[bufferFull]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[bufferEmpty]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[ackErr]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[ackState][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[appState][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[rxSegmentAddr][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[rxBufferAddr][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[rxSegmentWe]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[sndData]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[lenErr]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[appBusy]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[nextSeqN][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[seqN][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[txHeaderAddr][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[txSegmentAddr][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[txBufferAddr][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[tspState][*]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[txRdy]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[buffWe]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[buffSent]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[chkEn]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[chkStb]}
-
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[synH]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[ackH]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[rstH]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[nullH]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[dataH]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[dataD]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[resend]}
-ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_RssiServer/U_RssiCore/TxFSM_INST/r[ackSndData]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[state][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[hdrCnt][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[opCode][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[remVer][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[addr][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[memResp][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[reqSize][*]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[eofe]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[frameError]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[verMismatch]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[timeout]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[reqSizeError]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[skip]}
+ConfigProbe ${ilaName} {U_App/GEN_ETH.U_EthPortMapping/U_SRPv3/r[rxRst]}
 
 ##########################
 ## Write the port map file
