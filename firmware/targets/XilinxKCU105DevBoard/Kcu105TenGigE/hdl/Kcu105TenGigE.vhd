@@ -2,7 +2,7 @@
 -- File       : Kcu105TenGigE.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-08
--- Last update: 2017-02-16
+-- Last update: 2018-05-17
 -------------------------------------------------------------------------------
 -- Description: Example using 10G-BASER Protocol
 -------------------------------------------------------------------------------
@@ -105,14 +105,15 @@ begin
    -------------------
    U_App : entity work.AppCore
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         XIL_DEVICE_G => "ULTRASCALE",
-         APP_TYPE_G   => "ETH",
-         AXIS_SIZE_G  => AXIS_SIZE_C,
-         DHCP_G       => false,
-         MAC_ADDR_G   => MAC_ADDR_C,
-         IP_ADDR_G    => IP_ADDR_C)
+         TPD_G           => TPD_G,
+         BUILD_INFO_G    => BUILD_INFO_G,
+         XIL_DEVICE_G    => "ULTRASCALE",
+         APP_TYPE_G      => "ETH",
+         AXIS_SIZE_G     => AXIS_SIZE_C,
+         APP_ILEAVE_EN_G => false,
+         DHCP_G          => false,
+         MAC_ADDR_G      => MAC_ADDR_C,
+         IP_ADDR_G       => IP_ADDR_C)
       port map (
          -- Clock and Reset
          clk       => clk,

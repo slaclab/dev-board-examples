@@ -1,0 +1,53 @@
+##############################################################################
+## This file is part of 'LCLS2 Common Carrier Core'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'LCLS2 Common Carrier Core', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+#schemaversion 3.0.0
+#once AmcCarrierCore.yaml
+#include AxiVersion.yaml
+#include AxiSysMonUltraScale.yaml
+#include SsiPrbsTx.yaml
+#include SsiPrbsRx.yaml
+#include RssiCore.yaml
+
+AmcCarrierCore: &DigFpga 
+  name: DigFpga
+  description: DigFpga
+  class: MMIODev
+  configPrio: 1  
+  size: 0x100000000 # 4GB of address space
+  ########
+  MMIODev:
+  ########
+    ##################################################
+    AxiVersion:
+      <<: *AxiVersion
+      at:
+        offset: 0x00000000
+    ##################################################
+    AxiSysMonUltraScale:
+      <<: *AxiSysMonUltraScale
+      at:
+        offset: 0x00020000
+    ##################################################
+    SsiPrbsTx:
+      <<: *SsiPrbsTx
+      at:
+        offset: 0x00040000   
+    ##################################################
+    SsiPrbsRx:
+      <<: *SsiPrbsRx
+      at:
+        offset: 0x00050000           
+    ##################################################
+    RssiServer:
+      <<: *RssiCore
+      at:
+        offset: 0x00070000 
+    ##################################################
+    
