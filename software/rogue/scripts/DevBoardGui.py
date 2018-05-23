@@ -30,7 +30,7 @@ import rogue.hardware.data
 import sys
 import argparse
 
-# rogue.Logging.setLevel(rogue.Logging.Warning)
+rogue.Logging.setLevel(rogue.Logging.Warning)
 # # rogue.Logging.setFilter("pyrogue.SrpV3",rogue.Logging.Debug)
 # # rogue.Logging.setLevel(rogue.Logging.Debug)
 
@@ -190,7 +190,7 @@ rootTop.start(
     pollEn   = args.pollEn,
     initRead = args.initRead,
 )
-rootTop.setTimeout(5)
+# rootTop.setTimeout(5)
 
 # Print the AxiVersion Summary
 rootTop.Fpga.AxiVersion.printStatus()

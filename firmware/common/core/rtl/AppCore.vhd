@@ -2,7 +2,7 @@
 -- File       : AppCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2018-05-17
+-- Last update: 2018-05-18
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -26,6 +26,7 @@ entity AppCore is
    generic (
       TPD_G           : time             := 1 ns;
       BUILD_INFO_G    : BuildInfoType;
+      CLK_FREQUENCY_G : real             := 156.25E+6;
       XIL_DEVICE_G    : string           := "7SERIES";
       APP_TYPE_G      : string           := "ETH";
       AXIS_SIZE_G     : positive         := 1;
@@ -86,6 +87,7 @@ begin
       U_EthPortMapping : entity work.EthPortMapping
          generic map (
             TPD_G           => TPD_G,
+            CLK_FREQUENCY_G => CLK_FREQUENCY_G,
             MAC_ADDR_G      => MAC_ADDR_G,
             IP_ADDR_G       => IP_ADDR_G,
             APP_ILEAVE_EN_G => APP_ILEAVE_EN_G,
@@ -174,9 +176,10 @@ begin
    -------------------
    U_Reg : entity work.AppReg
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         XIL_DEVICE_G => XIL_DEVICE_G)
+         TPD_G           => TPD_G,
+         BUILD_INFO_G    => BUILD_INFO_G,
+         CLK_FREQUENCY_G => CLK_FREQUENCY_G,
+         XIL_DEVICE_G    => XIL_DEVICE_G)
       port map (
          -- Clock and Reset
          clk             => clk,

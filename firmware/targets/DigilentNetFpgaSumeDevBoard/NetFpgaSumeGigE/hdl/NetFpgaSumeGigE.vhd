@@ -2,7 +2,7 @@
 -- File       : NetFpgaSumeGigE.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-01
--- Last update: 2016-02-09
+-- Last update: 2018-05-18
 -------------------------------------------------------------------------------
 -- Description: Example using 1000BASE-SX Protocol
 -------------------------------------------------------------------------------
@@ -47,13 +47,13 @@ entity NetFpgaSumeGigE is
       ethRxP       : in  sl;
       ethRxN       : in  sl;
       ethTxP       : out sl;
-      ethTxN       : out sl);        
+      ethTxN       : out sl);
 end NetFpgaSumeGigE;
 
 architecture top_level of NetFpgaSumeGigE is
 
    constant AXIS_SIZE_C : positive         := 1;
-   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";      -- 192.168.2.10  
+   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10  
    constant MAC_ADDR_C  : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01
 
    signal txMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
@@ -76,12 +76,12 @@ begin
       port map (
          I  => sysClkP,
          IB => sysClkN,
-         O  => sysClock); 
+         O  => sysClock);
 
    BUFG_Inst : BUFG
       port map (
          I => sysClock,
-         O => sysClk);           
+         O => sysClk);
 
    ----------------------------
    -- 10GBASE-R Ethernet Module
@@ -98,7 +98,7 @@ begin
          CLKFBOUT_MULT_F_G  => 40.0,    -- 1 GHz = (40 x 25 MHz)
          CLKOUT0_DIVIDE_F_G => 8.000,   -- 125 MHz = (1.0 GHz/8)         
          -- AXI Streaming Configurations
-         AXIS_CONFIG_G      => (others => EMAC_AXIS_CONFIG_C))  
+         AXIS_CONFIG_G      => (others => EMAC_AXIS_CONFIG_C))
       port map (
          -- Streaming DMA Interface 
          dmaClk       => (others => clk),
@@ -117,20 +117,21 @@ begin
          gtTxP(0)     => ethTxP,
          gtTxN(0)     => ethTxN,
          gtRxP(0)     => ethRxP,
-         gtRxN(0)     => ethRxN);        
+         gtRxN(0)     => ethRxN);
 
    -------------------
    -- Application Core
    -------------------
    U_App : entity work.AppCore
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         XIL_DEVICE_G => "7SERIES",
-         APP_TYPE_G   => "ETH",
-         AXIS_SIZE_G  => AXIS_SIZE_C,
-         MAC_ADDR_G   => MAC_ADDR_C,
-         IP_ADDR_G    => IP_ADDR_C)         
+         TPD_G           => TPD_G,
+         BUILD_INFO_G    => BUILD_INFO_G,
+         CLK_FREQUENCY_G => 125.0E+6,
+         XIL_DEVICE_G    => "7SERIES",
+         APP_TYPE_G      => "ETH",
+         AXIS_SIZE_G     => AXIS_SIZE_C,
+         MAC_ADDR_G      => MAC_ADDR_C,
+         IP_ADDR_G       => IP_ADDR_C)
       port map (
          -- Clock and Reset
          clk       => clk,
@@ -142,7 +143,7 @@ begin
          rxSlaves  => rxSlaves,
          -- ADC Ports
          vPIn      => vPIn,
-         vNIn      => vNIn);         
+         vNIn      => vNIn);
 
    ----------------
    -- Misc. Signals

@@ -1,0 +1,4 @@
+# Config File Generated: 2018-05-17.15:40:17
+- DigFpga:
+    - TestMemory:
+        - MyMem: !<value> 0x00000000

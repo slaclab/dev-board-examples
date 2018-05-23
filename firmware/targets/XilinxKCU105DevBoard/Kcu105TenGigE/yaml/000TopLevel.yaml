@@ -9,7 +9,7 @@
 ##############################################################################
 #schemaversion 3.0.0
 #once 000TopLevel.yaml
-#include: DigFpga.yaml
+#include DigFpga.yaml
 
 #MMIO range, will be attached to FPGA
 mmio: &mmio
@@ -23,7 +23,20 @@ mmio: &mmio
         <<: *DigFpga
         at:
         offset: 0x00000000  
-            
+
+stream: &stream
+    SRP:
+      protocolVersion: SRP_UDP_NONE
+    UDP:
+      port: 8192
+      numRxThreads: 2
+    RSSI: yes
+    stripHeader: yes
+    depack:
+      useDepack: yes
+    TDESTMux:
+      TDEST: 0x01
+        
 NetIODev:
   ipAddr: 192.168.2.10
   class: NetIODev
@@ -41,5 +54,10 @@ NetIODev:
            useDepack: yes
          TDESTMux:
            TDEST: 0
-
+     Stream0:
+       class: Field 
+       at:
+         <<: *stream
+         TDESTMux:
+           TDEST: 0x01
            

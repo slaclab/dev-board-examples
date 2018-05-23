@@ -2,7 +2,7 @@
 -- File       : Kcu116GigE.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-08
--- Last update: 2018-04-05
+-- Last update: 2018-05-18
 -------------------------------------------------------------------------------
 -- Description: Example using 1000BASE-SX Protocol
 -------------------------------------------------------------------------------
@@ -122,14 +122,15 @@ begin
    -------------------
    U_App : entity work.AppCore
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         XIL_DEVICE_G => "ULTRASCALE",
-         APP_TYPE_G   => "ETH",
-         AXIS_SIZE_G  => AXIS_SIZE_C,
-         DHCP_G       => true,
-         IP_ADDR_G    => x"0A_02_A8_C0",  -- 192.168.2.10
-         MAC_ADDR_G   => MAC_ADDR_INIT_C)
+         TPD_G           => TPD_G,
+         BUILD_INFO_G    => BUILD_INFO_G,
+         CLK_FREQUENCY_G => 125.0E+6,
+         XIL_DEVICE_G    => "ULTRASCALE",
+         APP_TYPE_G      => "ETH",
+         AXIS_SIZE_G     => AXIS_SIZE_C,
+         DHCP_G          => true,
+         IP_ADDR_G       => x"0A_02_A8_C0",  -- 192.168.2.10
+         MAC_ADDR_G      => MAC_ADDR_INIT_C)
       port map (
          -- Clock and Reset
          clk       => clk,

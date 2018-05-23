@@ -27,7 +27,7 @@ use work.EthMacPkg.all;
 entity EthPortMapping is
    generic (
       TPD_G           : time             := 1 ns;
-      CLK_FREQUENCY_G : real             := 125.0E+6;
+      CLK_FREQUENCY_G : real             := 156.25E+6;
       MAC_ADDR_G      : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01 (ETH only)   
       IP_ADDR_G       : slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10 (ETH only)
       APP_ILEAVE_EN_G : boolean          := true;  -- true = AxiStreamPacketizer2, false = AxiStreamPacketizer1

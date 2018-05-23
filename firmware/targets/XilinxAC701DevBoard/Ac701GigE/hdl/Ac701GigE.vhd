@@ -2,7 +2,7 @@
 -- File       : Ac701GigE.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-02-02
--- Last update: 2018-04-05
+-- Last update: 2018-05-18
 -------------------------------------------------------------------------------
 -- Description: Example using 1000BASE-SX Protocol
 -------------------------------------------------------------------------------
@@ -110,14 +110,15 @@ begin
    -------------------
    U_App : entity work.AppCore
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         XIL_DEVICE_G => "7SERIES",
-         APP_TYPE_G   => "ETH",
-         AXIS_SIZE_G  => 1,
-         DHCP_G       => false,
-         IP_ADDR_G    => x"0A_02_A8_C0",  -- 192.168.2.10
-         MAC_ADDR_G   => MAC_ADDR_INIT_C)
+         TPD_G           => TPD_G,
+         BUILD_INFO_G    => BUILD_INFO_G,
+         CLK_FREQUENCY_G => 125.0E+6,
+         XIL_DEVICE_G    => "7SERIES",
+         APP_TYPE_G      => "ETH",
+         AXIS_SIZE_G     => 1,
+         DHCP_G          => false,
+         IP_ADDR_G       => x"0A_02_A8_C0",  -- 192.168.2.10
+         MAC_ADDR_G      => MAC_ADDR_INIT_C)
       port map (
          -- Clock and Reset
          clk       => clk,

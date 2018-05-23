@@ -2,7 +2,7 @@
 -- File       : Kc705GigE.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-02-02
--- Last update: 2018-02-12
+-- Last update: 2018-05-18
 -------------------------------------------------------------------------------
 -- Description: Example using 1000BASE-SX Protocol
 -------------------------------------------------------------------------------
@@ -45,13 +45,13 @@ entity Kc705GigE is
       gtRxP  : in  sl;
       gtRxN  : in  sl;
       gtTxP  : out sl;
-      gtTxN  : out sl);      
+      gtTxN  : out sl);
 end Kc705GigE;
 
 architecture top_level of Kc705GigE is
 
    constant AXIS_SIZE_C : positive         := 1;
-   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";      -- 192.168.2.10  
+   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10  
    constant MAC_ADDR_C  : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01
 
    signal txMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
@@ -99,20 +99,21 @@ begin
          gtTxP(0)     => gtTxP,
          gtTxN(0)     => gtTxN,
          gtRxP(0)     => gtRxP,
-         gtRxN(0)     => gtRxN);      
+         gtRxN(0)     => gtRxN);
 
    -------------------
    -- Application Core
    -------------------
    U_App : entity work.AppCore
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         XIL_DEVICE_G => "7SERIES",
-         APP_TYPE_G   => "ETH",
-         AXIS_SIZE_G  => AXIS_SIZE_C,
-         MAC_ADDR_G   => MAC_ADDR_C,
-         IP_ADDR_G    => IP_ADDR_C)         
+         TPD_G           => TPD_G,
+         BUILD_INFO_G    => BUILD_INFO_G,
+         CLK_FREQUENCY_G => 125.0E+6,
+         XIL_DEVICE_G    => "7SERIES",
+         APP_TYPE_G      => "ETH",
+         AXIS_SIZE_G     => AXIS_SIZE_C,
+         MAC_ADDR_G      => MAC_ADDR_C,
+         IP_ADDR_G       => IP_ADDR_C)
       port map (
          -- Clock and Reset
          clk       => clk,
@@ -137,5 +138,5 @@ begin
    led(2) <= '0';
    led(1) <= not(rst);
    led(0) <= phyReady;
-   
+
 end top_level;

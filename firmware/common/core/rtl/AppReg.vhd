@@ -2,7 +2,7 @@
 -- File       : AppReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2018-05-14
+-- Last update: 2018-05-18
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -27,9 +27,10 @@ use work.SsiPkg.all;
 
 entity AppReg is
    generic (
-      TPD_G        : time   := 1 ns;
-      BUILD_INFO_G : BuildInfoType;
-      XIL_DEVICE_G : string := "7SERIES");
+      TPD_G           : time   := 1 ns;
+      BUILD_INFO_G    : BuildInfoType;
+      CLK_FREQUENCY_G : real   := 156.25E+6;
+      XIL_DEVICE_G    : string := "7SERIES");
    port (
       -- Clock and Reset
       clk             : in  sl;
@@ -210,6 +211,7 @@ begin
    U_AxiVersion : entity work.AxiVersion
       generic map (
          TPD_G           => TPD_G,
+         CLK_PERIOD_G    => (1.0/CLK_FREQUENCY_G),
          BUILD_INFO_G    => BUILD_INFO_G,
          XIL_DEVICE_G    => XIL_DEVICE_G,
          EN_DEVICE_DNA_G => true)

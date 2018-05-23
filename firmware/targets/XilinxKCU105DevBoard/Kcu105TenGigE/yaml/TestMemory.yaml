@@ -1,0 +1,30 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+#schemaversion 3.0.0
+#once TestMemory.yaml 
+
+TestMemory: &TestMemory 
+  name:   TestMemory
+  description: TestMemory
+  class: MMIODev
+  configPrio: 1
+  size: 0x80000000
+  children:
+    #########################################################    
+    MyMem:
+      at:
+        offset: 0x0
+        stride: 4
+        nelms: 0x4000
+      class: IntField
+      name: MyMem
+      sizeBits: 32
+      mode: RW
+    #########################################################    

@@ -8,22 +8,23 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once AmcCarrierCore.yaml
+#once DigFpga.yaml
 #include AxiVersion.yaml
 #include AxiSysMonUltraScale.yaml
 #include SsiPrbsTx.yaml
 #include SsiPrbsRx.yaml
 #include RssiCore.yaml
+#include TestMemory.yaml
 
-AmcCarrierCore: &DigFpga 
+DigFpga: &DigFpga 
   name: DigFpga
   description: DigFpga
   class: MMIODev
-  configPrio: 1  
+  configPrio: 1
   size: 0x100000000 # 4GB of address space
-  ########
-  MMIODev:
-  ########
+  ######### 
+  children:
+  ######### 
     ##################################################
     AxiVersion:
       <<: *AxiVersion
@@ -49,5 +50,10 @@ AmcCarrierCore: &DigFpga
       <<: *RssiCore
       at:
         offset: 0x00070000 
+    ##################################################
+    TestMemory:
+      <<: *TestMemory
+      at:
+        offset: 0x80000000     
     ##################################################
     
