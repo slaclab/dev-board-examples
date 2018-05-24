@@ -30,7 +30,7 @@ import rogue.hardware.data
 import sys
 import argparse
 
-rogue.Logging.setLevel(rogue.Logging.Warning)
+# rogue.Logging.setLevel(rogue.Logging.Warning)
 # # rogue.Logging.setFilter("pyrogue.SrpV3",rogue.Logging.Debug)
 # # rogue.Logging.setLevel(rogue.Logging.Debug)
 
@@ -163,15 +163,18 @@ rootTop = pr.Root(name='System',description='Front End Board')
 srp = rogue.protocols.srp.SrpV3()
 pr.streamConnectBiDir(vc0Srp,srp)  
 
-# Connect VC1 to FW TX PRBS
-prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx')
-pyrogue.streamConnect(vc1Prbs,prbsRx)
-rootTop.add(prbsRx)  
+# # Connect VC1 to FW TX PRBS
+# prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx')
+# pyrogue.streamConnect(vc1Prbs,prbsRx)
+# rootTop.add(prbsRx)  
     
-# Connect VC1 to FW RX PRBS
-prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx")
-pyrogue.streamConnect(prbTx, vc1Prbs)
-rootTop.add(prbTx)  
+# # Connect VC1 to FW RX PRBS
+# prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx")
+# pyrogue.streamConnect(prbTx, vc1Prbs)
+# rootTop.add(prbTx)  
+    
+# Loopback the PRBS data
+pyrogue.streamConnect(vc1Prbs,vc1Prbs)    
     
 # Add registers
 rootTop.add(devBoard.Fpga(

@@ -110,7 +110,7 @@ begin
          XIL_DEVICE_G    => "ULTRASCALE",
          APP_TYPE_G      => "ETH",
          AXIS_SIZE_G     => AXIS_SIZE_C,
-         APP_ILEAVE_EN_G => false,
+         APP_ILEAVE_EN_G => true,
          DHCP_G          => false,
          MAC_ADDR_G      => MAC_ADDR_C,
          IP_ADDR_G       => IP_ADDR_C)
