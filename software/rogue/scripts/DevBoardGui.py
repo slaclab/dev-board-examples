@@ -24,7 +24,6 @@ import DevBoard as devBoard
 import pyrogue.gui
 import pyrogue.protocols
 import pyrogue.utilities.prbs
-import PyQt4.QtGui
 import rogue.hardware.pgp
 import rogue.hardware.data
 import sys
@@ -203,7 +202,7 @@ if args.varRate: rootTop.Fpga.varRateTest()
 if args.rawRate: rootTop.Fpga.rawRateTest()
 
 # Create GUI
-appTop = PyQt4.QtGui.QApplication(sys.argv)
+appTop = pr.gui.application(sys.argv)
 guiTop = pr.gui.GuiTop(group='PyRogueGui')
 guiTop.addTree(rootTop)
 guiTop.resize(800, 1200)
