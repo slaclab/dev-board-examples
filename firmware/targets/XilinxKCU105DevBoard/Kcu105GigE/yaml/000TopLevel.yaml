@@ -92,7 +92,7 @@ stream: &stream
       numRxThreads: 2
     RSSI: yes
     depack:
-      useDepack: yes
+      protocolVersion: DEPACKETIZER_V2
     TDESTMux:
       TDEST: 0x80
       stripHeader: yes
@@ -115,6 +115,7 @@ NetIODev:
            port: 8192
          RSSI:
          depack:
+           protocolVersion: DEPACKETIZER_V2
          TDESTMux:
            TDEST: 0
      Stream0:

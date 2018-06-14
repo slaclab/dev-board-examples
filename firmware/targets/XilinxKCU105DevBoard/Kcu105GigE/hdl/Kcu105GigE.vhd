@@ -33,7 +33,7 @@ entity Kcu105GigE is
       BUILD_INFO_G  : BuildInfoType;
       SIM_SPEEDUP_G : boolean := false;
       SIMULATION_G  : boolean := false;
-      SGMII_ETH_G   : boolean := false);
+      SGMII_ETH_G   : integer := 0);
    port (
       -- Misc. IOs
       extRst     : in    sl;
@@ -49,13 +49,6 @@ entity Kcu105GigE is
       ethRxN     : in    sl;
       ethTxP     : out   sl;
       ethTxN     : out   sl;
-      -- SGMII (ext. PHY) ETH
-      sgmiiClkP  : in    sl;
-      sgmiiClkN  : in    sl;
-      sgmiiRxP   : in    sl;
-      sgmiiRxN   : in    sl;
-      sgmiiTxP   : out   sl;
-      sgmiiTxN   : out   sl;
       -- ETH external PHY pins
       phyMdc     : out   sl;
       phyMdio    : inout sl;
@@ -68,8 +61,10 @@ end Kcu105GigE;
 
 architecture top_level of Kcu105GigE is
 
-   constant AXIS_SIZE_C : positive         := 1;
-   constant RST_DEL_C   : slv(23 downto 0) := X"5FFFFF";  -- 2*10ms @ 300MHz
+   constant AXIS_SIZE_C       : positive         := 1;
+   constant ETH_AXIS_CONFIG_C : AxiStreamConfigArray(3 downto 0) := (others => EMAC_AXIS_CONFIG_C);
+
+   constant RST_DEL_C         : slv(23 downto 0) := X"5FFFFF";  -- 2*10ms @ 300MHz
 
    signal txMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
    signal txSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
@@ -129,8 +124,7 @@ begin
          syncRst  => sysRst300
          );
 
-
-   GEN_GTH : if (not SGMII_ETH_G) generate
+   GEN_GTH : if (SGMII_ETH_G = 0) generate
 
       ---------------------
       -- 1 GigE XAUI Module
@@ -147,13 +141,13 @@ begin
             CLKFBOUT_MULT_F_G  => 32.0,  -- 1 GHz = (32 x 31.25 MHz)
             CLKOUT0_DIVIDE_F_G => 8.0,   -- 125 MHz = (1.0 GHz/8)
             -- AXI Streaming Configurations
-            AXIS_CONFIG_G      => (others => EMAC_AXIS_CONFIG_C))
+            AXIS_CONFIG_G      => ETH_AXIS_CONFIG_C)
          port map (
             -- Local Configurations
-            localMac     => (others => MAC_ADDR_INIT_C),
+            localMac(0)  => MAC_ADDR_INIT_C,
             -- Streaming DMA Interface
-            dmaClk       => (others => clk),
-            dmaRst       => (others => rst),
+            dmaClk(0)    => clk,
+            dmaRst(0)    => rst,
             dmaIbMasters => rxMasters,
             dmaIbSlaves  => rxSlaves,
             dmaObMasters => txMasters,
@@ -177,7 +171,7 @@ begin
 
    end generate GEN_GTH;
 
-   GEN_SGMII : if (SGMII_ETH_G) generate
+   GEN_SGMII : if (SGMII_ETH_G /= 0) generate
 
       signal rstCnt     : slv(23 downto 0) := RST_DEL_C;
       signal phyInitRst : sl;
@@ -203,7 +197,7 @@ begin
 
       extPhyReady <= rstCnt(23);
 
-      extPhyRstN <= ite((unsigned(rstCnt(22 downto 20)) > 3) and (extPhyReady = '0'), '0', '1');
+      extPhyRstN <= ite((unsigned(rstCnt(22 downto 20)) > 2) and (extPhyReady = '0'), '0', '1');
 
       -- The MDIO controller which talks to the external PHY must be held
       -- in reset until extPhyReady; it works in a different clock domain...
@@ -276,13 +270,13 @@ begin
             DIVCLK_DIVIDE_G   => 2,     -- 312.5 MHz
             CLKFBOUT_MULT_F_G => 2.0,   -- VCO: 625 MHz
             -- AXI Streaming Configurations
-            AXIS_CONFIG_G     => (others => EMAC_AXIS_CONFIG_C))
+            AXIS_CONFIG_G     => ETH_AXIS_CONFIG_C)
          port map (
             -- Local Configurations
-            localMac           => (others => MAC_ADDR_INIT_C),
+            localMac(0)        => MAC_ADDR_INIT_C,
             -- Streaming DMA Interface
-            dmaClk             => (others => clk),
-            dmaRst             => (others => rst),
+            dmaClk(0)          => clk,
+            dmaRst(0)          => rst,
             dmaIbMasters       => rxMasters,
             dmaIbSlaves        => rxSlaves,
             dmaObMasters       => txMasters,
@@ -297,13 +291,13 @@ begin
             speed_is_100(0)    => speed100,
 
             -- MGT Clock Port
-            sgmiiClkP   => sgmiiClkP,
-            sgmiiClkN   => sgmiiClkN,
+            sgmiiClkP   => ethClkP,
+            sgmiiClkN   => ethClkN,
             -- MGT Ports
-            sgmiiTxP(0) => sgmiiTxP,
-            sgmiiTxN(0) => sgmiiTxN,
-            sgmiiRxP(0) => sgmiiRxP,
-            sgmiiRxN(0) => sgmiiRxN);
+            sgmiiTxP(0) => ethTxP,
+            sgmiiTxN(0) => ethTxN,
+            sgmiiRxP(0) => ethRxP,
+            sgmiiRxN(0) => ethRxN);
 
    end generate GEN_SGMII;
 

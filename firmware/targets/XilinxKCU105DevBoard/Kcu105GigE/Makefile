@@ -12,8 +12,9 @@ export PRJ_PART = XCKU040-FFVA1156-2-E
 
 # Whether to use the on-board PHY (connected to the RJ-45 jack)
 # or an SFP module for ethernet connectivity.
-# Must be true or false
-export USE_RJ45_ETH = false
+# Must be 1 or 0
+export USE_RJ45_ETH = 0
+
 export INCLUDE_ETH_SGMII_LVDS = 1
 
 # Using a non-standard target directory structure, 
