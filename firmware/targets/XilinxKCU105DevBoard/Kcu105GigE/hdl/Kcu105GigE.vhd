@@ -202,7 +202,7 @@ begin
 
       extPhyReady <= rstCnt(23);
 
-      extPhyRstN <= ite((unsigned(rstCnt(22 downto 20)) > 3) and (extPhyReady = '0'), '0', '1');
+      extPhyRstN <= ite((unsigned(rstCnt(22 downto 20)) > 2) and (extPhyReady = '0'), '0', '1');
 
       -- The MDIO controller which talks to the external PHY must be held
       -- in reset until extPhyReady; it works in a different clock domain...
