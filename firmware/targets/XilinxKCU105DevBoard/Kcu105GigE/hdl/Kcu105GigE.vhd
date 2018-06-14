@@ -33,7 +33,7 @@ entity Kcu105GigE is
       BUILD_INFO_G  : BuildInfoType;
       SIM_SPEEDUP_G : boolean := false;
       SIMULATION_G  : boolean := false;
-      SGMII_ETH_G   : boolean := false);
+      SGMII_ETH_G   : integer := 0);
    port (
       -- Misc. IOs
       extRst     : in    sl;
@@ -129,8 +129,7 @@ begin
          syncRst  => sysRst300
          );
 
-
-   GEN_GTH : if (not SGMII_ETH_G) generate
+   GEN_GTH : if (SGMII_ETH_G = 0) generate
 
       ---------------------
       -- 1 GigE XAUI Module
@@ -177,7 +176,7 @@ begin
 
    end generate GEN_GTH;
 
-   GEN_SGMII : if (SGMII_ETH_G) generate
+   GEN_SGMII : if (SGMII_ETH_G /= 0) generate
 
       signal rstCnt     : slv(23 downto 0) := RST_DEL_C;
       signal phyInitRst : sl;
