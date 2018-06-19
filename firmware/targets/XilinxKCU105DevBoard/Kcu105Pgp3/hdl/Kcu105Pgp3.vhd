@@ -2,7 +2,7 @@
 -- File       : Kcu105Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-03-13
--- Last update: 2018-03-13
+-- Last update: 2018-06-19
 -------------------------------------------------------------------------------
 -- Description: Example using PGP2B Protocol
 -------------------------------------------------------------------------------
@@ -106,8 +106,8 @@ begin
          TPD_G        => TPD_G,
          BUILD_INFO_G => BUILD_INFO_G,
          XIL_DEVICE_G => "ULTRASCALE",
-         APP_TYPE_G   => "PGP3",
-         AXIS_SIZE_G  => AXIS_SIZE_C)
+         AXIS_CONFIG_G => PGP3_AXIS_CONFIG_C,
+         RX_READY_EN_G => false)
       port map (
          -- Clock and Reset
          clk       => clk,
