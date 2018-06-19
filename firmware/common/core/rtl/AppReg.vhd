@@ -2,7 +2,7 @@
 -- File       : AppReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2018-05-18
+-- Last update: 2018-06-19
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -45,11 +45,11 @@ entity AppReg is
       commWriteSlave  : in  AxiLiteWriteSlaveType;
       commReadMaster  : out AxiLiteReadMasterType;
       commReadSlave   : in  AxiLiteReadSlaveType;
-      -- PBRS Interface
-      pbrsTxMaster    : out AxiStreamMasterType;
-      pbrsTxSlave     : in  AxiStreamSlaveType;
-      pbrsRxMaster    : in  AxiStreamMasterType;
-      pbrsRxSlave     : out AxiStreamSlaveType;
+      -- PRBS Interface
+      prbsTxMaster    : out AxiStreamMasterType;
+      prbsTxSlave     : in  AxiStreamSlaveType;
+      prbsRxMaster    : in  AxiStreamMasterType;
+      prbsRxSlave     : out AxiStreamSlaveType;
       -- HLS Interface
       hlsTxMaster     : out AxiStreamMasterType;
       hlsTxSlave      : in  AxiStreamSlaveType;
@@ -299,8 +299,8 @@ begin
       port map (
          mAxisClk        => clk,
          mAxisRst        => rst,
-         mAxisMaster     => pbrsTxMaster,
-         mAxisSlave      => pbrsTxSlave,
+         mAxisMaster     => prbsTxMaster,
+         mAxisSlave      => prbsTxSlave,
          locClk          => clk,
          locRst          => rst,
          trig            => '0',
@@ -322,8 +322,8 @@ begin
       port map (
          sAxisClk       => clk,
          sAxisRst       => rst,
-         sAxisMaster    => pbrsRxMaster,
-         sAxisSlave     => pbrsRxSlave,
+         sAxisMaster    => prbsRxMaster,
+         sAxisSlave     => prbsRxSlave,
          mAxisClk       => clk,
          mAxisRst       => rst,
          axiClk         => clk,

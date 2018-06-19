@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : PgpVcMapping.vhd
+-- File       : StreamMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-30
 -- Last update: 2018-03-28
@@ -25,10 +25,11 @@ use work.AxiLitePkg.all;
 use work.Pgp2bPkg.all;
 use work.Pgp3Pkg.all;
 
-entity PgpVcMapping is
+entity StreamMapping is
    generic (
-      TPD_G      : time   := 1 ns;
-      APP_TYPE_G : string := "PGP");
+      TPD_G         : time                := 1 ns;
+      RX_READY_EN_G : boolean             := false;
+      AXIS_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));
    port (
       -- Clock and Reset
       clk              : in  sl;
@@ -39,11 +40,11 @@ entity PgpVcMapping is
       rxMasters        : in  AxiStreamMasterArray(3 downto 0);
       rxSlaves         : out AxiStreamSlaveArray(3 downto 0);
       rxCtrl           : out AxiStreamCtrlArray(3 downto 0);
-      -- PBRS Interface
-      pbrsTxMaster     : in  AxiStreamMasterType;
-      pbrsTxSlave      : out AxiStreamSlaveType;
-      pbrsRxMaster     : out AxiStreamMasterType;
-      pbrsRxSlave      : in  AxiStreamSlaveType;
+      -- PRBS Interface
+      prbsTxMaster     : in  AxiStreamMasterType;
+      prbsTxSlave      : out AxiStreamSlaveType;
+      prbsRxMaster     : out AxiStreamMasterType;
+      prbsRxSlave      : in  AxiStreamSlaveType;
       -- HLS Interface
       hlsTxMaster      : in  AxiStreamMasterType;
       hlsTxSlave       : out AxiStreamSlaveType;
@@ -56,17 +57,12 @@ entity PgpVcMapping is
       mAxilWriteMaster : out AxiLiteWriteMasterType;
       mAxilWriteSlave  : in  AxiLiteWriteSlaveType;
       mAxilReadMaster  : out AxiLiteReadMasterType;
-      mAxilReadSlave   : in  AxiLiteReadSlaveType;
-      -- Communication Slave AXI-Lite Interface
-      commWriteMaster  : in  AxiLiteWriteMasterType;
-      commWriteSlave   : out AxiLiteWriteSlaveType;
-      commReadMaster   : in  AxiLiteReadMasterType;
-      commReadSlave    : out AxiLiteReadSlaveType);
-end PgpVcMapping;
+      mAxilReadSlave   : in  AxiLiteReadSlaveType);
+end StreamMapping;
 
-architecture mapping of PgpVcMapping is
+architecture mapping of StreamMapping is
 
-   constant AXIS_CONFIG_C : AxiStreamConfigType := ite(APP_TYPE_G = "PGP", SSI_PGP2B_CONFIG_C, PGP3_AXIS_CONFIG_C);
+   --constant AXIS_CONFIG_C : AxiStreamConfigType := ite(APP_TYPE_G = "PGP", SSI_PGP2B_CONFIG_C, PGP3_AXIS_CONFIG_C);
 
    constant MB_STREAM_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
@@ -79,24 +75,19 @@ architecture mapping of PgpVcMapping is
 
 begin
 
-   commWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C;
-   commReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C;
-
-   assert ((APP_TYPE_G = "PGP") or (APP_TYPE_G = "PGP3"))
-      report "APP_TYPE_G must be PGP or PGP3" severity error;
-
    -- VC0 RX/TX, SRPv3 register Module
    U_SRPv3 : entity work.SrpV3AxiLite
       generic map (
          TPD_G               => TPD_G,
-         SLAVE_READY_EN_G    => false,
+         SLAVE_READY_EN_G    => RX_READY_EN_G,
          GEN_SYNC_FIFO_G     => true,
-         AXI_STREAM_CONFIG_G => AXIS_CONFIG_C)
+         AXI_STREAM_CONFIG_G => AXIS_CONFIG_G)
       port map (
          -- Streaming Slave (Rx) Interface (sAxisClk domain) 
          sAxisClk         => clk,
          sAxisRst         => rst,
          sAxisMaster      => rxMasters(0),
+         sAxisSlave       => rxSlaves(0),
          sAxisCtrl        => rxCtrl(0),
          -- Streaming Master (Tx) Data Interface (mAxisClk domain)
          mAxisClk         => clk,
@@ -111,8 +102,8 @@ begin
          mAxilWriteMaster => mAxilWriteMaster,
          mAxilWriteSlave  => mAxilWriteSlave);
 
-   -- VC1 TX, PBRS
-   VCTX1 : entity work.AxiStreamFifo
+   -- VC1 TX, PRBS
+   VCTX1 : entity work.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
@@ -129,26 +120,26 @@ begin
          FIFO_PAUSE_THRESH_G => 128,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => ssiAxiStreamConfig(4),
-         MASTER_AXI_CONFIG_G => AXIS_CONFIG_C)
+         MASTER_AXI_CONFIG_G => AXIS_CONFIG_G)
       port map (
          -- Slave Port
          sAxisClk    => clk,
          sAxisRst    => rst,
-         sAxisMaster => pbrsTxMaster,
-         sAxisSlave  => pbrsTxSlave,
+         sAxisMaster => prbsTxMaster,
+         sAxisSlave  => prbsTxSlave,
          -- Master Port
          mAxisClk    => clk,
          mAxisRst    => rst,
          mAxisMaster => txMasters(1),
          mAxisSlave  => txSlaves(1));
 
-   -- VC1 RX, PBRS
-   VCRX1 : entity work.AxiStreamFifo
+   -- VC1 RX, PRBS
+   VCRX1 : entity work.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
          PIPE_STAGES_G       => 1,
-         SLAVE_READY_EN_G    => true,
+         SLAVE_READY_EN_G    => RX_READY_EN_G,
          VALID_THOLD_G       => 1,
          -- FIFO configurations
          BRAM_EN_G           => true,
@@ -159,22 +150,23 @@ begin
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 128,
          -- AXI Stream Port Configurations
-         SLAVE_AXI_CONFIG_G  => AXIS_CONFIG_C,
+         SLAVE_AXI_CONFIG_G  => AXIS_CONFIG_G,
          MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(4))
       port map (
          -- Slave Port
          sAxisClk    => clk,
          sAxisRst    => rst,
          sAxisMaster => rxMasters(1),
+         sAxisSlave  => rxSlaves(1),
          sAxisCtrl   => rxCtrl(1),
          -- Master Port
          mAxisClk    => clk,
          mAxisRst    => rst,
-         mAxisMaster => pbrsRxMaster,
-         mAxisSlave  => pbrsRxSlave);
+         mAxisMaster => prbsRxMaster,
+         mAxisSlave  => prbsRxSlave);
 
    -- VC2 TX, HLS
-   VCTX2 : entity work.AxiStreamFifo
+   VCTX2 : entity work.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
@@ -191,7 +183,7 @@ begin
          FIFO_PAUSE_THRESH_G => 128,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => ssiAxiStreamConfig(4),
-         MASTER_AXI_CONFIG_G => AXIS_CONFIG_C)
+         MASTER_AXI_CONFIG_G => AXIS_CONFIG_G)
       port map (
          -- Slave Port
          sAxisClk    => clk,
@@ -205,12 +197,12 @@ begin
          mAxisSlave  => txSlaves(2));
 
    -- VC2 RX, HLS
-   VCRX2 : entity work.AxiStreamFifo
+   VCRX2 : entity work.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
          PIPE_STAGES_G       => 1,
-         SLAVE_READY_EN_G    => true,
+         SLAVE_READY_EN_G    => RX_READY_EN_G,
          VALID_THOLD_G       => 1,
          -- FIFO configurations
          BRAM_EN_G           => true,
@@ -221,13 +213,14 @@ begin
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 128,
          -- AXI Stream Port Configurations
-         SLAVE_AXI_CONFIG_G  => AXIS_CONFIG_C,
+         SLAVE_AXI_CONFIG_G  => AXIS_CONFIG_G,
          MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(4))
       port map (
          -- Slave Port
          sAxisClk    => clk,
          sAxisRst    => rst,
          sAxisMaster => rxMasters(2),
+         sAxisSlave => rxSlaves(2),
          sAxisCtrl   => rxCtrl(2),
          -- Master Port
          mAxisClk    => clk,
@@ -235,11 +228,8 @@ begin
          mAxisMaster => hlsRxMaster,
          mAxisSlave  => hlsRxSlave);
 
-   -- Terminate Unused slave AXIS
-   rxSlaves <= (others => AXI_STREAM_SLAVE_INIT_C);
-
    -- VC3 Microblaze
-   MBTX_FIFO : entity work.AxiStreamFifo
+   MBTX_FIFO : entity work.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
@@ -256,7 +246,7 @@ begin
          FIFO_PAUSE_THRESH_G => 128,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => MB_STREAM_CONFIG_C,
-         MASTER_AXI_CONFIG_G => AXIS_CONFIG_C)
+         MASTER_AXI_CONFIG_G => AXIS_CONFIG_G)
       port map (
          -- Slave Port
          sAxisClk    => clk,
@@ -269,6 +259,8 @@ begin
          mAxisMaster => txMasters(3),
          mAxisSlave  => txSlaves(3));
 
-   rxCtrl(3) <= AXI_STREAM_CTRL_UNUSED_C;
+   -- Perhaps force here instead
+   rxCtrl(3)   <= AXI_STREAM_CTRL_UNUSED_C;
+   rxSlaves(3) <= AXI_STREAM_SLAVE_INIT_C;
 
 end mapping;
