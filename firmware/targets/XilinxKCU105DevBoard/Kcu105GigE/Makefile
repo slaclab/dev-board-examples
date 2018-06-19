@@ -21,5 +21,7 @@ export INCLUDE_ETH_SGMII_LVDS = 1
 # which requires me to define the TOP_DIR path
 export TOP_DIR = $(abspath $(PWD)/../../..)
 
+export GIT_BYPASS = 1
+
 # Use top level makefile
 include $(TOP_DIR)/submodules/ruckus/system_vivado.mk
