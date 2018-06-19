@@ -2,7 +2,7 @@
 -- File       : Kcu105Pgp.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-09
--- Last update: 2017-09-01
+-- Last update: 2018-06-19
 -------------------------------------------------------------------------------
 -- Description: Example using PGP2B Protocol
 -------------------------------------------------------------------------------
@@ -30,8 +30,7 @@ entity Kcu105Pgp is
    generic (
       TPD_G         : time    := 1 ns;
       BUILD_INFO_G  : BuildInfoType;
-      SIM_SPEEDUP_G : boolean := false;
-      SIMULATION_G  : boolean := false);
+      SIM_SPEEDUP_G : boolean := false);
    port (
       -- Misc. IOs
       extRst  : in  sl;
@@ -69,103 +68,67 @@ architecture top_level of Kcu105Pgp is
 
 begin
 
-   REAL_PGP : if (not SIMULATION_G) generate
+   U_IBUFDS_GTE3 : IBUFDS_GTE3
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
+      port map (
+         I     => pgpClkP,
+         IB    => pgpClkN,
+         CEB   => '0',
+         ODIV2 => pgpRefClkDiv2,        -- Divide by 1
+         O     => pgpRefClk);
 
-      U_IBUFDS_GTE3 : IBUFDS_GTE3
-         generic map (
-            REFCLK_EN_TX_PATH  => '0',
-            REFCLK_HROW_CK_SEL => "00",  -- 2'b00: ODIV2 = O
-            REFCLK_ICNTL_RX    => "00")
-         port map (
-            I     => pgpClkP,
-            IB    => pgpClkN,
-            CEB   => '0',
-            ODIV2 => pgpRefClkDiv2,      -- Divide by 1
-            O     => pgpRefClk);
+   U_BUFG_GT : BUFG_GT
+      port map (
+         I       => pgpRefClkDiv2,
+         CE      => '1',
+         CLR     => '0',
+         CEMASK  => '1',
+         CLRMASK => '1',
+         DIV     => "000",              -- Divide by 1
+         O       => clk);
 
-      U_BUFG_GT : BUFG_GT
-         port map (
-            I       => pgpRefClkDiv2,
-            CE      => '1',
-            CLR     => '0',
-            CEMASK  => '1',
-            CLRMASK => '1',
-            DIV     => "000",           -- Divide by 1
-            O       => clk);
-
-      U_PGP : entity work.Pgp2bGthUltra
-         generic map (
-            TPD_G             => TPD_G,
-            PAYLOAD_CNT_TOP_G => 7,
-            VC_INTERLEAVE_G   => 1,
-            NUM_VC_EN_G       => 4)
-         port map (
-            stableClk       => clk,
-            stableRst       => rst,
-            gtRefClk        => pgpRefClk,
-            pgpGtTxP        => pgpTxP,
-            pgpGtTxN        => pgpTxN,
-            pgpGtRxP        => pgpRxP,
-            pgpGtRxN        => pgpRxN,
-            pgpTxReset      => rst,
-            pgpTxClk        => clk,
-            pgpTxMmcmLocked => '1',
-            pgpRxReset      => rst,
-            pgpRxClk        => clk,
-            pgpRxMmcmLocked => '1',
-            pgpTxIn         => PGP2B_TX_IN_INIT_C,
-            pgpTxOut        => pgpTxOut,
-            pgpRxIn         => PGP2B_RX_IN_INIT_C,
-            pgpRxOut        => pgpRxOut,
-            pgpTxMasters    => txMasters,
-            pgpTxSlaves     => txSlaves,
-            pgpRxMasters    => rxMasters,
-            pgpRxCtrl       => rxCtrl);
-   end generate REAL_PGP;
-
-   SIM_PGP : if (SIMULATION_G) generate
-      U_SimModel : entity work.PgpSimModel
-         generic map (
-            TPD_G => TPD_G)
-         port map (
-            pgpTxClk     => clk,
-            pgpTxClkRst  => rst,
-            pgpRxClk     => clk,
-            pgpRxClkRst  => rst,
-            pgpTxIn      => PGP2B_TX_IN_INIT_C,
-            pgpTxOut     => pgpTxOut,
-            pgpRxIn      => PGP2B_RX_IN_INIT_C,
-            pgpRxOut     => pgpRxOut,
-            pgpTxMasters => txMasters,
-            pgpTxSlaves  => txSlaves,
-            pgpRxMasters => rxMasters,
-            pgpRxCtrl    => rxCtrl);
-
-      clk <= pgpClkP;
-
-      U_PwrUpRst : entity work.PwrUpRst
-         generic map (
-            TPD_G          => TPD_G,
-            SIM_SPEEDUP_G  => SIM_SPEEDUP_G,
-            IN_POLARITY_G  => '1',
-            OUT_POLARITY_G => '1')
-         port map (
-            clk    => clk,
-            arst   => extRst,
-            rstOut => rst);
-
-   end generate SIM_PGP;
+   U_PGP : entity work.Pgp2bGthUltra
+      generic map (
+         TPD_G             => TPD_G,
+         PAYLOAD_CNT_TOP_G => 7,
+         VC_INTERLEAVE_G   => 1,
+         NUM_VC_EN_G       => 4)
+      port map (
+         stableClk       => clk,
+         stableRst       => rst,
+         gtRefClk        => pgpRefClk,
+         pgpGtTxP        => pgpTxP,
+         pgpGtTxN        => pgpTxN,
+         pgpGtRxP        => pgpRxP,
+         pgpGtRxN        => pgpRxN,
+         pgpTxReset      => rst,
+         pgpTxClk        => clk,
+         pgpTxMmcmLocked => '1',
+         pgpRxReset      => rst,
+         pgpRxClk        => clk,
+         pgpRxMmcmLocked => '1',
+         pgpTxIn         => PGP2B_TX_IN_INIT_C,
+         pgpTxOut        => pgpTxOut,
+         pgpRxIn         => PGP2B_RX_IN_INIT_C,
+         pgpRxOut        => pgpRxOut,
+         pgpTxMasters    => txMasters,
+         pgpTxSlaves     => txSlaves,
+         pgpRxMasters    => rxMasters,
+         pgpRxCtrl       => rxCtrl);
 
    -------------------
    -- Application Core
    -------------------
    U_App : entity work.AppCore
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         XIL_DEVICE_G => "ULTRASCALE",
-         APP_TYPE_G   => "PGP",
-         AXIS_SIZE_G  => AXIS_SIZE_C)
+         TPD_G         => TPD_G,
+         BUILD_INFO_G  => BUILD_INFO_G,
+         XIL_DEVICE_G  => "ULTRASCALE",
+         AXIS_CONFIG_G => SSI_PGP2B_CONFIG_C,
+         RX_READY_EN_G => false)
       port map (
          -- Clock and Reset
          clk       => clk,
