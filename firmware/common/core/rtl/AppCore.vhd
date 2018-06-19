@@ -42,10 +42,10 @@ entity AppCore is
       rxSlaves            : out AxiStreamSlaveArray(3 downto 0);
       rxCtrl              : out AxiStreamCtrlArray(3 downto 0);
       -- AXIL interface for comm protocol config/status
-      commAxilWriteMaster : out AxiLiteWriteMasterType;
-      commAxilWriteSlave  : in  AxiLiteWriteSlaveType;
-      commAxilReadMaster  : out AxiLiteReadMasterType;
-      commAxilReadSlave   : in  AxiLiteReadSlaveType;
+      commAxilWriteMaster : out AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
+      commAxilWriteSlave  : in  AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
+      commAxilReadMaster  : out AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
+      commAxilReadSlave   : in  AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
       -- ADC Ports
       vPIn                : in  sl;
       vNIn                : in  sl);
