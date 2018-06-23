@@ -24,14 +24,14 @@ import DevBoard as devBoard
 import pyrogue.gui
 import pyrogue.protocols
 import pyrogue.utilities.prbs
-import PyQt4.QtGui
 import rogue.hardware.pgp
-import rogue.hardware.data
+import rogue.hardware.axi
 import sys
 import argparse
 
 # rogue.Logging.setLevel(rogue.Logging.Warning)
-# # rogue.Logging.setFilter("pyrogue.SrpV3",rogue.Logging.Debug)
+#rogue.Logging.setFilter("pyrogue.rssi",rogue.Logging.Info)
+#rogue.Logging.setFilter("pyrogue.packetizer",rogue.Logging.Info)
 # # rogue.Logging.setLevel(rogue.Logging.Debug)
 
 #################################################################
@@ -127,8 +127,8 @@ args = parser.parse_args()
 # DataDev PCIe Card
 if ( args.type == 'datadev' ):
 
-    vc0Srp  = rogue.hardware.data.DataCard(args.dev,(args.lane*32)+0)
-    vc1Prbs = rogue.hardware.data.DataCard(args.dev,(args.lane*32)+1)
+    vc0Srp  = rogue.hardware.axi.AxiStream(args.dev,(args.lane*32)+0)
+    vc1Prbs = rogue.hardware.axi.AxiStream(args.dev,(args.lane*32)+1)
     
 # RUDP Ethernet
 elif ( args.type == 'eth' ):
@@ -164,17 +164,17 @@ srp = rogue.protocols.srp.SrpV3()
 pr.streamConnectBiDir(vc0Srp,srp)  
 
 # # Connect VC1 to FW TX PRBS
-# prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx')
-# pyrogue.streamConnect(vc1Prbs,prbsRx)
-# rootTop.add(prbsRx)  
+prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx')
+pyrogue.streamConnect(vc1Prbs,prbsRx)
+rootTop.add(prbsRx)  
     
 # # Connect VC1 to FW RX PRBS
-# prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx")
-# pyrogue.streamConnect(prbTx, vc1Prbs)
-# rootTop.add(prbTx)  
+prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx")
+pyrogue.streamConnect(prbTx, vc1Prbs)
+rootTop.add(prbTx)  
     
 # Loopback the PRBS data
-pyrogue.streamConnect(vc1Prbs,vc1Prbs)    
+#pyrogue.streamConnect(vc1Prbs,vc1Prbs)    
     
 # Add registers
 rootTop.add(devBoard.Fpga(
@@ -203,7 +203,7 @@ if args.varRate: rootTop.Fpga.varRateTest()
 if args.rawRate: rootTop.Fpga.rawRateTest()
 
 # Create GUI
-appTop = PyQt4.QtGui.QApplication(sys.argv)
+appTop = pr.gui.application(sys.argv)
 guiTop = pr.gui.GuiTop(group='PyRogueGui')
 guiTop.addTree(rootTop)
 guiTop.resize(800, 1200)
