@@ -2,7 +2,7 @@
 -- File       : Kcu105Xaui.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-08
--- Last update: 2017-02-16
+-- Last update: 2018-06-19
 -------------------------------------------------------------------------------
 -- Description: Example using 10 GbE XAUI Protocol
 --              https://en.wikipedia.org/wiki/XAUI
@@ -62,14 +62,24 @@ end Kcu105Xaui;
 
 architecture top_level of Kcu105Xaui is
 
-   constant AXIS_SIZE_C : positive         := 1;
-   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10  
-   constant MAC_ADDR_C  : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01
+   constant CLK_FREQUENCY_C : real             := 125.0E+6;
+   constant IP_ADDR_C       : slv(31 downto 0) := x"0A02A8C0";      -- 192.168.2.10  
+   constant MAC_ADDR_C      : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01
 
-   signal txMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
-   signal txSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
-   signal rxMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
-   signal rxSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
+   signal ethTxMaster : AxiStreamMasterType;
+   signal ethTxSlave  : AxiStreamSlaveType;
+   signal ethRxMaster : AxiStreamMasterType;
+   signal ethRxSlave  : AxiStreamSlaveType;
+
+   signal txMasters : AxiStreamMasterArray(3 downto 0);
+   signal txSlaves  : AxiStreamSlaveArray(3 downto 0);
+   signal rxMasters : AxiStreamMasterArray(3 downto 0);
+   signal rxSlaves  : AxiStreamSlaveArray(3 downto 0);
+
+   signal commAxilWriteMaster : AxiLiteWriteMasterType;
+   signal commAxilWriteSlave  : AxiLiteWriteSlaveType;
+   signal commAxilReadMaster  : AxiLiteReadMasterType;
+   signal commAxilReadSlave   : AxiLiteReadSlaveType;
 
    signal clk      : sl;
    signal rst      : sl;
@@ -101,10 +111,10 @@ begin
          -- Streaming DMA Interface 
          dmaClk      => clk,
          dmaRst      => rst,
-         dmaIbMaster => rxMasters(0),
-         dmaIbSlave  => rxSlaves(0),
-         dmaObMaster => txMasters(0),
-         dmaObSlave  => txSlaves(0),
+         dmaIbMaster => ethRxMaster,
+         dmaIbSlave  => ethRxSlave,
+         dmaObMaster => ethTxMaster,
+         dmaObSlave  => ethTxSlave,
          -- Misc. Signals
          extRst      => reset,
          phyClk      => clk,
@@ -119,30 +129,61 @@ begin
          gtRxP       => ethRxP,
          gtRxN       => ethRxN);
 
+   -------------------------------------------------------------------------------------------------
+   -- UDP and RSSI
+   -------------------------------------------------------------------------------------------------
+   U_EthUdpRssiWrapper_1 : entity work.EthUdpRssiWrapper
+      generic map (
+         TPD_G           => TPD_G,
+         CLK_FREQUENCY_G => CLK_FREQUENCY_C,
+         IP_ADDR_G       => IP_ADDR_C,
+         MAC_ADDR_G      => MAC_ADDR_C,
+         APP_ILEAVE_EN_G => true,
+         DHCP_G          => false,
+         JUMBO_G         => false)
+      port map (
+         clk                 => clk,                  -- [in]
+         rst                 => rst,                  -- [in]
+         ethTxMaster         => ethTxMaster,          -- [out]
+         ethTxSlave          => ethTxSlave,           -- [in]
+         ethRxMaster         => ethRxMaster,          -- [in]
+         ethRxSlave          => ethRxSlave,           -- [out]
+         txMasters           => txMasters,            -- [in]
+         txSlaves            => txSlaves,             -- [out]
+         rxMasters           => rxMasters,            -- [out]
+         rxSlaves            => rxSlaves,             -- [in]
+         rssiAxilWriteMaster => commAxilWriteMaster,  -- [in]
+         rssiAxilWriteSlave  => commAxilWriteSlave,   -- [out]
+         rssiAxilReadMaster  => commAxilReadMaster,   -- [in]
+         rssiAxilReadSlave   => commAxilReadSlave);   -- [out]
+
    -------------------
    -- Application Core
    -------------------
    U_App : entity work.AppCore
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         XIL_DEVICE_G => "ULTRASCALE",
-         APP_TYPE_G   => "ETH",
-         AXIS_SIZE_G  => AXIS_SIZE_C,
-         MAC_ADDR_G   => MAC_ADDR_C,
-         IP_ADDR_G    => IP_ADDR_C)
+         TPD_G         => TPD_G,
+         BUILD_INFO_G  => BUILD_INFO_G,
+         XIL_DEVICE_G  => "ULTRASCALE",
+         RX_READY_EN_G => true,
+         AXIS_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
          -- Clock and Reset
-         clk       => clk,
-         rst       => rst,
+         clk                 => clk,
+         rst                 => rst,
          -- AXIS interface
-         txMasters => txMasters,
-         txSlaves  => txSlaves,
-         rxMasters => rxMasters,
-         rxSlaves  => rxSlaves,
+         txMasters           => txMasters,
+         txSlaves            => txSlaves,
+         rxMasters           => rxMasters,
+         rxSlaves            => rxSlaves,
+         -- AXIL interface for comm protocol
+         commAxilWriteMaster => commAxilWriteMaster,
+         commAxilWriteSlave  => commAxilWriteSlave,
+         commAxilReadMaster  => commAxilReadMaster,
+         commAxilReadSlave   => commAxilReadSlave,
          -- ADC Ports
-         vPIn      => vPIn,
-         vNIn      => vNIn);
+         vPIn                => vPIn,
+         vNIn                => vNIn);
 
    ----------------
    -- Misc. Signals
