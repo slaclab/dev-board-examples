@@ -127,8 +127,8 @@ args = parser.parse_args()
 # DataDev PCIe Card
 if ( args.type == 'datadev' ):
 
-    vc0Srp  = rogue.hardware.axi.AxiStream(args.dev,(args.lane*32)+0)
-    vc1Prbs = rogue.hardware.axi.AxiStream(args.dev,(args.lane*32)+1)
+    vc0Srp  = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*32)+0,True)
+    vc1Prbs = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*32)+1,True)
     
 # RUDP Ethernet
 elif ( args.type == 'eth' ):

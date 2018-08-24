@@ -30,14 +30,16 @@ architecture testbed of MyAxiStreamPacketizer2Tb is
 
    constant CLK_PERIOD_C       : time             := 10 ns;
    constant TPD_G              : time             := CLK_PERIOD_C/4;
-   constant PKT_SIZE_C         : positive         := 128;
-   constant MAX_PACKET_BYTES_C : positive         := 3+(8*PKT_SIZE_C)/8;
-   -- constant MAX_PACKET_BYTES_C : positive         := 1024;
-   constant TKEEP_TLAST_C      : slv(15 downto 0) := genTKeep(1);
+   constant PKT_SIZE_C         : positive         := 3;
+   
+   -- constant MAX_PACKET_BYTES_C : positive         := 3+(8*PKT_SIZE_C)/8;
+   constant MAX_PACKET_BYTES_C : positive         := 1024;
+   
+   constant TKEEP_TLAST_C      : slv(15 downto 0) := genTKeep(4);
 
 
-   -- constant BRAM_EN_C : boolean := true;
-   constant BRAM_EN_C : boolean := false;
+   constant BRAM_EN_C : boolean := true;
+   -- constant BRAM_EN_C : boolean := false;
 
    
    
