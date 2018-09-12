@@ -295,7 +295,8 @@ begin
       generic map (
          TPD_G                      => TPD_G,
          MASTER_AXI_PIPE_STAGES_G   => 1,
-         MASTER_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(4))
+         PRBS_SEED_SIZE_G           => 128,
+         MASTER_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(16))
       port map (
          mAxisClk        => clk,
          mAxisRst        => rst,
@@ -318,7 +319,8 @@ begin
    U_SsiPrbsRx : entity work.SsiPrbsRx
       generic map (
          TPD_G                     => TPD_G,
-         SLAVE_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(4))
+         PRBS_SEED_SIZE_G           => 128,
+         SLAVE_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(16))
       port map (
          sAxisClk       => clk,
          sAxisRst       => rst,

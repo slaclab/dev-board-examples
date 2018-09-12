@@ -85,7 +85,7 @@ architecture mapping of EthPortMapping is
    constant RSSI_SIZE_C : positive := 4;
    constant AXIS_CONFIG_C : AxiStreamConfigArray(RSSI_SIZE_C-1 downto 0) := (
       0 => ssiAxiStreamConfig(4),
-      1 => ssiAxiStreamConfig(4),
+      1 => ssiAxiStreamConfig(16),
       2 => ssiAxiStreamConfig(4),
       3 => MB_STREAM_CONFIG_C);
 
@@ -212,7 +212,7 @@ begin
          mAxilWriteSlave  => mAxilWriteSlave);
 
    --------------------------
-   -- TDEST = 0x1: TX/RX PBRS   
+   -- TDEST = 0x1: TX/RX PBRS
    --------------------------
    rssiIbMasters(1) <= pbrsTxMaster;
    pbrsTxSlave      <= rssiIbSlaves(1);
@@ -228,7 +228,7 @@ begin
    rssiObSlaves(2)  <= hlsRxSlave;
 
    --------------------------
-   -- TDEST = 0x3: TX/RX PBRS   
+   -- TDEST = 0x3: Microblaze
    --------------------------
    rssiIbMasters(3) <= mbTxMaster;
    mbTxSlave        <= rssiIbSlaves(3);

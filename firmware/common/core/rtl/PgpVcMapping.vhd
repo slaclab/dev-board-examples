@@ -128,7 +128,7 @@ begin
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 128,
          -- AXI Stream Port Configurations
-         SLAVE_AXI_CONFIG_G  => ssiAxiStreamConfig(4),
+         SLAVE_AXI_CONFIG_G  => ssiAxiStreamConfig(16),
          MASTER_AXI_CONFIG_G => AXIS_CONFIG_C)
       port map (
          -- Slave Port
@@ -160,7 +160,7 @@ begin
          FIFO_PAUSE_THRESH_G => 128,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(4))
+         MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(16))
       port map (
          -- Slave Port
          sAxisClk    => clk,
