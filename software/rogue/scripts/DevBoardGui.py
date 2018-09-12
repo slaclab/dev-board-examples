@@ -164,12 +164,12 @@ srp = rogue.protocols.srp.SrpV3()
 pr.streamConnectBiDir(vc0Srp,srp)  
 
 # # Connect VC1 to FW TX PRBS
-prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx')
+prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx',width=128)
 pyrogue.streamConnect(vc1Prbs,prbsRx)
 rootTop.add(prbsRx)  
     
 # # Connect VC1 to FW RX PRBS
-prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx")
+prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx",width=128)
 pyrogue.streamConnect(prbTx, vc1Prbs)
 rootTop.add(prbTx)  
     
