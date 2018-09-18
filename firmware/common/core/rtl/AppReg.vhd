@@ -2,7 +2,7 @@
 -- File       : AppReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2018-05-18
+-- Last update: 2018-09-18
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -319,7 +319,8 @@ begin
    U_SsiPrbsRx : entity work.SsiPrbsRx
       generic map (
          TPD_G                     => TPD_G,
-         PRBS_SEED_SIZE_G           => 128,
+         SLAVE_AXI_PIPE_STAGES_G   => 1,
+         PRBS_SEED_SIZE_G          => 128,
          SLAVE_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(16))
       port map (
          sAxisClk       => clk,
