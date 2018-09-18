@@ -46,7 +46,7 @@ create_generated_clock -name dnaClk    [get_pins {U_App/U_Reg/U_AxiVersion/GEN_D
 create_generated_clock -name dnaClkInv [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/DNA_CLK_INV_BUFR/O}] 
 
 set_clock_groups -asynchronous -group [get_clocks {pgpClk}] -group [get_clocks {stableClk}] 
-set_clock_groups -asynchronous -group [get_clocks {pgpClk}] -group [get_clocks {dnaClkInv}] 
+set_clock_groups -asynchronous -group [get_clocks {pgpClk}] -group [get_clocks {dnaClk}] -group [get_clocks {dnaClkInv}] 
 
 # .bit File Configuration
 set_property BITSTREAM.CONFIG.CONFIGRATE 33 [current_design]  
