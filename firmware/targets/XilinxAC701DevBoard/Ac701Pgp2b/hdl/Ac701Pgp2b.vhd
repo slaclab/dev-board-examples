@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : Ac701Pgp.vhd
+-- File       : Ac701Pgp2b.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-02-02
 -- Last update: 2017-09-01
@@ -26,7 +26,7 @@ use work.Pgp2bPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity Ac701Pgp is
+entity Ac701Pgp2b is
    generic (
       TPD_G         : time    := 1 ns;
       BUILD_INFO_G  : BuildInfoType;
@@ -49,9 +49,9 @@ entity Ac701Pgp is
       gtRxN   : in  sl;
       gtTxP   : out sl;
       gtTxN   : out sl);
-end Ac701Pgp;
+end Ac701Pgp2b;
 
-architecture top_level of Ac701Pgp is
+architecture top_level of Ac701Pgp2b is
 
    constant AXIS_SIZE_C : positive := 4;
 
