@@ -5,7 +5,7 @@ export INCLUDE_PGP3_6G = 1
 target: prom
 
 # Define Firmware Version Number
-export PRJ_VERSION = 0x00000006
+export PRJ_VERSION = 0x00000009
 
 # Define target part
 export PRJ_PART = XC7A200TFBG676-2

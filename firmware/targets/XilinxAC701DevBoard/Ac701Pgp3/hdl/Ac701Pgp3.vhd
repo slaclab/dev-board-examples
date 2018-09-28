@@ -2,7 +2,7 @@
 -- File       : Ac701Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-02-02
--- Last update: 2018-09-20
+-- Last update: 2018-09-28
 -------------------------------------------------------------------------------
 -- Description: Example using PGP2B Protocol
 -------------------------------------------------------------------------------
@@ -89,6 +89,7 @@ begin
          ROGUE_SIM_USER_ID_G => 99,
          NUM_LANES_G         => 1,
          NUM_VC_G            => 4,
+         SPEED_GRADE_G       => 2,
          RATE_G              => "6.25Gbps",
          REFCLK_TYPE_G       => PGP3_REFCLK_125_C)
       port map (
@@ -125,11 +126,12 @@ begin
    -------------------
    U_App : entity work.AppCore
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         XIL_DEVICE_G => "7SERIES",
-         APP_TYPE_G   => "PGP3",
-         AXIS_SIZE_G  => AXIS_SIZE_C)
+         TPD_G           => TPD_G,
+         BUILD_INFO_G    => BUILD_INFO_G,
+         XIL_DEVICE_G    => "7SERIES",
+         APP_TYPE_G      => "PGP3",
+         CLK_FREQUENCY_G => (6.25E+9/64.0),
+         AXIS_SIZE_G     => AXIS_SIZE_C)
       port map (
          -- Clock and Reset
          clk       => clk,
