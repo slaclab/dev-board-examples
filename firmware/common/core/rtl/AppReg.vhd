@@ -2,7 +2,7 @@
 -- File       : AppReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2018-09-18
+-- Last update: 2018-09-28
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -68,56 +68,61 @@ architecture mapping of AppReg is
    constant SHARED_MEM_WIDTH_C : positive                           := 13;
    constant IRQ_ADDR_C         : slv(SHARED_MEM_WIDTH_C-1 downto 0) := (others => '1');
 
-   constant NUM_AXI_MASTERS_C : natural := 9;
+   constant NUM_AXI_MASTERS_C : natural := 10;
 
-   constant VERSION_INDEX_C : natural := 0;
-   constant XADC_INDEX_C    : natural := 1;
-   constant SYS_MON_INDEX_C : natural := 2;
-   constant MEM_INDEX_C     : natural := 3;
-   constant PRBS_TX_INDEX_C : natural := 4;
-   constant PRBS_RX_INDEX_C : natural := 5;
-   constant HLS_INDEX_C     : natural := 6;
-   constant COMM_INDEX_C    : natural := 7;
-   constant TEST_INDEX_C    : natural := 8;
+   constant VERSION_INDEX_C  : natural := 0;
+   constant XADC_INDEX_C     : natural := 1;
+   constant SYS_MON_INDEX_C  : natural := 2;
+   constant MEM_INDEX_C      : natural := 3;
+   constant PRBS_TX_INDEX_C  : natural := 4;
+   constant PRBS_RX_INDEX_C  : natural := 5;
+   constant HLS_INDEX_C      : natural := 6;
+   constant COMM_INDEX_C     : natural := 7;
+   constant AXIS_MON_INDEX_C : natural := 8;
+   constant TEST_INDEX_C     : natural := 9;
 
    -- constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, x"0000_0000", 20, 16);
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
-      VERSION_INDEX_C => (
-         baseAddr     => x"0000_0000",
-         addrBits     => 16,
-         connectivity => x"FFFF"),
-      XADC_INDEX_C    => (
-         baseAddr     => x"0001_0000",
-         addrBits     => 16,
-         connectivity => x"FFFF"),
-      SYS_MON_INDEX_C => (
-         baseAddr     => x"0002_0000",
-         addrBits     => 16,
-         connectivity => x"FFFF"),
-      MEM_INDEX_C     => (
-         baseAddr     => x"0003_0000",
-         addrBits     => 16,
-         connectivity => x"FFFF"),
-      PRBS_TX_INDEX_C => (
-         baseAddr     => x"0004_0000",
-         addrBits     => 16,
-         connectivity => x"FFFF"),
-      PRBS_RX_INDEX_C => (
-         baseAddr     => x"0005_0000",
-         addrBits     => 16,
-         connectivity => x"FFFF"),
-      HLS_INDEX_C     => (
-         baseAddr     => x"0006_0000",
-         addrBits     => 16,
-         connectivity => x"FFFF"),
-      COMM_INDEX_C    => (
-         baseAddr     => x"0007_0000",
-         addrBits     => 16,
-         connectivity => x"FFFF"),
-      TEST_INDEX_C    => (
-         baseAddr     => x"8000_0000",
-         addrBits     => 31,
-         connectivity => x"FFFF"));
+      VERSION_INDEX_C  => (
+         baseAddr      => x"0000_0000",
+         addrBits      => 16,
+         connectivity  => x"FFFF"),
+      XADC_INDEX_C     => (
+         baseAddr      => x"0001_0000",
+         addrBits      => 16,
+         connectivity  => x"FFFF"),
+      SYS_MON_INDEX_C  => (
+         baseAddr      => x"0002_0000",
+         addrBits      => 16,
+         connectivity  => x"FFFF"),
+      MEM_INDEX_C      => (
+         baseAddr      => x"0003_0000",
+         addrBits      => 16,
+         connectivity  => x"FFFF"),
+      PRBS_TX_INDEX_C  => (
+         baseAddr      => x"0004_0000",
+         addrBits      => 16,
+         connectivity  => x"FFFF"),
+      PRBS_RX_INDEX_C  => (
+         baseAddr      => x"0005_0000",
+         addrBits      => 16,
+         connectivity  => x"FFFF"),
+      HLS_INDEX_C      => (
+         baseAddr      => x"0006_0000",
+         addrBits      => 16,
+         connectivity  => x"FFFF"),
+      COMM_INDEX_C     => (
+         baseAddr      => x"0007_0000",
+         addrBits      => 16,
+         connectivity  => x"FFFF"),
+      AXIS_MON_INDEX_C => (
+         baseAddr      => x"0008_0000",
+         addrBits      => 16,
+         connectivity  => x"FFFF"),
+      TEST_INDEX_C     => (
+         baseAddr      => x"8000_0000",
+         addrBits      => 31,
+         connectivity  => x"FFFF"));
 
    signal mAxilWriteMaster : AxiLiteWriteMasterType;
    signal mAxilWriteSlave  : AxiLiteWriteSlaveType;
@@ -128,6 +133,11 @@ architecture mapping of AppReg is
    signal mAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
    signal mAxilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal mAxilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_DECERR_C);
+
+   signal txMaster : AxiStreamMasterType;
+   signal txSlave  : AxiStreamSlaveType;
+   signal rxMaster : AxiStreamMasterType;
+   signal rxSlave  : AxiStreamSlaveType;
 
    signal axiWrValid : sl;
    signal axiWrAddr  : slv(SHARED_MEM_WIDTH_C-1 downto 0);
@@ -313,6 +323,9 @@ begin
          axilWriteMaster => mAxilWriteMasters(PRBS_TX_INDEX_C),
          axilWriteSlave  => mAxilWriteSlaves(PRBS_TX_INDEX_C));
 
+   pbrsTxMaster <= txMaster;
+   txSlave      <= pbrsTxSlave;
+
    -------------------
    -- AXI-Lite PRBS RX
    -------------------
@@ -325,16 +338,43 @@ begin
       port map (
          sAxisClk       => clk,
          sAxisRst       => rst,
-         sAxisMaster    => pbrsRxMaster,
-         sAxisSlave     => pbrsRxSlave,
-         mAxisClk       => clk,
-         mAxisRst       => rst,
+         sAxisMaster    => rxMaster,
+         sAxisSlave     => rxSlave,
          axiClk         => clk,
          axiRst         => rst,
          axiReadMaster  => mAxilReadMasters(PRBS_RX_INDEX_C),
          axiReadSlave   => mAxilReadSlaves(PRBS_RX_INDEX_C),
          axiWriteMaster => mAxilWriteMasters(PRBS_RX_INDEX_C),
          axiWriteSlave  => mAxilWriteSlaves(PRBS_RX_INDEX_C));
+
+   rxMaster    <= pbrsRxMaster;
+   pbrsRxSlave <= rxSlave;
+
+   --------------------------------------
+   -- AXI-Lite PRBS AXI Stream Monitoring
+   --------------------------------------
+   U_AXIS_MON : entity work.AxiStreamMonAxiL
+      generic map(
+         TPD_G            => TPD_G,
+         COMMON_CLK_G     => true,
+         AXIS_CLK_FREQ_G  => CLK_FREQUENCY_G,
+         AXIS_NUM_SLOTS_G => 2,
+         AXIS_CONFIG_G    => ssiAxiStreamConfig(16))
+      port map(
+         -- AXIS Stream Interface
+         axisClk          => clk,
+         axisRst          => rst,
+         axisMaster(0)    => txMaster,
+         axisMaster(1)    => rxMaster,
+         axisSlave(0)     => txSlave,
+         axisSlave(1)     => rxSlave,
+         -- AXI lite slave port for register access
+         axilClk          => clk,
+         axilRst          => rst,
+         sAxilWriteMaster => mAxilWriteMasters(AXIS_MON_INDEX_C),
+         sAxilWriteSlave  => mAxilWriteSlaves(AXIS_MON_INDEX_C),
+         sAxilReadMaster  => mAxilReadMasters(AXIS_MON_INDEX_C),
+         sAxilReadSlave   => mAxilReadSlaves(AXIS_MON_INDEX_C));
 
    ------------------------------
    -- AXI-Lite HLS Example Module

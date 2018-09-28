@@ -129,6 +129,7 @@ if ( args.type == 'datadev' ):
 
     vc0Srp  = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*32)+0,True)
     vc1Prbs = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*32)+1,True)
+    # vc1Prbs.setZeroCopyEn(False)
     
 # RUDP Ethernet
 elif ( args.type == 'eth' ):
@@ -143,12 +144,14 @@ elif ( args.type == 'eth' ):
     # Map the AxiStream.TDEST
     vc0Srp  = rudp.application(0); # AxiStream.tDest = 0x0
     vc1Prbs = rudp.application(1); # AxiStream.tDest = 0x1
+    # vc1Prbs.setZeroCopyEn(False)
         
 # Legacy PGP PCIe Card
 elif ( args.type == 'pgp' ):
 
     vc0Srp  = rogue.hardware.pgp.PgpCard(args.dev,args.lane,0) # Registers
     vc1Prbs = rogue.hardware.pgp.PgpCard(args.dev,args.lane,1) # Data
+    # vc1Prbs.setZeroCopyEn(False)
 
 # Undefined device type
 else:
@@ -164,12 +167,12 @@ srp = rogue.protocols.srp.SrpV3()
 pr.streamConnectBiDir(vc0Srp,srp)  
 
 # # Connect VC1 to FW TX PRBS
-prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx',width=128)
+prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=False)
 pyrogue.streamConnect(vc1Prbs,prbsRx)
 rootTop.add(prbsRx)  
     
 # # Connect VC1 to FW RX PRBS
-prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx",width=128)
+prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
 pyrogue.streamConnect(prbTx, vc1Prbs)
 rootTop.add(prbTx)  
     

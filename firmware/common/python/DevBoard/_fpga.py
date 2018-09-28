@@ -78,6 +78,13 @@ class Fpga(pr.Device):
                 offset = 0x00070000,
                 expand = False,
             ))                 
+               
+        self.add(axi.AxiStreamMonitoring(            
+            name        = 'AxisMon', 
+            offset      = 0x00080000, 
+            numberLanes = 2,
+            expand      = False,
+        ))            
             
         self.add(MbSharedMem(
             name   = 'TestEmptyMem',
