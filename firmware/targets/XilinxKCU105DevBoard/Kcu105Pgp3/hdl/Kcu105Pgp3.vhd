@@ -2,7 +2,7 @@
 -- File       : Kcu105Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-03-13
--- Last update: 2018-03-13
+-- Last update: 2018-10-11
 -------------------------------------------------------------------------------
 -- Description: Example using PGP2B Protocol
 -------------------------------------------------------------------------------
@@ -60,10 +60,23 @@ architecture top_level of Kcu105Pgp3 is
    signal pgpTxOut : Pgp3TxOutType;
    signal pgpRxOut : Pgp3RxOutType;
 
+   signal stableClk : sl;
+   signal stableRst : sl;
+
    signal clk : sl;
    signal rst : sl;
 
 begin
+
+   U_PwrUpRst : entity work.PwrUpRst
+      generic map (
+         TPD_G          => TPD_G,
+         IN_POLARITY_G  => '1',
+         OUT_POLARITY_G => '1')
+      port map (
+         clk    => stableClk,
+         arst   => extRst,
+         rstOut => stableRst);
 
    U_Pgp : entity work.Pgp3GthUsWrapper
       generic map (
@@ -72,31 +85,32 @@ begin
          NUM_VC_G    => 4)
       port map (
          -- Stable Clock and Reset
-         stableClk    => clk,
-         stableRst    => rst,
+         stableClk         => stableClk,
+         stableRst         => stableRst,
          -- Gt Serial IO
-         pgpGtTxP(0)  => pgpTxP,
-         pgpGtTxN(0)  => pgpTxN,
-         pgpGtRxP(0)  => pgpRxP,
-         pgpGtRxN(0)  => pgpRxN,
+         pgpGtTxP(0)       => pgpTxP,
+         pgpGtTxN(0)       => pgpTxN,
+         pgpGtRxP(0)       => pgpRxP,
+         pgpGtRxN(0)       => pgpRxN,
          -- GT Clocking
-         pgpRefClkP   => pgpClkP,
-         pgpRefClkN   => pgpClkN,
+         pgpRefClkP        => pgpClkP,
+         pgpRefClkN        => pgpClkN,
+         pgpRefClkDiv2Bufg => stableClk,
          -- Clocking
-         pgpClk(0)    => clk,
-         pgpClkRst(0) => rst,
+         pgpClk(0)         => clk,
+         pgpClkRst(0)      => rst,
          -- Non VC Rx Signals
-         pgpRxIn(0)   => PGP3_RX_IN_INIT_C,
-         pgpRxOut(0)  => pgpRxOut,
+         pgpRxIn(0)        => PGP3_RX_IN_INIT_C,
+         pgpRxOut(0)       => pgpRxOut,
          -- Non VC Tx Signals
-         pgpTxIn(0)   => PGP3_TX_IN_INIT_C,
-         pgpTxOut(0)  => pgpTxOut,
+         pgpTxIn(0)        => PGP3_TX_IN_INIT_C,
+         pgpTxOut(0)       => pgpTxOut,
          -- Frame Transmit Interface
-         pgpTxMasters => txMasters,
-         pgpTxSlaves  => txSlaves,
+         pgpTxMasters      => txMasters,
+         pgpTxSlaves       => txSlaves,
          -- Frame Receive Interface
-         pgpRxMasters => rxMasters,
-         pgpRxCtrl    => rxCtrl);
+         pgpRxMasters      => rxMasters,
+         pgpRxCtrl         => rxCtrl);
 
    -------------------
    -- Application Core
