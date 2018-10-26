@@ -39,6 +39,7 @@ create_generated_clock -name dnaClk [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVI
 
 set_clock_groups -asynchronous -group [get_clocks {ethClk}]  -group [get_clocks {dnaClk}]
 set_clock_groups -asynchronous -group [get_clocks {ethClkP}] -group [get_clocks {dnaClk}]
+set_clock_groups -asynchronous -group [get_clocks {ethClkP}] -group [get_clocks {ethClk}]
 
 # BITSTREAM Configurations
 set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design] 
