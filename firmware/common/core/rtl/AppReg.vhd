@@ -364,10 +364,10 @@ begin
          -- AXIS Stream Interface
          axisClk          => clk,
          axisRst          => rst,
-         axisMaster(0)    => txMaster,
-         axisMaster(1)    => rxMaster,
-         axisSlave(0)     => txSlave,
-         axisSlave(1)     => rxSlave,
+         axisMasters(0)   => txMaster,
+         axisMasters(1)   => rxMaster,
+         axisSlaves(0)    => txSlave,
+         axisSlaves(1)    => rxSlave,
          -- AXI lite slave port for register access
          axilClk          => clk,
          axilRst          => rst,
