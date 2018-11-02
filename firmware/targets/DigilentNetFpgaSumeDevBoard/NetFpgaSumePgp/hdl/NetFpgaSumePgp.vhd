@@ -18,10 +18,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.Pgp2bPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.Pgp2bPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -80,7 +81,7 @@ begin
          IB => FPGA_SYSCLK_N,
          O  => sysClk);     
 
-   ClockManager7_0 : entity work.ClockManager7
+   ClockManager7_0 : entity surf.ClockManager7
       generic map(
          TPD_G              => TPD_G,
          TYPE_G             => "MMCM",
@@ -105,7 +106,7 @@ begin
       ------------------------
       -- PGP Core for VIRTEX-7
       ------------------------
-      Pgp2bGth7VarLatWrapper_Inst : entity work.Pgp2bGth7VarLatWrapper
+      Pgp2bGth7VarLatWrapper_Inst : entity surf.Pgp2bGth7VarLatWrapper
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -132,7 +133,7 @@ begin
    end generate REAL_PGP;
 
    SIM_PGP : if (SIMULATION_G) generate
-      U_SimModel : entity work.PgpSimModel
+      U_SimModel : entity surf.PgpSimModel
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -151,7 +152,7 @@ begin
 
       clk <= FPGA_SYSCLK_P;
 
-      U_PwrUpRst : entity work.PwrUpRst
+      U_PwrUpRst : entity surf.PwrUpRst
          generic map (
             TPD_G          => TPD_G,
             SIM_SPEEDUP_G  => SIM_SPEEDUP_G,

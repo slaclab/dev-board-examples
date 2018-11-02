@@ -31,8 +31,9 @@ use ieee_proposed.fixed_float_types.all;
 use ieee_proposed.float_pkg.all;
 -- synthesis translate_on
 
-use work.StdRtlPkg.all;
-use work.DspPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.DspPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -85,7 +86,7 @@ begin
          I => clock,
          O => clk);
 
-   U_PwrUpRst0 : entity work.PwrUpRst
+   U_PwrUpRst0 : entity surf.PwrUpRst
       generic map(
          TPD_G         => TPD_G,
          SIM_SPEEDUP_G => SIM_SPEEDUP_G)
@@ -106,7 +107,7 @@ begin
    led(1) <= '1';
    led(0) <= '1';
 
-   U_Heartbeat : entity work.Heartbeat
+   U_Heartbeat : entity surf.Heartbeat
       generic map(
          TPD_G       => TPD_G,
          PERIOD_IN_G => 8.0E-9)
@@ -130,7 +131,7 @@ begin
 
    counter <= to_slv(cnt);
 
-   U_Add : entity work.DspFp32AddSub
+   U_Add : entity surf.DspFp32AddSub
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -140,7 +141,7 @@ begin
          add  => '1',
          pOut => add);
 
-   U_Sub : entity work.DspFp32AddSub
+   U_Sub : entity surf.DspFp32AddSub
       generic map (
          TPD_G => TPD_G)
       port map (

@@ -19,10 +19,11 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.EthMacPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -117,7 +118,7 @@ begin
          O => sysClk300
          );
 
-   U_SysclkRstSync : entity work.RstSync
+   U_SysclkRstSync : entity surf.RstSync
       port map (
          clk      => sysClk300,
          asyncRst => extRst,
@@ -129,7 +130,7 @@ begin
       ---------------------
       -- 1 GigE XAUI Module
       ---------------------
-      U_1GigE : entity work.GigEthGthUltraScaleWrapper
+      U_1GigE : entity surf.GigEthGthUltraScaleWrapper
          generic map (
             TPD_G              => TPD_G,
             -- DMA/MAC Configurations
@@ -202,7 +203,7 @@ begin
       -- The MDIO controller which talks to the external PHY must be held
       -- in reset until extPhyReady; it works in a different clock domain...
 
-      U_PhyInitRstSync : entity work.RstSync
+      U_PhyInitRstSync : entity surf.RstSync
          generic map (
             IN_POLARITY_G  => '0',
             OUT_POLARITY_G => '1'
@@ -219,7 +220,7 @@ begin
       -- and handle link changes (aneg still enabled on copper) flagged
       -- by the PHY...
 
-      U_PhyCtrl : entity work.PhyControllerCore
+      U_PhyCtrl : entity surf.PhyControllerCore
          generic map (
             TPD_G => TPD_G,
             DIV_G => 100
@@ -241,14 +242,14 @@ begin
             );
 
       -- synchronize MDI and IRQ signals into 'clk' domain
-      U_SyncMdi : entity work.Synchronizer
+      U_SyncMdi : entity surf.Synchronizer
          port map (
             clk     => clk,
             dataIn  => phyMdio,
             dataOut => phyMdi
             );
 
-      U_SyncIrq : entity work.Synchronizer
+      U_SyncIrq : entity surf.Synchronizer
          generic map (
             OUT_POLARITY_G => '0',
             INIT_G         => "11"
@@ -259,7 +260,7 @@ begin
             dataOut => phyIrq
             );
 
-      U_1GigE : entity work.GigEthLvdsUltraScaleWrapper
+      U_1GigE : entity surf.GigEthLvdsUltraScaleWrapper
          generic map (
             TPD_G             => TPD_G,
             -- DMA/MAC Configurations

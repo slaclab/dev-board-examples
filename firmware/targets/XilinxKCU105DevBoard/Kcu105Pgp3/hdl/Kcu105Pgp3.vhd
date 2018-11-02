@@ -18,10 +18,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.Pgp3Pkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.Pgp3Pkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -68,7 +69,7 @@ architecture top_level of Kcu105Pgp3 is
 
 begin
 
-   U_PwrUpRst : entity work.PwrUpRst
+   U_PwrUpRst : entity surf.PwrUpRst
       generic map (
          TPD_G          => TPD_G,
          IN_POLARITY_G  => '1',
@@ -78,7 +79,7 @@ begin
          arst   => extRst,
          rstOut => stableRst);
 
-   U_Pgp : entity work.Pgp3GthUsWrapper
+   U_Pgp : entity surf.Pgp3GthUsWrapper
       generic map (
          TPD_G       => TPD_G,
          NUM_LANES_G => 1,

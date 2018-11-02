@@ -18,10 +18,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.Pgp3Pkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.Pgp3Pkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -71,7 +72,7 @@ architecture top_level of Ac701Pgp3 is
 
 begin
 
-   U_PwrUpRst : entity work.PwrUpRst
+   U_PwrUpRst : entity surf.PwrUpRst
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -82,7 +83,7 @@ begin
    -----------------------
    -- PGP Core for ARTIX-7
    -----------------------
-   U_PGP : entity work.Pgp3Gtp7Wrapper
+   U_PGP : entity surf.Pgp3Gtp7Wrapper
       generic map (
          TPD_G               => TPD_G,
          ROGUE_SIM_EN_G      => SIMULATION_G,

@@ -18,10 +18,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.Pgp2bPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.Pgp2bPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -93,7 +94,7 @@ begin
             DIV     => "000",           -- Divide by 1
             O       => clk);
 
-      U_PGP : entity work.Pgp2bGthUltra
+      U_PGP : entity surf.Pgp2bGthUltra
          generic map (
             TPD_G             => TPD_G,
             PAYLOAD_CNT_TOP_G => 7,
@@ -124,7 +125,7 @@ begin
    end generate REAL_PGP;
 
    SIM_PGP : if (SIMULATION_G) generate
-      U_SimModel : entity work.PgpSimModel
+      U_SimModel : entity surf.PgpSimModel
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -143,7 +144,7 @@ begin
 
       clk <= pgpClkP;
 
-      U_PwrUpRst : entity work.PwrUpRst
+      U_PwrUpRst : entity surf.PwrUpRst
          generic map (
             TPD_G          => TPD_G,
             SIM_SPEEDUP_G  => SIM_SPEEDUP_G,

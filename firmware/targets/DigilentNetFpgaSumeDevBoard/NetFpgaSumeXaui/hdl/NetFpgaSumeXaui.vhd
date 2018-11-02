@@ -21,10 +21,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.EthMacPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -89,7 +90,7 @@ begin
          I => sysClock,
          O => sysClk);           
 
-   PwrUpRst_Inst : entity work.PwrUpRst
+   PwrUpRst_Inst : entity surf.PwrUpRst
       generic map(
          TPD_G      => TPD_G,
          DURATION_G => 200000000)   
@@ -97,7 +98,7 @@ begin
          clk    => sysClk,
          rstOut => sysRst);         
 
-   ClockManager7_0 : entity work.ClockManager7
+   ClockManager7_0 : entity surf.ClockManager7
       generic map(
          TPD_G              => TPD_G,
          TYPE_G             => "MMCM",
@@ -121,7 +122,7 @@ begin
    ----------------------
    -- 10 GigE XAUI Module
    ----------------------
-   U_XAUI : entity work.XauiGth7Wrapper
+   U_XAUI : entity surf.XauiGth7Wrapper
       generic map (
          TPD_G          => TPD_G,
          -- QUAD PLL Configurations

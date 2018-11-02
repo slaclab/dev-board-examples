@@ -18,10 +18,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.EthMacPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -67,7 +68,7 @@ begin
    ------------------------
    -- GigE Core for ARTIX-7
    ------------------------
-   U_ETH_PHY_MAC : entity work.GigEthGtp7Wrapper
+   U_ETH_PHY_MAC : entity surf.GigEthGtp7Wrapper
       generic map (
          TPD_G              => TPD_G,
          NUM_LANE_G         => 2,

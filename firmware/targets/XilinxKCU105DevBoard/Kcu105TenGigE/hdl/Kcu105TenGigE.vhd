@@ -18,10 +18,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.EthMacPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -68,7 +69,7 @@ begin
    -----------------
    -- 10 GigE Module
    -----------------
-   U_10GigE : entity work.TenGigEthGthUltraScaleWrapper
+   U_10GigE : entity surf.TenGigEthGthUltraScaleWrapper
       generic map (
          TPD_G             => TPD_G,
          NUM_LANE_G        => 1,

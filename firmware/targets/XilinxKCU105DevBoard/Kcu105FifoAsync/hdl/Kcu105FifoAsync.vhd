@@ -20,10 +20,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -43,7 +44,7 @@ end Kcu105FifoAsync;
 
 architecture top_level of Kcu105FifoAsync is
 
-   constant SIZE_C           : natural      := 256;
+   constant SIZE_C           : natural      := 128;
    constant PRBS_SEED_SIZE_C : natural      := 32;
    constant PRBS_TAPS_C      : NaturalArray := (0 => 31, 1 => 6, 2 => 2, 3 => 1);
 
@@ -79,7 +80,7 @@ begin
          I => clock(0),
          O => clk125);
 
-   U_PwrUpRst0 : entity work.PwrUpRst
+   U_PwrUpRst0 : entity surf.PwrUpRst
       generic map(
          TPD_G => TPD_G)
       port map(
@@ -109,7 +110,7 @@ begin
          DIV     => "000",
          O       => clk156);
 
-   U_PwrUpRst1 : entity work.PwrUpRst
+   U_PwrUpRst1 : entity surf.PwrUpRst
       generic map(
          TPD_G => TPD_G)
       port map(
@@ -122,7 +123,7 @@ begin
       -----------------
       -- Data Generator
       -----------------
-      SsiPrbsTx_Inst : entity work.SsiPrbsTx
+      SsiPrbsTx_Inst : entity surf.SsiPrbsTx
          generic map (
             -- General Configurations
             TPD_G                      => TPD_G,
@@ -155,7 +156,7 @@ begin
       ---------------
       -- Data Checker
       ---------------
-      SsiPrbsRx_Inst : entity work.SsiPrbsRx
+      SsiPrbsRx_Inst : entity surf.SsiPrbsRx
          generic map (
             -- General Configurations
             TPD_G                      => TPD_G,
@@ -169,20 +170,13 @@ begin
             PRBS_TAPS_G                => PRBS_TAPS_C,
             -- AXI Stream Configurations
             SLAVE_AXI_STREAM_CONFIG_G  => ssiAxiStreamConfig(4),
-            SLAVE_AXI_PIPE_STAGES_G    => 1,
-            MASTER_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(4),  -- unused
-            MASTER_AXI_PIPE_STAGES_G   => 0)                      -- unused
+            SLAVE_AXI_PIPE_STAGES_G    => 1) 
          port map (
             -- Streaming RX Data Interface (sAxisClk domain) 
             sAxisClk       => clk125,
             sAxisRst       => rst125,
             sAxisMaster    => axisMasters(i),
             sAxisSlave     => axisSlaves(i),
-            -- Optional: Streaming TX Data Interface (mAxisClk domain)
-            mAxisClk       => clk125,
-            mAxisRst       => rst125,
-            mAxisMaster    => open,
-            mAxisSlave     => AXI_STREAM_SLAVE_FORCE_C,
             -- Optional: AXI-Lite Register Interface (axiClk domain)
             axiClk         => '0',
             axiRst         => '1',
@@ -220,7 +214,7 @@ begin
       end if;
    end process;
 
-   Heartbeat_0 : entity work.Heartbeat
+   Heartbeat_0 : entity surf.Heartbeat
       generic map(
          TPD_G       => TPD_G,
          PERIOD_IN_G => 6.4E-9)
@@ -228,7 +222,7 @@ begin
          clk => clk156,
          o   => heartBeat(0));
 
-   Heartbeat_1 : entity work.Heartbeat
+   Heartbeat_1 : entity surf.Heartbeat
       generic map(
          TPD_G       => TPD_G,
          PERIOD_IN_G => 8.0E-9)
@@ -236,7 +230,7 @@ begin
          clk => clk125,
          o   => heartBeat(1));
 
-   PwrUpRst_updatedLed : entity work.PwrUpRst
+   PwrUpRst_updatedLed : entity surf.PwrUpRst
       generic map(
          TPD_G          => TPD_G,
          IN_POLARITY_G  => '1',
