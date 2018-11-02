@@ -2,7 +2,7 @@
 -- File       : AppReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-15
--- Last update: 2018-09-28
+-- Last update: 2018-11-01
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -27,10 +27,11 @@ use work.SsiPkg.all;
 
 entity AppReg is
    generic (
-      TPD_G           : time   := 1 ns;
-      BUILD_INFO_G    : BuildInfoType;
-      CLK_FREQUENCY_G : real   := 156.25E+6;
-      XIL_DEVICE_G    : string := "7SERIES");
+      TPD_G             : time    := 1 ns;
+      BUILD_INFO_G      : BuildInfoType;
+      PRBS_TX_BATCHER_G : boolean := false;
+      CLK_FREQUENCY_G   : real    := 156.25E+6;
+      XIL_DEVICE_G      : string  := "7SERIES");
    port (
       -- Clock and Reset
       clk             : in  sl;
@@ -310,8 +311,8 @@ begin
       port map (
          mAxisClk        => clk,
          mAxisRst        => rst,
-         mAxisMaster     => pbrsTxMaster,
-         mAxisSlave      => pbrsTxSlave,
+         mAxisMaster     => txMaster,
+         mAxisSlave      => txSlave,
          locClk          => clk,
          locRst          => rst,
          trig            => '0',
@@ -323,8 +324,31 @@ begin
          axilWriteMaster => mAxilWriteMasters(PRBS_TX_INDEX_C),
          axilWriteSlave  => mAxilWriteSlaves(PRBS_TX_INDEX_C));
 
-   pbrsTxMaster <= txMaster;
-   txSlave      <= pbrsTxSlave;
+   GEN_BATCHER : if (PRBS_TX_BATCHER_G = true) generate
+      U_AxiStreamBatcher : entity work.AxiStreamBatcher
+         generic map (
+            TPD_G                        => TPD_G,
+            MAX_NUMBER_SUB_FRAMES_G      => 8,
+            SUPER_FRAME_BYTE_THRESHOLD_G => 0,  -- 0 = bypass super threshold check
+            MAX_CLK_GAP_G                => 0,  -- 0 = bypass MAX clock GAP 
+            AXIS_CONFIG_G                => ssiAxiStreamConfig(16),
+            INPUT_PIPE_STAGES_G          => 0,
+            OUTPUT_PIPE_STAGES_G         => 0)
+         port map (
+            -- Clock and Reset
+            axisClk     => clk,
+            axisRst     => rst,
+            -- AXIS Interfaces
+            sAxisMaster => txMaster,
+            sAxisSlave  => txSlave,
+            mAxisMaster => pbrsTxMaster,
+            mAxisSlave  => pbrsTxSlave);
+   end generate;
+
+   BYP_BATCHER : if (PRBS_TX_BATCHER_G = false) generate
+      pbrsTxMaster <= txMaster;
+      txSlave      <= pbrsTxSlave;
+   end generate;
 
    -------------------
    -- AXI-Lite PRBS RX
