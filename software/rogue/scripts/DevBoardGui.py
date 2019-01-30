@@ -19,15 +19,20 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
+import sys
+import argparse
+
 import pyrogue as pr
-import DevBoard as devBoard
 import pyrogue.gui
 import pyrogue.protocols
 import pyrogue.utilities.prbs
-import rogue.hardware.pgp
+
+import rogue
 import rogue.hardware.axi
-import sys
-import argparse
+import rogue.interfaces.stream
+import rogue.hardware.pgp
+
+import DevBoard as devBoard
 
 # rogue.Logging.setLevel(rogue.Logging.Warning)
 #rogue.Logging.setFilter("pyrogue.rssi",rogue.Logging.Info)
@@ -118,77 +123,93 @@ parser.add_argument(
     help     = "Run variable register rate test"
 )  
 
+parser.add_argument(
+    "--enPrbs", 
+    type     = argBool,
+    required = False,
+    default  = False,
+    help     = "Enable PRBS testing",
+) 
+
 parser.add_argument('--html', help='Use html for tables', action="store_true")
 # Get the arguments
 args = parser.parse_args()
 
-#################################################################
-
-# DataDev PCIe Card
-if ( args.type == 'datadev' ):
-
-    vc0Srp  = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*32)+0,True)
-    vc1Prbs = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*32)+1,True)
-    # vc1Prbs.setZeroCopyEn(False)
-    
-# RUDP Ethernet
-elif ( args.type == 'eth' ):
-
-    # Create the ETH interface @ IP Address = args.dev
-    rudp = pr.protocols.UdpRssiPack(
-        host    = args.ip,
-        port    = 8192,
-        packVer = args.packVer,
-        )    
-
-    # Map the AxiStream.TDEST
-    vc0Srp  = rudp.application(0); # AxiStream.tDest = 0x0
-    vc1Prbs = rudp.application(1); # AxiStream.tDest = 0x1
-    # vc1Prbs.setZeroCopyEn(False)
+class MyRoot(pr.Root):
+    def __init__(   self,       
+            name        = "MyRoot",
+            description = "my root container",
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
         
-# Legacy PGP PCIe Card
-elif ( args.type == 'pgp' ):
+        #################################################################
 
-    vc0Srp  = rogue.hardware.pgp.PgpCard(args.dev,args.lane,0) # Registers
-    vc1Prbs = rogue.hardware.pgp.PgpCard(args.dev,args.lane,1) # Data
-    # vc1Prbs.setZeroCopyEn(False)
+        # DataDev PCIe Card
+        if ( args.type == 'datadev' ):
 
-# Undefined device type
-else:
-    raise ValueError("Invalid type (%s)" % (args.type) )
+            self.vc0Srp  = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*0x100)+0,True)
+            # self.fake  = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*0x100)+0xFF,True)
+            if args.enPrbs:
+                self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*0x100)+1,True)
+                # self.vc1Prbs.setZeroCopyEn(False)
+            
+        # RUDP Ethernet
+        elif ( args.type == 'eth' ):
+
+            # Create the ETH interface @ IP Address = args.dev
+            self.rudp = pr.protocols.UdpRssiPack(
+                host    = args.ip,
+                port    = 8192,
+                packVer = args.packVer,
+                )    
+            self.add(rudp) 
+                
+            # Map the AxiStream.TDEST
+            self.vc0Srp  = rudp.application(0); # AxiStream.tDest = 0x0
+            if args.enPrbs:            
+                self.vc1Prbs = rudp.application(1); # AxiStream.tDest = 0x1
+                # self.vc1Prbs.setZeroCopyEn(False)
+                
+        # Legacy PGP PCIe Card
+        elif ( args.type == 'pgp' ):
+
+            self.vc0Srp  = rogue.hardware.pgp.PgpCard(args.dev,args.lane,0) # Registers
+            if args.enPrbs:            
+                self.vc1Prbs = rogue.hardware.pgp.PgpCard(args.dev,args.lane,1) # Data
+                # self.vc1Prbs.setZeroCopyEn(False)
+
+        # Undefined device type
+        else:
+            raise ValueError("Invalid type (%s)" % (args.type) )
     
-#################################################################    
+        #################################################################    
 
+        # Connect VC0 to SRPv3
+        self.srp = rogue.protocols.srp.SrpV3()
+        pr.streamConnectBiDir(self.vc0Srp,self.srp)          
+        
+        if args.enPrbs:        
+        
+            # Connect VC1 to FW TX PRBS
+            self.prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=False)
+            pyrogue.streamConnect(self.vc1Prbs,self.prbsRx)
+            rootTop.add(self.prbsRx)  
+                
+            # Connect VC1 to FW RX PRBS
+            self.prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
+            pyrogue.streamConnect(self.prbTx, self.vc1Prbs)
+            rootTop.add(self.prbTx)  
+
+        # Add registers
+        self.add(devBoard.Fpga(
+            memBase  = self.srp,
+            commType = args.type,
+            fpgaType = args.fpgaType,
+        ))        
+        
 # Set base
-rootTop = pr.Root(name='System',description='Front End Board')
+rootTop = MyRoot(name='System',description='Front End Board')
     
-# Connect VC0 to SRPv3
-srp = rogue.protocols.srp.SrpV3()
-pr.streamConnectBiDir(vc0Srp,srp)  
-
-# # Connect VC1 to FW TX PRBS
-prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=False)
-pyrogue.streamConnect(vc1Prbs,prbsRx)
-rootTop.add(prbsRx)  
-    
-# # Connect VC1 to FW RX PRBS
-prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
-pyrogue.streamConnect(prbTx, vc1Prbs)
-rootTop.add(prbTx)  
-    
-# Loopback the PRBS data
-#pyrogue.streamConnect(vc1Prbs,vc1Prbs)    
-    
-# Add registers
-rootTop.add(devBoard.Fpga(
-    memBase  = srp,
-    commType = args.type,
-    fpgaType = args.fpgaType,
-))
-
-if ( args.type == 'eth' ):
-    rootTop.add(rudp)
-
 #################################################################    
 
 # Start the system
@@ -196,7 +217,6 @@ rootTop.start(
     pollEn   = args.pollEn,
     initRead = args.initRead,
 )
-# rootTop.setTimeout(5)
 
 # Print the AxiVersion Summary
 rootTop.Fpga.AxiVersion.printStatus()
