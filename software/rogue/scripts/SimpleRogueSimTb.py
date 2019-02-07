@@ -9,17 +9,70 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-import pyrogue as pr
+import pyrogue 
 import pyrogue.gui
 import pyrogue.interfaces.simulation
-import surf.axi as axiVer
+import pyrogue.utilities.prbs
+import rogue.interfaces.memory
+import rogue.interfaces.stream
+import surf.axi 
+import surf.protocols.ssi
 import rogue
 import sys
 import argparse
 
 # rogue.Logging.setLevel(rogue.Logging.Warning)
 # rogue.Logging.setFilter("pyrogue.SrpV3",rogue.Logging.Debug)
-# rogue.Logging.setLevel(rogue.Logging.Debug)
+rogue.Logging.setLevel(rogue.Logging.Debug)
+
+#################################################################
+class Base(pyrogue.Root):
+
+    def __init__(self,pollEn,initRead):
+        pyrogue.Root.__init__(self,name='simulation',description='Simple RogueSim Example')
+
+        # Simulation interfaces
+        self.memSim    = rogue.interfaces.memory.BridgeClient('127.0.0.1',9000)
+        self.streamSim = rogue.interfaces.stream.Bridge('127.0.0.1',9002,False)
+        self.sbandSim  = pyrogue.interfaces.simulation.SideBandSim(host='127.0.0.1',port=9020)
+
+        # Simulation devices
+        self.add(surf.axi.AxiVersion( 
+            name    = 'AxiVersion', 
+            memBase = self.memSim,
+            offset  = 0x00000000, 
+            expand  = True,
+        ))
+
+        self.add(surf.protocols.ssi.SsiPrbsRx( 
+            name    = 'SimPrbsRx', 
+            memBase = self.memSim,
+            offset  = 0x00010000, 
+            expand  = True,
+        ))
+
+        self.add(surf.protocols.ssi.SsiPrbsTx( 
+            name    = 'SimPrbsTx', 
+            memBase = self.memSim,
+            offset  = 0x00020000, 
+            expand  = True,
+        ))
+
+        self._prbsRx = pyrogue.utilities.prbs.PrbsRx(name="SwPrbsRx")
+        self._prbsTx = pyrogue.utilities.prbs.PrbsTx(name="SwPrbsTx")
+
+        self.add(self._prbsRx)
+        self.add(self._prbsTx)
+
+        pyrogue.streamConnect(self._prbsTx,self.streamSim)
+        pyrogue.streamConnect(self.streamSim,self._prbsRx)
+
+        self.start(
+            pollEn   = pollEn,
+            initRead = initRead,
+            timeout  = 60.0,    
+        )
+
 
 #################################################################
 
@@ -42,7 +95,7 @@ parser.add_argument(
     "--initRead", 
     type     = argBool,
     required = False,
-    default  = True,
+    default  = False,
     help     = "Enable read all variables at start",
 )  
 
@@ -50,42 +103,17 @@ parser.add_argument(
 args = parser.parse_args()
 
 #################################################################
+with Base(args.pollEn,args.initRead) as b:
 
-# Set base
-base = pr.Root(name='simulation',description='Simple RogueSim Example')
+    # Create GUI
+    appTop = pyrogue.gui.application(sys.argv)
+    guiTop = pyrogue.gui.GuiTop(group='rootMesh')
+    appTop.setStyle('Fusion')
+    guiTop.addTree(b)
+    guiTop.resize(600, 800)
 
-# Connect the SRPv3 stream port
-srpStream = pr.interfaces.simulation.StreamSim(host='localhost', dest=0, uid=1, ssi=True)
-memMap = rogue.protocols.srp.SrpV3()                
-pr.streamConnectBiDir( memMap, srpStream )  
+    print("Starting GUI...\n");
 
-# Add devices
-base.add(axiVer.AxiVersion( 
-    name    = 'AxiVersion', 
-    memBase = memMap, 
-    offset  = 0x00000000, 
-    expand  = False,
-))
+    # Run GUI
+    appTop.exec_()    
 
-# Start the system
-base.start(
-    pollEn   = args.pollEn,
-    initRead = args.initRead,
-    timeout  = 1.0,    
-)
-
-# Create GUI
-appTop = pr.gui.application(sys.argv)
-guiTop = pr.gui.GuiTop(group='rootMesh')
-appTop.setStyle('Fusion')
-guiTop.addTree(base)
-guiTop.resize(600, 800)
-
-print("Starting GUI...\n");
-
-# Run GUI
-appTop.exec_()    
-    
-# Close
-base.stop()
-exit()   

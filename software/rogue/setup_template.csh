@@ -1,6 +1,6 @@
 
 # Setup environment
-source /afs/slac/g/reseng/rogue/pre-release/setup_rogue.csh
+#source /afs/slac/g/reseng/rogue/pre-release/setup_rogue.csh
 
 # Python Package directories
 setenv FEB_DIR    ${PWD}/../../firmware/common/python
