@@ -32,8 +32,8 @@ class Base(pyrogue.Root):
         pyrogue.Root.__init__(self,name='simulation',description='Simple RogueSim Example')
 
         # Simulation interfaces
-        self.memSim    = rogue.interfaces.memory.BridgeClient('127.0.0.1',9000)
-        self.streamSim = rogue.interfaces.stream.Bridge('127.0.0.1',9002,False)
+        self.memSim    = rogue.interfaces.memory.TcpClient('127.0.0.1',9000)
+        self.streamSim = rogue.interfaces.stream.TcpClient('127.0.0.1',9002,False)
         self.sbandSim  = pyrogue.interfaces.simulation.SideBandSim(host='127.0.0.1',port=9020)
 
         # Simulation devices
