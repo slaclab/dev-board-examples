@@ -127,7 +127,7 @@ parser.add_argument(
     "--enPrbs", 
     type     = argBool,
     required = False,
-    default  = False,
+    default  = True,
     help     = "Enable PRBS testing",
 ) 
 
@@ -148,7 +148,6 @@ class MyRoot(pr.Root):
         if ( args.type == 'datadev' ):
 
             self.vc0Srp  = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*0x100)+0,True)
-            # self.fake  = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*0x100)+0xFF,True)
             if args.enPrbs:
                 self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*0x100)+1,True)
                 # self.vc1Prbs.setZeroCopyEn(False)
@@ -162,12 +161,12 @@ class MyRoot(pr.Root):
                 port    = 8192,
                 packVer = args.packVer,
                 )    
-            self.add(rudp) 
+            self.add(self.rudp) 
                 
             # Map the AxiStream.TDEST
-            self.vc0Srp  = rudp.application(0); # AxiStream.tDest = 0x0
+            self.vc0Srp  = self.rudp.application(0); # AxiStream.tDest = 0x0
             if args.enPrbs:            
-                self.vc1Prbs = rudp.application(1); # AxiStream.tDest = 0x1
+                self.vc1Prbs = self.rudp.application(1); # AxiStream.tDest = 0x1
                 # self.vc1Prbs.setZeroCopyEn(False)
                 
         # Legacy PGP PCIe Card
@@ -193,12 +192,12 @@ class MyRoot(pr.Root):
             # Connect VC1 to FW TX PRBS
             self.prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=False)
             pyrogue.streamConnect(self.vc1Prbs,self.prbsRx)
-            rootTop.add(self.prbsRx)  
+            self.add(self.prbsRx)  
                 
             # Connect VC1 to FW RX PRBS
             self.prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
             pyrogue.streamConnect(self.prbTx, self.vc1Prbs)
-            rootTop.add(self.prbTx)  
+            self.add(self.prbTx)  
 
         # Add registers
         self.add(devBoard.Fpga(
