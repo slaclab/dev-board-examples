@@ -2,7 +2,7 @@
 -- File       : Kcu105GigE.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-08
--- Last update: 2018-05-18
+-- Last update: 2019-04-02
 -------------------------------------------------------------------------------
 -- Description: Example using 1000BASE-SX Protocol
 -------------------------------------------------------------------------------
@@ -61,10 +61,8 @@ end Kcu105GigE;
 
 architecture top_level of Kcu105GigE is
 
-   constant AXIS_SIZE_C       : positive         := 1;
+   constant AXIS_SIZE_C       : positive                         := 1;
    constant ETH_AXIS_CONFIG_C : AxiStreamConfigArray(3 downto 0) := (others => EMAC_AXIS_CONFIG_C);
-
-   constant RST_DEL_C         : slv(23 downto 0) := X"5FFFFF";  -- 2*10ms @ 300MHz
 
    signal txMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
    signal txSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
@@ -75,21 +73,14 @@ architecture top_level of Kcu105GigE is
    signal rst      : sl;
    signal phyReady : sl;
 
-   signal phyMdo : sl := '1';
-
    signal sysClk300NB : sl;
    signal sysClk300   : sl;
    signal sysRst300   : sl;
 
-   signal speed10_100 : sl := '0';
-   signal speed100    : sl := '0';
-   signal linkIsUp    : sl := '0';
-
-   signal extPhyRstN  : sl;
-   signal extPhyReady : sl;
-
-   signal initDone : sl := '0';
-
+   signal speed1000 : sl := '0';
+   signal speed100  : sl := '0';
+   signal speed10   : sl := '0';
+   signal linkUp    : sl := '0';
 
    attribute dont_touch              : string;
    attribute dont_touch of txMasters : signal is "TRUE";
@@ -103,26 +94,22 @@ begin
    U_SysClk300IBUFDS : IBUFDS
       generic map (
          DIFF_TERM    => false,
-         IBUF_LOW_PWR => false
-         )
+         IBUF_LOW_PWR => false)
       port map (
          I  => sysClk300P,
          IB => sysClk300N,
-         O  => sysClk300NB
-         );
+         O  => sysClk300NB);
 
    U_SysclkBUFG : BUFG
       port map (
          I => sysClk300NB,
-         O => sysClk300
-         );
+         O => sysClk300);
 
    U_SysclkRstSync : entity work.RstSync
       port map (
          clk      => sysClk300,
          asyncRst => extRst,
-         syncRst  => sysRst300
-         );
+         syncRst  => sysRst300);
 
    GEN_GTH : if (SGMII_ETH_G = 0) generate
 
@@ -166,139 +153,46 @@ begin
             gtRxP(0)     => ethRxP,
             gtRxN(0)     => ethRxN);
 
-      extPhyRstN <= '0';
-      phyMdc     <= '0';
-
    end generate GEN_GTH;
 
    GEN_SGMII : if (SGMII_ETH_G /= 0) generate
-
-      signal rstCnt     : slv(23 downto 0) := RST_DEL_C;
-      signal phyInitRst : sl;
-      signal phyIrq     : sl;
-      signal phyMdi     : sl;
-   begin
-
-      -- Main clock is derived from the PHY refclock. However,
-      -- while it is in reset there is no clock coming in;
-      -- thus we use the on-board clock to reset the (external) PHY.
-      -- We must hold reset for >10ms and then wait >5ms until we may talk
-      -- to it (we actually wait also >10ms) which is indicated by 'extPhyReady'.
-      process (sysClk300)
-      begin
-         if (rising_edge(sysClk300)) then
-            if (sysRst300 /= '0') then
-               rstCnt <= RST_DEL_C;
-            elsif (rstCnt(23) = '0') then
-               rstCnt <= slv(unsigned(rstCnt) - 1);
-            end if;
-         end if;
-      end process;
-
-      extPhyReady <= rstCnt(23);
-
-      extPhyRstN <= ite((unsigned(rstCnt(22 downto 20)) > 2) and (extPhyReady = '0'), '0', '1');
-
-      -- The MDIO controller which talks to the external PHY must be held
-      -- in reset until extPhyReady; it works in a different clock domain...
-
-      U_PhyInitRstSync : entity work.RstSync
-         generic map (
-            IN_POLARITY_G  => '0',
-            OUT_POLARITY_G => '1'
-            )
-         port map (
-            clk      => clk,
-            asyncRst => extPhyReady,
-            syncRst  => phyInitRst
-            );
-
-      -- The SaltCore does not support autonegotiation on the SGMII link
-      -- (mac<->phy) - however, the marvell phy (by default) assumes it does.
-      -- We need to disable auto-negotiation in the PHY on the SGMII side
-      -- and handle link changes (aneg still enabled on copper) flagged
-      -- by the PHY...
-
-      U_PhyCtrl : entity work.PhyControllerCore
-         generic map (
-            TPD_G => TPD_G,
-            DIV_G => 100
-            )
-         port map (
-            clk      => clk,
-            rst      => phyInitRst,
-            initDone => initDone,
-
-            speed_is_10_100 => speed10_100,
-            speed_is_100    => speed100,
-            linkIsUp        => linkIsUp,
-
-            mdi => phyMdi,
-            mdc => phyMdc,
-            mdo => phyMdo,
-
-            linkIrq => phyIrq
-            );
-
-      -- synchronize MDI and IRQ signals into 'clk' domain
-      U_SyncMdi : entity work.Synchronizer
-         port map (
-            clk     => clk,
-            dataIn  => phyMdio,
-            dataOut => phyMdi
-            );
-
-      U_SyncIrq : entity work.Synchronizer
-         generic map (
-            OUT_POLARITY_G => '0',
-            INIT_G         => "11"
-            )
-         port map (
-            clk     => clk,
-            dataIn  => phyIrqN,
-            dataOut => phyIrq
-            );
-
-      U_1GigE : entity work.GigEthLvdsUltraScaleWrapper
+      U_MarvelWrap : entity work.Sgmii88E1111LvdsUltraScale
          generic map (
             TPD_G             => TPD_G,
-            -- DMA/MAC Configurations
-            NUM_LANE_G        => 1,
-            -- MMCM Configuration
-            USE_REFCLK_G      => false,
-            CLKIN_PERIOD_G    => 1.6,   -- 625.0 MHz
-            DIVCLK_DIVIDE_G   => 2,     -- 312.5 MHz
-            CLKFBOUT_MULT_F_G => 2.0,   -- VCO: 625 MHz
-            -- AXI Streaming Configurations
-            AXIS_CONFIG_G     => ETH_AXIS_CONFIG_C)
+            STABLE_CLK_FREQ_G => 300.0E+6,
+            AXIS_CONFIG_G     => ETH_AXIS_CONFIG_C(0))
          port map (
-            -- Local Configurations
-            localMac(0)        => MAC_ADDR_INIT_C,
-            -- Streaming DMA Interface
-            dmaClk(0)          => clk,
-            dmaRst(0)          => rst,
-            dmaIbMasters       => rxMasters,
-            dmaIbSlaves        => rxSlaves,
-            dmaObMasters       => txMasters,
-            dmaObSlaves        => txSlaves,
-            -- Misc. Signals
-            extRst             => extRst,
-            phyClk             => clk,
-            phyRst             => rst,
-            phyReady(0)        => phyReady,
-            mmcmLocked         => open,
-            speed_is_10_100(0) => speed10_100,
-            speed_is_100(0)    => speed100,
-
-            -- MGT Clock Port
-            sgmiiClkP   => ethClkP,
-            sgmiiClkN   => ethClkN,
-            -- MGT Ports
-            sgmiiTxP(0) => ethTxP,
-            sgmiiTxN(0) => ethTxN,
-            sgmiiRxP(0) => ethRxP,
-            sgmiiRxN(0) => ethRxN);
-
+            -- clock and reset
+            extRst      => extRst,
+            stableClk   => sysClk300,
+            phyClk      => clk,
+            phyRst      => rst,
+            -- Local Configurations/status
+            localMac    => MAC_ADDR_INIT_C,
+            phyReady    => phyReady,
+            linkUp      => linkUp,
+            speed10     => speed10,
+            speed100    => speed100,
+            speed1000   => speed1000,
+            -- Interface to Ethernet Media Access Controller (MAC)
+            macClk      => clk,
+            macRst      => rst,
+            obMacMaster => rxMasters(0),
+            obMacSlave  => rxSlaves(0),
+            ibMacMaster => txMasters(0),
+            ibMacSlave  => txSlaves(0),
+            -- ETH external PHY Ports
+            phyClkP     => ethClkP,
+            phyClkN     => ethClkN,
+            phyMdc      => phyMdc,
+            phyMdio     => phyMdio,
+            phyRstN     => phyRstN,
+            phyIrqN     => phyIrqN,
+            -- LVDS SGMII Ports
+            sgmiiTxP    => ethTxP,
+            sgmiiTxN    => ethTxN,
+            sgmiiRxP    => ethRxP,
+            sgmiiRxN    => ethRxN);
    end generate GEN_SGMII;
 
    -------------------
@@ -331,18 +225,13 @@ begin
    ----------------
    -- Misc. Signals
    ----------------
-   led(7) <= linkIsUp;
-   led(6) <= not speed10_100;              -- lit when 1Gb
-   led(5) <= not speed10_100 or speed100;  -- lit when 1Gb or 100Mb
-   led(4) <= extPhyRstN;
-   led(3) <= phyIrqN;
-   led(2) <= initDone;
+   led(7) <= linkUp;
+   led(6) <= speed1000;
+   led(5) <= speed100;
+   led(4) <= speed100;
+   led(3) <= phyReady;
+   led(2) <= phyReady;
    led(1) <= phyReady;
    led(0) <= phyReady;
-
-   -- Tri-state driver for phyMdio
-   phyMdio <= 'Z' when phyMdo = '1' else '0';
-   -- Reset line of the external phy
-   phyRstN <= extPhyRstN;
 
 end top_level;
