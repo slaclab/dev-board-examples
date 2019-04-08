@@ -2,6 +2,8 @@
 
 Development Board Firmware/Software Examples
 
+<!--- ########################################################################################### -->
+
 # Before you clone the GIT repository
 
 1) Create a github account:
@@ -33,66 +35,77 @@ $ git-lfs version
 git-lfs/2.1.1
 ```
 
+<!--- ########################################################################################### -->
+
 # Clone the GIT repository
 
 ```
 $ git clone --recursive git@github.com:slaclab/dev-board-examples
 ```
 
+<!--- ########################################################################################### -->
+
 # How to build the firmware 
 
 1) Setup Xilinx licensing
 
 > If you are on the SLAC network, here's how to setup the Xilinx licensing
-
->> In C-Shell: 
-```
-$ source dev-board-examples/firmware/setup_env_slac.csh
-```
-
->> In Bash:    
+  
 ```
 $ source dev-board-examples/firmware/setup_env_slac.sh
 ```
 
-2) Go to the target directory (that you want to build) and make the firmware:
+> Else you will need to install Vivado and install the Xilinx Licensing
 
-> Example of building the Ac701GigE firmware example target
+2) Go to the firmware's target directory:
+
+> Example of building the KC705 10 GbE firmware example target:
+
 ```
-$ cd dev-board-examples/firmware/targets/XilinxKCU105DevBoard/Ac701GigE
-$ make
+$ cd dev-board-examples/firmware/targets/XilinxKC705DevBoard/Kc705TenGigE
 ```
 
 3) Optional: Review the results in GUI mode
+
 ```
 $ make gui
 ```
 
-# How to build/run the software 
 
-1) Install 'rogue' software on your platform
+3) Build the firmware
 
-> Build instrustions can be found here:
-
->> https://github.com/slaclab/rogue/blob/master/Readme_build.txt
-
-> If you are on the SLAC network, there in a network install of rogue on AFS:
- ```
-/afs/slac/g/reseng/rogue/master/
+```
+$ make
 ```
 
-2) Go to your git clone's rogue software directory
+4) Optional: Open up the project in GUI mode to view the firmware build results
+
 ```
+$ make gui
+```
+
+<!--- ########################################################################################### -->
+
+# How to install the Rogue With Anaconda
+
+> https://slaclab.github.io/rogue/installing/anaconda.html
+
+<!--- ########################################################################################### -->
+
+# How to run the Software Development GUI
+
+```
+# Go to software directory
 $ cd dev-board-examples/software/rogue
+
+# Activate Rogue conda Environment 
+$ source /path/to/my/anaconda3/etc/profile.d/conda.sh
+
+# Setup the Python Environment
+$ source setup_env.sh
+
+# Launch the GUI
+$ python scripts/DevBoardGui.py
 ```
 
-3) Setup your environment (example below assumes access to SLAC AFS):
-```
-$ source  setup_template.csh
-```
-
-4) Launch the PyQT QUI
-```
-$ python3 scripts/DevBoardGui.py 
-```
-
+<!--- ########################################################################################### -->
