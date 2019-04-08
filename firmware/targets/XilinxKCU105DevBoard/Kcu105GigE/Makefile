@@ -15,8 +15,6 @@ export PRJ_PART = XCKU040-FFVA1156-2-E
 # Must be 1 or 0
 export USE_RJ45_ETH = 0
 
-export INCLUDE_ETH_SGMII_LVDS = 1
-
 # Using a non-standard target directory structure, 
 # which requires me to define the TOP_DIR path
 export TOP_DIR = $(abspath $(PWD)/../../..)
