@@ -1,15 +1,5 @@
 #!/usr/bin/env python3
 #-----------------------------------------------------------------------------
-# Title      : PyRogue DevBoardGui Module
-#-----------------------------------------------------------------------------
-# File       : DevBoardGui.py
-# Author     : Larry Ruckman <ruckman@slac.stanford.edu>
-# Created    : 2017-02-15
-# Last update: 2017-02-15
-#-----------------------------------------------------------------------------
-# Description:
-# Rogue interface to DEV board
-#-----------------------------------------------------------------------------
 # This file is part of the 'Development Board Examples'. It is subject to 
 # the license terms in the LICENSE.txt file found in the top-level directory 
 # of this distribution and at: 
@@ -18,6 +8,8 @@
 # copied, modified, propagated, or distributed except according to the terms 
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
+
+import setupLibPaths
 
 import sys
 import argparse
