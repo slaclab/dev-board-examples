@@ -160,6 +160,7 @@ begin
          generic map (
             TPD_G             => TPD_G,
             STABLE_CLK_FREQ_G => 300.0E+6,
+            CLKOUT1_PHASE_G   => 0.0, -- Deskew the 625MHz/312.5MHz
             AXIS_CONFIG_G     => ETH_AXIS_CONFIG_C(0))
          port map (
             -- clock and reset
