@@ -70,6 +70,8 @@ end EthPortMapping;
 
 architecture mapping of EthPortMapping is
 
+   constant MAX_SEG_SIZE_C     : positive := ite(JUMBO_G,8192,1024);
+
    constant MB_STREAM_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
       TDATA_BYTES_C => 4,
@@ -143,8 +145,8 @@ begin
       generic map (
          TPD_G               => TPD_G,
          APP_ILEAVE_EN_G     => APP_ILEAVE_EN_G,
-         MAX_SEG_SIZE_G      => 1024,
-         SEGMENT_ADDR_SIZE_G => 7,
+         MAX_SEG_SIZE_G      => MAX_SEG_SIZE_C,  -- Using Jumbo frames
+         SEGMENT_ADDR_SIZE_G => bitSize(MAX_SEG_SIZE_C/8),
          APP_STREAMS_G       => RSSI_SIZE_C,
          APP_STREAM_ROUTES_G => (
             0                => X"00",
