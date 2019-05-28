@@ -152,6 +152,7 @@ class MyRoot(pr.Root):
                 host    = args.ip,
                 port    = 8192,
                 packVer = args.packVer,
+                jumbo   = True,
                 )    
             self.add(self.rudp) 
                 
