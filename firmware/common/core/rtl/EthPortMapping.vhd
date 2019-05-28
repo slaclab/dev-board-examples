@@ -70,6 +70,7 @@ end EthPortMapping;
 
 architecture mapping of EthPortMapping is
 
+   constant WINDOW_ADDR_SIZE_C : positive := 4;     -- 16 buffers (2^4)
    constant MAX_SEG_SIZE_C     : positive := ite(JUMBO_G,8192,1024);
 
    constant MB_STREAM_CONFIG_C : AxiStreamConfigType := (
@@ -144,6 +145,7 @@ begin
    U_RssiServer : entity work.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
+         PIPE_STAGES_G       => 1,
          APP_ILEAVE_EN_G     => APP_ILEAVE_EN_G,
          MAX_SEG_SIZE_G      => MAX_SEG_SIZE_C,  -- Using Jumbo frames
          SEGMENT_ADDR_SIZE_G => bitSize(MAX_SEG_SIZE_C/8),
@@ -156,13 +158,11 @@ begin
          CLK_FREQUENCY_G     => CLK_FREQUENCY_G,
          TIMEOUT_UNIT_G      => 1.0E-3,  -- In units of seconds
          SERVER_G            => true,
-         RETRANSMIT_ENABLE_G => true,
-         BYPASS_CHUNKER_G    => false,
-         WINDOW_ADDR_SIZE_G  => 3,
-         PIPE_STAGES_G       => 1,
+         WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_C,
+         MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
+         MAX_RETRANS_CNT_G   => 16,                  
          APP_AXIS_CONFIG_G   => AXIS_CONFIG_C,
-         TSP_AXIS_CONFIG_G   => EMAC_AXIS_CONFIG_C,
-         INIT_SEQ_N_G        => 16#80#)
+         TSP_AXIS_CONFIG_G   => EMAC_AXIS_CONFIG_C)
       port map (
          clk_i             => clk,
          rst_i             => rst,
