@@ -168,21 +168,13 @@ begin
             PRBS_SEED_SIZE_G           => PRBS_SEED_SIZE_C,
             PRBS_TAPS_G                => PRBS_TAPS_C,
             -- AXI Stream Configurations
-            SLAVE_AXI_STREAM_CONFIG_G  => ssiAxiStreamConfig(4),
-            SLAVE_AXI_PIPE_STAGES_G    => 1,
-            MASTER_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(4),  -- unused
-            MASTER_AXI_PIPE_STAGES_G   => 0)                      -- unused
+            SLAVE_AXI_STREAM_CONFIG_G  => ssiAxiStreamConfig(4))
          port map (
             -- Streaming RX Data Interface (sAxisClk domain) 
             sAxisClk       => clk125,
             sAxisRst       => rst125,
             sAxisMaster    => axisMasters(i),
             sAxisSlave     => axisSlaves(i),
-            -- Optional: Streaming TX Data Interface (mAxisClk domain)
-            mAxisClk       => clk125,
-            mAxisRst       => rst125,
-            mAxisMaster    => open,
-            mAxisSlave     => AXI_STREAM_SLAVE_FORCE_C,
             -- Optional: AXI-Lite Register Interface (axiClk domain)
             axiClk         => '0',
             axiRst         => '1',
