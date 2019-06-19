@@ -43,7 +43,7 @@ end Kcu105FifoAsync;
 
 architecture top_level of Kcu105FifoAsync is
 
-   constant SIZE_C           : natural      := 256;
+   constant SIZE_C           : natural      := 1;
    constant PRBS_SEED_SIZE_C : natural      := 32;
    constant PRBS_TAPS_C      : NaturalArray := (0 => 31, 1 => 6, 2 => 2, 3 => 1);
 

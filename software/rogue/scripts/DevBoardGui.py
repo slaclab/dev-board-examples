@@ -26,7 +26,7 @@ import rogue.hardware.pgp
 
 import DevBoard as devBoard
 
-# rogue.Logging.setLevel(rogue.Logging.Warning)
+rogue.Logging.setLevel(rogue.Logging.Warning)
 #rogue.Logging.setFilter("pyrogue.rssi",rogue.Logging.Info)
 #rogue.Logging.setFilter("pyrogue.packetizer",rogue.Logging.Info)
 # # rogue.Logging.setLevel(rogue.Logging.Debug)
@@ -140,9 +140,8 @@ class MyRoot(pr.Root):
         if ( args.type == 'datadev' ):
 
             self.vc0Srp  = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*0x100)+0,True)
-            if args.enPrbs:
-                self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*0x100)+1,True)
-                # self.vc1Prbs.setZeroCopyEn(False)
+            self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*0x100)+1,True)
+            # self.vc1Prbs.setZeroCopyEn(False)
             
         # RUDP Ethernet
         elif ( args.type == 'eth' ):
@@ -153,22 +152,21 @@ class MyRoot(pr.Root):
                 port    = 8192,
                 packVer = args.packVer,
                 jumbo   = True,
+                expand  = False,
                 )    
             self.add(self.rudp) 
                 
             # Map the AxiStream.TDEST
             self.vc0Srp  = self.rudp.application(0); # AxiStream.tDest = 0x0
-            if args.enPrbs:            
-                self.vc1Prbs = self.rudp.application(1); # AxiStream.tDest = 0x1
-                # self.vc1Prbs.setZeroCopyEn(False)
+            self.vc1Prbs = self.rudp.application(1); # AxiStream.tDest = 0x1
+            # self.vc1Prbs.setZeroCopyEn(False)
                 
         # Legacy PGP PCIe Card
         elif ( args.type == 'pgp' ):
 
             self.vc0Srp  = rogue.hardware.pgp.PgpCard(args.dev,args.lane,0) # Registers
-            if args.enPrbs:            
-                self.vc1Prbs = rogue.hardware.pgp.PgpCard(args.dev,args.lane,1) # Data
-                # self.vc1Prbs.setZeroCopyEn(False)
+            self.vc1Prbs = rogue.hardware.pgp.PgpCard(args.dev,args.lane,1) # Data
+            # self.vc1Prbs.setZeroCopyEn(False)
 
         # Undefined device type
         else:
@@ -191,7 +189,10 @@ class MyRoot(pr.Root):
             self.prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
             pyrogue.streamConnect(self.prbTx, self.vc1Prbs)
             self.add(self.prbTx)  
-
+            
+        else:
+            pyrogue.streamConnect(self.vc1Prbs,self.vc1Prbs) 
+            
         # Add registers
         self.add(devBoard.Fpga(
             memBase  = self.srp,
