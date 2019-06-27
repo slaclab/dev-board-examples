@@ -1,8 +1,11 @@
 # Define target output
-target: bit
+target: mcs
+
+export GEN_BIN_IMAGE = 1
+export GZIP_BUILD_IMAGE = 1
 
 # Define Firmware Version Number
-export PRJ_VERSION = 0x00000001
+export PRJ_VERSION = 0x00000003
 
 # Define target part
 export PRJ_PART = XCKU040-FFVA1156-2-E
