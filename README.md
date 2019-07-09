@@ -40,7 +40,7 @@ git-lfs/2.1.1
 # Clone the GIT repository
 
 ```
-$ git clone --recursive git@github.com:slaclab/dev-board-examples
+$ git clone --recursive https://github.com/slaclab/dev-board-examples
 ```
 
 <!--- ########################################################################################### -->
