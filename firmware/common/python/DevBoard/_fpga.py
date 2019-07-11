@@ -23,6 +23,7 @@ import surf.axi            as axi
 import surf.protocols.ssi  as ssi
 import surf.protocols.rssi as rssi
 import surf.xilinx         as xil
+import surf.ethernet.udp   as udp
 import time
 import click 
 
@@ -77,8 +78,14 @@ class Fpga(pr.Device):
             self.add(rssi.RssiCore(
                 offset = 0x00070000,
                 expand = False,
-            ))                 
-               
+            ))  
+
+            # self.add(udp.UdpEngine(
+                # offset = 0x00078000,
+                # numSrv = 1,
+                # expand = False,
+            # ))
+            
         self.add(axi.AxiStreamMonitoring(            
             name        = 'AxisMon', 
             offset      = 0x00080000, 

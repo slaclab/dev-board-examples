@@ -2,7 +2,7 @@
 -- File       : EthPortMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-30
--- Last update: 2018-05-17
+-- Last update: 2019-06-27
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -70,8 +70,20 @@ end EthPortMapping;
 
 architecture mapping of EthPortMapping is
 
-   constant WINDOW_ADDR_SIZE_C : positive := 4;     -- 16 buffers (2^4)
-   constant MAX_SEG_SIZE_C     : positive := ite(JUMBO_G,8192,1024);
+   constant NUM_AXIL_MASTERS_C : natural := 2;
+
+   constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := (
+      0               => (
+         baseAddr     => x"0007_0000",
+         addrBits     => 15,
+         connectivity => x"FFFF"),
+      1               => (
+         baseAddr     => x"0007_8000",
+         addrBits     => 15,
+         connectivity => x"FFFF"));
+
+   constant WINDOW_ADDR_SIZE_C : positive := 4;  -- 16 buffers (2^4)
+   constant MAX_SEG_SIZE_C     : positive := ite(JUMBO_G, 8192, 1024);
 
    constant MB_STREAM_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
@@ -92,6 +104,11 @@ architecture mapping of EthPortMapping is
       2 => ssiAxiStreamConfig(4),
       3 => MB_STREAM_CONFIG_C);
 
+   signal commWriteMasters : AxiLiteWriteMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
+   signal commWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
+   signal commReadMasters  : AxiLiteReadMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
+   signal commReadSlaves   : AxiLiteReadSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_DECERR_C);
+
    signal ibServerMasters : AxiStreamMasterArray(NUM_SERVERS_C-1 downto 0);
    signal ibServerSlaves  : AxiStreamSlaveArray(NUM_SERVERS_C-1 downto 0);
    signal obServerMasters : AxiStreamMasterArray(NUM_SERVERS_C-1 downto 0);
@@ -103,6 +120,27 @@ architecture mapping of EthPortMapping is
    signal rssiObSlaves  : AxiStreamSlaveArray(RSSI_SIZE_C-1 downto 0);
 
 begin
+
+   ---------------------------
+   -- AXI-Lite Crossbar Module
+   ---------------------------         
+   U_XBAR : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => NUM_AXIL_MASTERS_C,
+         MASTERS_CONFIG_G   => AXIL_CONFIG_C)
+      port map (
+         sAxiWriteMasters(0) => commWriteMaster,
+         sAxiWriteSlaves(0)  => commWriteSlave,
+         sAxiReadMasters(0)  => commReadMaster,
+         sAxiReadSlaves(0)   => commReadSlave,
+         mAxiWriteMasters    => commWriteMasters,
+         mAxiWriteSlaves     => commWriteSlaves,
+         mAxiReadMasters     => commReadMasters,
+         mAxiReadSlaves      => commReadSlaves,
+         axiClk              => clk,
+         axiClkRst           => rst);
 
    ----------------------
    -- IPv4/ARP/UDP Engine
@@ -135,6 +173,11 @@ begin
          obServerSlaves  => obServerSlaves,
          ibServerMasters => ibServerMasters,
          ibServerSlaves  => ibServerSlaves,
+         -- AXI-Lite Interface
+         axilReadMaster  => commReadMasters(1),
+         axilReadSlave   => commReadSlaves(1),
+         axilWriteMaster => commWriteMasters(1),
+         axilWriteSlave  => commWriteSlaves(1),
          -- Clock and Reset
          clk             => clk,
          rst             => rst);
@@ -156,11 +199,11 @@ begin
             2                => X"02",
             3                => X"03"),
          CLK_FREQUENCY_G     => CLK_FREQUENCY_G,
-         TIMEOUT_UNIT_G      => 1.0E-3,  -- In units of seconds
+         TIMEOUT_UNIT_G      => 1.0E-3,          -- In units of seconds
          SERVER_G            => true,
          WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_C,
          MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
-         MAX_RETRANS_CNT_G   => 16,                  
+         MAX_RETRANS_CNT_G   => 16,
          APP_AXIS_CONFIG_G   => AXIS_CONFIG_C,
          TSP_AXIS_CONFIG_G   => EMAC_AXIS_CONFIG_C)
       port map (
@@ -180,10 +223,10 @@ begin
          -- AXI-Lite Interface
          axiClk_i          => clk,
          axiRst_i          => rst,
-         axilReadMaster    => commReadMaster,
-         axilReadSlave     => commReadSlave,
-         axilWriteMaster   => commWriteMaster,
-         axilWriteSlave    => commWriteSlave);
+         axilReadMaster    => commReadMasters(0),
+         axilReadSlave     => commReadSlaves(0),
+         axilWriteMaster   => commWriteMasters(0),
+         axilWriteSlave    => commWriteSlaves(0));
 
    ---------------------------------------
    -- TDEST = 0x0: Register access control   

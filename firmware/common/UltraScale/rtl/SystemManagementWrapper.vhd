@@ -2,7 +2,7 @@
 -- File       : SystemManagementWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-30
--- Last update: 2017-03-17
+-- Last update: 2019-06-27
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -37,13 +37,45 @@ end entity SystemManagementWrapper;
 
 architecture mapping of SystemManagementWrapper is
 
+   component SystemManagementCore
+      port (
+         s_axi_aclk    : in  std_logic;
+         s_axi_aresetn : in  std_logic;
+         s_axi_awaddr  : in  std_logic_vector(12 downto 0);
+         s_axi_awvalid : in  std_logic;
+         s_axi_awready : out std_logic;
+         s_axi_wdata   : in  std_logic_vector(31 downto 0);
+         s_axi_wstrb   : in  std_logic_vector(3 downto 0);
+         s_axi_wvalid  : in  std_logic;
+         s_axi_wready  : out std_logic;
+         s_axi_bresp   : out std_logic_vector(1 downto 0);
+         s_axi_bvalid  : out std_logic;
+         s_axi_bready  : in  std_logic;
+         s_axi_araddr  : in  std_logic_vector(12 downto 0);
+         s_axi_arvalid : in  std_logic;
+         s_axi_arready : out std_logic;
+         s_axi_rdata   : out std_logic_vector(31 downto 0);
+         s_axi_rresp   : out std_logic_vector(1 downto 0);
+         s_axi_rvalid  : out std_logic;
+         s_axi_rready  : in  std_logic;
+         ip2intc_irpt  : out std_logic;
+         vp            : in  std_logic;
+         vn            : in  std_logic;
+         ot_out        : out std_logic;
+         channel_out   : out std_logic_vector(5 downto 0);
+         eoc_out       : out std_logic;
+         alarm_out     : out std_logic;
+         eos_out       : out std_logic;
+         busy_out      : out std_logic);
+   end component;
+
    signal axiRstL : sl;
 
 begin
 
    axiRstL <= not axiRst;
 
-   SystemManagementCore_Inst : entity work.SystemManagementCore
+   SystemManagementCore_Inst : SystemManagementCore
       port map (
          s_axi_aclk    => axiClk,
          s_axi_aresetn => axiRstL,
@@ -65,8 +97,9 @@ begin
          s_axi_rvalid  => axiReadSlave.rvalid,
          s_axi_rready  => axiReadMaster.rready,
          ip2intc_irpt  => open,
-         vp            => vpIn,
-         vn            => vnIn,
+         vp            => vPIn,
+         vn            => vNIn,
+         ot_out        => open,
          channel_out   => open,
          eoc_out       => open,
          alarm_out     => open,
