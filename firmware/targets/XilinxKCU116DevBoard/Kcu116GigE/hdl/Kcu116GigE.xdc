@@ -10,6 +10,9 @@
 
 # I/O Port Mapping
 
+set_property -dict { PACKAGE_PIN P14 IOSTANDARD ANALOG } [get_ports { vPIn }]
+set_property -dict { PACKAGE_PIN R13 IOSTANDARD ANALOG } [get_ports { vNIn }]
+
 set_property -dict { PACKAGE_PIN B9  IOSTANDARD LVCMOS33 } [get_ports { extRst }]
 
 set_property -dict { PACKAGE_PIN C9  IOSTANDARD LVCMOS33 } [get_ports { led[0] }]
