@@ -1,10 +1,8 @@
 -------------------------------------------------------------------------------
 -- File       : AxiLiteExample.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2014-07-31
--- Last update: 2017-03-17
 -------------------------------------------------------------------------------
--- Description: 
+-- Description: Wrapper on the Vivado HLS AXI-Lite Example
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
