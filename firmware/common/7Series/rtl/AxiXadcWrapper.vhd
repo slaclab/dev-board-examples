@@ -1,10 +1,8 @@
 -------------------------------------------------------------------------------
 -- File       : AxiXadcWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-01-30
--- Last update: 2018-02-12
 -------------------------------------------------------------------------------
--- Description: 
+-- Description: Wrapper on the XADC with AXI-Lite Interface
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -23,7 +21,7 @@ use work.AxiLitePkg.all;
 
 entity AxiXadcWrapper is
    generic (
-      TPD_G            : time            := 1 ns);
+      TPD_G : time := 1 ns);
    port (
       axiClk : in sl;
       axiRst : in sl;
