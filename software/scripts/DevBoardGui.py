@@ -13,6 +13,8 @@ import setupLibPaths
 
 import sys
 import argparse
+import time
+import logging
 
 import pyrogue as pr
 import pyrogue.gui
@@ -27,9 +29,13 @@ import rogue.hardware.pgp
 import DevBoard as devBoard
 
 rogue.Logging.setLevel(rogue.Logging.Warning)
+rogue.Logging.setLevel(rogue.Logging.Debug)
 #rogue.Logging.setFilter("pyrogue.rssi",rogue.Logging.Info)
 #rogue.Logging.setFilter("pyrogue.packetizer",rogue.Logging.Info)
 # # rogue.Logging.setLevel(rogue.Logging.Debug)
+
+logger = logging.getLogger('pyrogue')
+logger.setLevel(logging.DEBUG)
 
 #################################################################
 
@@ -154,7 +160,7 @@ class MyRoot(pr.Root):
                 jumbo   = True,
                 expand  = False,
                 )    
-            self.add(self.rudp) 
+            # self.add(self.rudp) 
                 
             # Map the AxiStream.TDEST
             self.vc0Srp  = self.rudp.application(0); # AxiStream.tDest = 0x0
@@ -204,27 +210,31 @@ class MyRoot(pr.Root):
 rootTop = MyRoot(name='System',description='Front End Board')
     
 #################################################################    
-
 # Start the system
 rootTop.start(
     pollEn   = args.pollEn,
     initRead = args.initRead,
 )
 
-# Print the AxiVersion Summary
-rootTop.Fpga.AxiVersion.printStatus()
+print('before')
+# time.sleep(10)
 
-# Rate testers
-if args.varRate: rootTop.Fpga.varRateTest()
-if args.rawRate: rootTop.Fpga.rawRateTest()
+
+# # Print the AxiVersion Summary
+# rootTop.Fpga.AxiVersion.printStatus()
+
+# # Rate testers
+# if args.varRate: rootTop.Fpga.varRateTest()
+# if args.rawRate: rootTop.Fpga.rawRateTest()
 
 # Create GUI
 appTop = pr.gui.application(sys.argv)
-guiTop = pr.gui.GuiTop(group='PyRogueGui')
+guiTop = pr.gui.GuiTop()
 guiTop.addTree(rootTop)
 guiTop.resize(800, 1200)
 
 print("Starting GUI...\n");
+print('after')
 
 # Run gui
 appTop.exec_()
