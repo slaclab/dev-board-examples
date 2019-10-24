@@ -1,10 +1,8 @@
 -------------------------------------------------------------------------------
 -- File       : AppReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-15
--- Last update: 2018-11-01
 -------------------------------------------------------------------------------
--- Description:
+-- Description:  Application Registers and Modules
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 

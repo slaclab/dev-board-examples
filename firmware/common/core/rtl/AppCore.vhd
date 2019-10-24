@@ -1,10 +1,8 @@
 -------------------------------------------------------------------------------
 -- File       : AppCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-15
--- Last update: 2018-05-18
 -------------------------------------------------------------------------------
--- Description:
+-- Description: Container of all the Application Space
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 

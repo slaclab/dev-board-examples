@@ -1,10 +1,8 @@
 -------------------------------------------------------------------------------
 -- File       : EthPortMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-01-30
--- Last update: 2019-06-27
 -------------------------------------------------------------------------------
--- Description: 
+-- Description: ETH Port Mapping
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -44,17 +42,17 @@ entity EthPortMapping is
       rxSlave          : out AxiStreamSlaveType;
       rxCtrl           : out AxiStreamCtrlType;
       -- PBRS Interface
-      pbrsTxMaster     : in  AxiStreamMasterType;
+      pbrsTxMaster     : in  AxiStreamMasterType    := AXI_STREAM_MASTER_INIT_C;
       pbrsTxSlave      : out AxiStreamSlaveType;
       pbrsRxMaster     : out AxiStreamMasterType;
-      pbrsRxSlave      : in  AxiStreamSlaveType;
+      pbrsRxSlave      : in  AxiStreamSlaveType     := AXI_STREAM_SLAVE_FORCE_C;
       -- HLS Interface
-      hlsTxMaster      : in  AxiStreamMasterType;
+      hlsTxMaster      : in  AxiStreamMasterType    := AXI_STREAM_MASTER_INIT_C;
       hlsTxSlave       : out AxiStreamSlaveType;
       hlsRxMaster      : out AxiStreamMasterType;
-      hlsRxSlave       : in  AxiStreamSlaveType;
+      hlsRxSlave       : in  AxiStreamSlaveType     := AXI_STREAM_SLAVE_FORCE_C;
       -- MB Interface
-      mbTxMaster       : in  AxiStreamMasterType;
+      mbTxMaster       : in  AxiStreamMasterType    := AXI_STREAM_MASTER_INIT_C;
       mbTxSlave        : out AxiStreamSlaveType;
       -- SRPv3 Master AXI-Lite Interface
       mAxilWriteMaster : out AxiLiteWriteMasterType;
@@ -62,9 +60,9 @@ entity EthPortMapping is
       mAxilReadMaster  : out AxiLiteReadMasterType;
       mAxilReadSlave   : in  AxiLiteReadSlaveType;
       -- Communication Slave AXI-Lite Interface
-      commWriteMaster  : in  AxiLiteWriteMasterType;
+      commWriteMaster  : in  AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
       commWriteSlave   : out AxiLiteWriteSlaveType;
-      commReadMaster   : in  AxiLiteReadMasterType;
+      commReadMaster   : in  AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
       commReadSlave    : out AxiLiteReadSlaveType);
 end EthPortMapping;
 

@@ -1,10 +1,8 @@
 -------------------------------------------------------------------------------
 -- File       : PgpVcMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-01-30
--- Last update: 2018-03-28
 -------------------------------------------------------------------------------
--- Description: 
+-- Description: PGP Virtual Channel (VC) Mapping
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
