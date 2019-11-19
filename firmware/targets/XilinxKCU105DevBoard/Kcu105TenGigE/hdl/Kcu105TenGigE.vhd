@@ -91,7 +91,7 @@ begin
          coreClk      => clk,
          coreRst      => rst,
          phyReady(0)  => phyReady,
-         -- MGT Clock Port (156.25 MHz or 312.5 MHz)
+         -- MGT Clock Port 156.25 MHz
          gtClkP       => ethClkP,
          gtClkN       => ethClkN,
          -- MGT Ports
