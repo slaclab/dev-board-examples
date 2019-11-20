@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : Ac701Pgp2b.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-02-02
--- Last update: 2017-09-01
 -------------------------------------------------------------------------------
 -- Description: Example using PGP2B Protocol
 -------------------------------------------------------------------------------
@@ -18,10 +16,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.Pgp2bPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.Pgp2bPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -72,7 +71,7 @@ begin
       -----------------------
       -- PGP Core for ARTIX-7
       -----------------------
-      U_PGP : entity work.Pgp2bGtp7VarLatWrapper
+      U_PGP : entity surf.Pgp2bGtp7VarLatWrapper
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -103,7 +102,7 @@ begin
    end generate REAL_PGP;
 
    SIM_PGP : if (SIMULATION_G) generate
-      U_SimModel : entity work.PgpSimModel
+      U_SimModel : entity surf.PgpSimModel
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -122,7 +121,7 @@ begin
 
       clk <= gtClkP;
 
-      U_PwrUpRst : entity work.PwrUpRst
+      U_PwrUpRst : entity surf.PwrUpRst
          generic map (
             TPD_G          => TPD_G,
             SIM_SPEEDUP_G  => SIM_SPEEDUP_G,

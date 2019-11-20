@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : Kcu105GigE.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-08
--- Last update: 2019-04-02
 -------------------------------------------------------------------------------
 -- Description: Example using 1000BASE-SX Protocol
 -------------------------------------------------------------------------------
@@ -19,10 +17,11 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.EthMacPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -105,7 +104,7 @@ begin
          I => sysClk300NB,
          O => sysClk300);
 
-   U_SysclkRstSync : entity work.RstSync
+   U_SysclkRstSync : entity surf.RstSync
       port map (
          clk      => sysClk300,
          asyncRst => extRst,
@@ -116,7 +115,7 @@ begin
       ---------------------
       -- 1 GigE XAUI Module
       ---------------------
-      U_1GigE : entity work.GigEthGthUltraScaleWrapper
+      U_1GigE : entity surf.GigEthGthUltraScaleWrapper
          generic map (
             TPD_G              => TPD_G,
             -- DMA/MAC Configurations
@@ -156,7 +155,7 @@ begin
    end generate GEN_GTH;
 
    GEN_SGMII : if (SGMII_ETH_G /= 0) generate
-      U_MarvelWrap : entity work.Sgmii88E1111LvdsUltraScale
+      U_MarvelWrap : entity surf.Sgmii88E1111LvdsUltraScale
          generic map (
             TPD_G             => TPD_G,
             STABLE_CLK_FREQ_G => 300.0E+6,

@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : Kcu105FifoAsync.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-01
--- Last update: 2017-08-14
 -------------------------------------------------------------------------------
 -- Description: Hardware Testbed for checking FifoAsync with two ASYNC clocks
 -------------------------------------------------------------------------------
@@ -20,10 +18,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -79,7 +78,7 @@ begin
          I => clock(0),
          O => clk125);
 
-   U_PwrUpRst0 : entity work.PwrUpRst
+   U_PwrUpRst0 : entity surf.PwrUpRst
       generic map(
          TPD_G => TPD_G)
       port map(
@@ -109,7 +108,7 @@ begin
          DIV     => "000",
          O       => clk156);
 
-   U_PwrUpRst1 : entity work.PwrUpRst
+   U_PwrUpRst1 : entity surf.PwrUpRst
       generic map(
          TPD_G => TPD_G)
       port map(
@@ -122,12 +121,12 @@ begin
       -----------------
       -- Data Generator
       -----------------
-      SsiPrbsTx_Inst : entity work.SsiPrbsTx
+      SsiPrbsTx_Inst : entity surf.SsiPrbsTx
          generic map (
             -- General Configurations
             TPD_G                      => TPD_G,
             -- FIFO configurations
-            BRAM_EN_G                  => true,
+            MEMORY_TYPE_G              => "block",
             GEN_SYNC_FIFO_G            => false,
             FIFO_ADDR_WIDTH_G          => 9,
             FIFO_PAUSE_THRESH_G        => 1,
@@ -155,12 +154,12 @@ begin
       ---------------
       -- Data Checker
       ---------------
-      SsiPrbsRx_Inst : entity work.SsiPrbsRx
+      SsiPrbsRx_Inst : entity surf.SsiPrbsRx
          generic map (
             -- General Configurations
             TPD_G                      => TPD_G,
             -- FIFO Configurations
-            BRAM_EN_G                  => false,
+            MEMORY_TYPE_G              => "distributed",
             GEN_SYNC_FIFO_G            => true,
             FIFO_ADDR_WIDTH_G          => 4,
             FIFO_PAUSE_THRESH_G        => 1,
@@ -212,7 +211,7 @@ begin
       end if;
    end process;
 
-   Heartbeat_0 : entity work.Heartbeat
+   Heartbeat_0 : entity surf.Heartbeat
       generic map(
          TPD_G       => TPD_G,
          PERIOD_IN_G => 6.4E-9)
@@ -220,7 +219,7 @@ begin
          clk => clk156,
          o   => heartBeat(0));
 
-   Heartbeat_1 : entity work.Heartbeat
+   Heartbeat_1 : entity surf.Heartbeat
       generic map(
          TPD_G       => TPD_G,
          PERIOD_IN_G => 8.0E-9)
@@ -228,7 +227,7 @@ begin
          clk => clk125,
          o   => heartBeat(1));
 
-   PwrUpRst_updatedLed : entity work.PwrUpRst
+   PwrUpRst_updatedLed : entity surf.PwrUpRst
       generic map(
          TPD_G          => TPD_G,
          IN_POLARITY_G  => '1',

@@ -1,10 +1,8 @@
 -------------------------------------------------------------------------------
 -- File       : MyAxiStreamPacketizer2Tb.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-01-29
--- Last update: 2018-03-01
 -------------------------------------------------------------------------------
--- Description: 
+-- Description: Simulation test bed for AxiStreamPacketizer
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS FTK DF DEV'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -20,9 +18,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
 
 entity MyAxiStreamPacketizer2Tb is end MyAxiStreamPacketizer2Tb;
 
@@ -75,7 +74,7 @@ begin
    -----------------------------
    -- Generate clocks and resets
    -----------------------------
-   U_ClkRst : entity work.ClkRst
+   U_ClkRst : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_PERIOD_C,
          RST_START_DELAY_G => 0 ns,  -- Wait this long into simulation before asserting reset
@@ -84,7 +83,7 @@ begin
          clkP => clk,
          rst  => rst);
 
-   U_Packetizer : entity work.AxiStreamPacketizer2
+   U_Packetizer : entity surf.AxiStreamPacketizer2
       generic map (
          TPD_G                => TPD_G,
          BRAM_EN_G            => BRAM_EN_C,
@@ -101,7 +100,7 @@ begin
          mAxisMaster => master,
          mAxisSlave  => slave);
 
-   U_Depacketizer : entity work.AxiStreamDepacketizer2
+   U_Depacketizer : entity surf.AxiStreamDepacketizer2
       generic map (
          TPD_G                => TPD_G,
          BRAM_EN_G            => BRAM_EN_C,

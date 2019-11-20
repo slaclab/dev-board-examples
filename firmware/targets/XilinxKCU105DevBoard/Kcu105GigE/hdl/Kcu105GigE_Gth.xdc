@@ -26,3 +26,5 @@ create_generated_clock -name ethClk62p5MHz [get_pins {GEN_GTH.U_1GigE/U_MMCM/Mmc
 
 set_clock_groups -asynchronous -group [get_clocks {gtClkP}] -group [get_clocks {ethClk125MHz}] 
 set_clock_groups -asynchronous -group [get_clocks {gtClkP}] -group [get_clocks {ethClk62p5MHz}] 
+
+set_clock_groups -asynchronous -group [get_clocks gtClkP] -group [get_clocks -of_objects [get_pins GEN_GTH.U_1GigE/GEN_INT_PLL.U_MMCM/MmcmGen.U_Mmcm/CLKOUT0]]

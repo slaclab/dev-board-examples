@@ -41,13 +41,13 @@ create_clock -name gtClkP    -period 8.000 [get_ports {gtClkP}]
 
 create_generated_clock -name stableClk [get_pins {U_PGP/INT_REFCLK.U_pgpRefClk/ODIV2}]
 
-create_generated_clock -name pgpRxClk1x  [get_pins {U_PGP/REAL_PGP.GEN_LANE[0].U_Pgp/U_Pgp3Gtp7IpWrapper/U_RX_PLL/PllGen.U_Pll/CLKOUT0}]
-create_generated_clock -name pgpRxClk2x  [get_pins {U_PGP/REAL_PGP.GEN_LANE[0].U_Pgp/U_Pgp3Gtp7IpWrapper/U_RX_PLL/PllGen.U_Pll/CLKOUT2}]
-create_generated_clock -name pgpRxClk4x  [get_pins {U_PGP/REAL_PGP.GEN_LANE[0].U_Pgp/U_Pgp3Gtp7IpWrapper/U_RX_PLL/PllGen.U_Pll/CLKOUT1}]
+create_generated_clock -name pgpRxClk1x  [get_pins {U_PGP/REAL_PGP.GEN_LANE[0].U_Pgp/U_Pgp3Gtp7IpWrapper/U_RX_PLL/CLKOUT0}]
+create_generated_clock -name pgpRxClk2x  [get_pins {U_PGP/REAL_PGP.GEN_LANE[0].U_Pgp/U_Pgp3Gtp7IpWrapper/U_RX_PLL/CLKOUT2}]
+create_generated_clock -name pgpRxClk4x  [get_pins {U_PGP/REAL_PGP.GEN_LANE[0].U_Pgp/U_Pgp3Gtp7IpWrapper/U_RX_PLL/CLKOUT1}]
 
-create_generated_clock -name pgpTxClk1x  [get_pins {U_PGP/REAL_PGP.U_TX_PLL/PllGen.U_Pll/CLKOUT0}]
-create_generated_clock -name pgpTxClk2x  [get_pins {U_PGP/REAL_PGP.U_TX_PLL/PllGen.U_Pll/CLKOUT2}]
-create_generated_clock -name pgpTxClk4x  [get_pins {U_PGP/REAL_PGP.U_TX_PLL/PllGen.U_Pll/CLKOUT1}]
+create_generated_clock -name pgpTxClk1x  [get_pins {U_PGP/REAL_PGP.U_TX_PLL/CLKOUT0}]
+create_generated_clock -name pgpTxClk2x  [get_pins {U_PGP/REAL_PGP.U_TX_PLL/CLKOUT2}]
+create_generated_clock -name pgpTxClk4x  [get_pins {U_PGP/REAL_PGP.U_TX_PLL/CLKOUT1}]
 
 create_generated_clock -name dnaClk    [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/BUFR_Inst/O}] 
 create_generated_clock -name dnaClkInv [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/DNA_CLK_INV_BUFR/O}] 

@@ -16,12 +16,13 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiLitePkg.all;
-use work.Pgp2bPkg.all;
-use work.Pgp3Pkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.Pgp2bPkg.all;
+use surf.Pgp3Pkg.all;
 
 entity PgpVcMapping is
    generic (
@@ -84,7 +85,7 @@ begin
       report "APP_TYPE_G must be PGP or PGP3" severity error;
 
    -- VC0 RX/TX, SRPv3 register Module
-   U_SRPv3 : entity work.SrpV3AxiLite
+   U_SRPv3 : entity surf.SrpV3AxiLite
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => false,
@@ -110,7 +111,7 @@ begin
          mAxilWriteSlave  => mAxilWriteSlave);
 
    -- VC1 TX, PBRS
-   VCTX1 : entity work.AxiStreamFifo
+   VCTX1 : entity surf.AxiStreamFifo
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
@@ -119,8 +120,7 @@ begin
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => true,
-         USE_BUILT_IN_G      => false,
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => true,
          CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => 10,
@@ -142,7 +142,7 @@ begin
          mAxisSlave  => txSlaves(1));
 
    -- VC1 RX, PBRS
-   VCRX1 : entity work.AxiStreamFifo
+   VCRX1 : entity surf.AxiStreamFifo
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
@@ -151,8 +151,7 @@ begin
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => true,
-         USE_BUILT_IN_G      => false,
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => true,
          CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => 10,
@@ -174,7 +173,7 @@ begin
          mAxisSlave  => pbrsRxSlave);
 
    -- VC2 TX, HLS
-   VCTX2 : entity work.AxiStreamFifo
+   VCTX2 : entity surf.AxiStreamFifo
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
@@ -183,8 +182,7 @@ begin
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => true,
-         USE_BUILT_IN_G      => false,
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => true,
          CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => 10,
@@ -206,7 +204,7 @@ begin
          mAxisSlave  => txSlaves(2));
 
    -- VC2 RX, HLS
-   VCRX2 : entity work.AxiStreamFifo
+   VCRX2 : entity surf.AxiStreamFifo
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
@@ -215,8 +213,7 @@ begin
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => true,
-         USE_BUILT_IN_G      => false,
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => true,
          CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => 10,
@@ -241,7 +238,7 @@ begin
    rxSlaves <= (others => AXI_STREAM_SLAVE_INIT_C);
 
    -- VC3 Microblaze
-   MBTX_FIFO : entity work.AxiStreamFifo
+   MBTX_FIFO : entity surf.AxiStreamFifo
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
@@ -250,8 +247,7 @@ begin
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => true,
-         USE_BUILT_IN_G      => false,
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => true,
          CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => 9,

@@ -18,10 +18,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
 
 entity AppReg is
    generic (
@@ -149,7 +150,7 @@ begin
    ----------------------------
    -- Microblaze Wrapper Module
    ----------------------------   
-   U_CPU : entity work.MicroblazeBasicCoreWrapper
+   U_CPU : entity surf.MicroblazeBasicCoreWrapper
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -192,7 +193,7 @@ begin
    ---------------------------
    -- AXI-Lite Crossbar Module
    ---------------------------         
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 2,
@@ -217,7 +218,7 @@ begin
    ---------------------------
    -- AXI-Lite: Version Module
    ---------------------------            
-   U_AxiVersion : entity work.AxiVersion
+   U_AxiVersion : entity surf.AxiVersion
       generic map (
          TPD_G           => TPD_G,
          CLK_PERIOD_G    => (1.0/CLK_FREQUENCY_G),
@@ -272,7 +273,7 @@ begin
    --------------------------------          
    -- AXI-Lite Shared Memory Module
    --------------------------------          
-   U_Mem : entity work.AxiDualPortRam
+   U_Mem : entity surf.AxiDualPortRam
       generic map (
          TPD_G        => TPD_G,
          AXI_WR_EN_G  => true,
@@ -298,7 +299,7 @@ begin
    -------------------
    -- AXI-Lite PRBS RX
    -------------------
-   U_SsiPrbsTx : entity work.SsiPrbsTx
+   U_SsiPrbsTx : entity surf.SsiPrbsTx
       generic map (
          TPD_G                      => TPD_G,
          MASTER_AXI_PIPE_STAGES_G   => 1,
@@ -321,7 +322,7 @@ begin
          axilWriteSlave  => mAxilWriteSlaves(PRBS_TX_INDEX_C));
 
    GEN_BATCHER : if (PRBS_TX_BATCHER_G = true) generate
-      U_AxiStreamBatcher : entity work.AxiStreamBatcher
+      U_AxiStreamBatcher : entity surf.AxiStreamBatcher
          generic map (
             TPD_G                        => TPD_G,
             MAX_NUMBER_SUB_FRAMES_G      => 8,
@@ -349,7 +350,7 @@ begin
    -------------------
    -- AXI-Lite PRBS RX
    -------------------
-   U_SsiPrbsRx : entity work.SsiPrbsRx
+   U_SsiPrbsRx : entity surf.SsiPrbsRx
       generic map (
          TPD_G                     => TPD_G,
          SLAVE_AXI_PIPE_STAGES_G   => 1,
@@ -373,7 +374,7 @@ begin
    --------------------------------------
    -- AXI-Lite PRBS AXI Stream Monitoring
    --------------------------------------
-   U_AXIS_MON : entity work.AxiStreamMonAxiL
+   U_AXIS_MON : entity surf.AxiStreamMonAxiL
       generic map(
          TPD_G            => TPD_G,
          COMMON_CLK_G     => true,

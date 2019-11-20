@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : StaticDesign.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2014-01-13
--- Last update: 2014-01-14
 -------------------------------------------------------------------------------
 -- Description: Simple Partial Reconfiguration Example 
 --              with LedRtlA & LedRtlB blinking at 1 Hz rate
@@ -19,7 +17,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;

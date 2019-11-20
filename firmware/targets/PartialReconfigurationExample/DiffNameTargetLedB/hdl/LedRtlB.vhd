@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : LedRtlB.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2014-01-13
--- Last update: 2014-01-13
 -------------------------------------------------------------------------------
 -- Description: Blinks the LED @ 5 Hz (instead of static design's 1 Hz rate)
 -------------------------------------------------------------------------------
@@ -21,7 +19,8 @@ use ieee.numeric_std.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
 
 entity LedRtlB is
    port (

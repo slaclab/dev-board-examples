@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : Ac701Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-02-02
--- Last update: 2018-09-28
 -------------------------------------------------------------------------------
 -- Description: Example using PGP2B Protocol
 -------------------------------------------------------------------------------
@@ -18,10 +16,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.Pgp3Pkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.Pgp3Pkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -71,7 +70,7 @@ architecture top_level of Ac701Pgp3 is
 
 begin
 
-   U_PwrUpRst : entity work.PwrUpRst
+   U_PwrUpRst : entity surf.PwrUpRst
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -82,16 +81,16 @@ begin
    -----------------------
    -- PGP Core for ARTIX-7
    -----------------------
-   U_PGP : entity work.Pgp3Gtp7Wrapper
+   U_PGP : entity surf.Pgp3Gtp7Wrapper
       generic map (
-         TPD_G               => TPD_G,
-         ROGUE_SIM_EN_G      => SIMULATION_G,
-         ROGUE_SIM_USER_ID_G => 99,
-         NUM_LANES_G         => 1,
-         NUM_VC_G            => 4,
-         SPEED_GRADE_G       => 2,
-         RATE_G              => "6.25Gbps",
-         REFCLK_TYPE_G       => PGP3_REFCLK_125_C)
+         TPD_G                => TPD_G,
+         ROGUE_SIM_EN_G       => SIMULATION_G,
+         ROGUE_SIM_PORT_NUM_G => 9000,
+         NUM_LANES_G          => 1,
+         NUM_VC_G             => 4,
+         SPEED_GRADE_G        => 2,
+         RATE_G               => "6.25Gbps",
+         REFCLK_TYPE_G        => PGP3_REFCLK_125_C)
       port map (
          -- Stable Clock and Reset
          stableClk         => stableClk,

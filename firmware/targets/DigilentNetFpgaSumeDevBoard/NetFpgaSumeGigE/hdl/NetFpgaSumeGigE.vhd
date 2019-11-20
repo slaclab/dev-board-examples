@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : NetFpgaSumeGigE.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-01
--- Last update: 2018-05-18
 -------------------------------------------------------------------------------
 -- Description: Example using 1000BASE-SX Protocol
 -------------------------------------------------------------------------------
@@ -18,10 +16,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.EthMacPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -86,7 +85,7 @@ begin
    ----------------------------
    -- 10GBASE-R Ethernet Module
    ----------------------------
-   U_1GigE : entity work.GigEthGth7Wrapper
+   U_1GigE : entity surf.GigEthGth7Wrapper
       generic map (
          TPD_G              => TPD_G,
          -- DMA/MAC Configurations
