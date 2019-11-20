@@ -10,6 +10,6 @@
 #-----------------------------------------------------------------------------
 import pyrogue as pr
 
-# pr.addLibraryPath('../../../firmware/common/python')
-# pr.addLibraryPath('../../../firmware/submodules/surf/python')
-# pr.addLibraryPath('../python')
+# pr.addLibraryPath('../../firmware/common/python')
+# pr.addLibraryPath('../../firmware/submodules/surf/python')
+# pr.addLibraryPath('python')
