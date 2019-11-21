@@ -4,6 +4,11 @@
 -------------------------------------------------------------------------------
 -- Description: Example using 10G-BASER Protocol
 -------------------------------------------------------------------------------
+--    Note: To use this firmware build, you will need the FMC below:
+--    http://www.fastertechnology.com/products/fmc/fm-s14.html
+--    The KC705 does NOT have a 156.25 MHz or 312.5 MHz reference OSC.
+--    We use the FMC card's 312.5 MHz OSC for the GT reference clock
+-------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
 -- top-level directory of this distribution and at: 
