@@ -28,14 +28,14 @@ import rogue.hardware.pgp
 
 import DevBoard as devBoard
 
-rogue.Logging.setLevel(rogue.Logging.Warning)
-rogue.Logging.setLevel(rogue.Logging.Debug)
+#rogue.Logging.setLevel(rogue.Logging.Warning)
+#rogue.Logging.setLevel(rogue.Logging.Debug)
 #rogue.Logging.setFilter("pyrogue.rssi",rogue.Logging.Info)
 #rogue.Logging.setFilter("pyrogue.packetizer",rogue.Logging.Info)
 # # rogue.Logging.setLevel(rogue.Logging.Debug)
 
-logger = logging.getLogger('pyrogue')
-logger.setLevel(logging.DEBUG)
+#logger = logging.getLogger('pyrogue')
+#logger.setLevel(logging.DEBUG)
 
 #################################################################
 
