@@ -2,7 +2,7 @@
 -- File       : Kcu105Pgp3.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: Example using PGP2B Protocol
+-- Description: Example using PGPv3 Protocol
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -32,13 +32,13 @@ entity Kcu105Pgp3 is
       SIM_SPEEDUP_G : boolean := false;
       SIMULATION_G  : boolean := false);
    port (
-      -- Misc. IOs
+      -- Misc. Ports
       extRst  : in  sl;
       led     : out slv(7 downto 0);
       -- XADC Ports
       vPIn    : in  sl;
       vNIn    : in  sl;
-      -- ETH GT Pins
+      -- GT Ports
       pgpClkP : in  sl;
       pgpClkN : in  sl;
       pgpRxP  : in  sl;
