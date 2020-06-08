@@ -38,3 +38,4 @@ bin*
 *.gz
 *.dcp
 *.zip
+*.xsa
