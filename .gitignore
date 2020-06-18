@@ -30,6 +30,7 @@ build.info
 # Build directories 
 build*
 bin*
+report*
 
 # Only .bit.gz and .mcs.gz should be committed to git
 *.bit
