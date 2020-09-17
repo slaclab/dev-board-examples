@@ -236,10 +236,11 @@ begin
    U_AxiVersion : entity surf.AxiVersion
       generic map (
          TPD_G           => TPD_G,
-         CLK_PERIOD_G    => (1.0/CLK_FREQUENCY_G),
          BUILD_INFO_G    => BUILD_INFO_G,
+         CLK_PERIOD_G    => (1.0/CLK_FREQUENCY_G),
          XIL_DEVICE_G    => XIL_DEVICE_G,
-         EN_DEVICE_DNA_G => true)
+         EN_DEVICE_DNA_G => true,
+         EN_ICAP_G       => true)
       port map (
          axiReadMaster  => mAxilReadMasters(VERSION_INDEX_C),
          axiReadSlave   => mAxilReadSlaves(VERSION_INDEX_C),
