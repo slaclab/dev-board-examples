@@ -4,6 +4,13 @@
 -------------------------------------------------------------------------------
 -- Description: Example using PGP2B Protocol
 -------------------------------------------------------------------------------
+-- https://www.xilinx.com/products/boards-and-kits/kc705.html
+--
+-- Note: Using the QSPI (not BPI) for booting from PROM.
+--       J3 needs to have the jumper installed
+--       SW13 needs to be in the "00001" position to set FPGA.M[2:0] = "001"
+--
+-------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the
 -- top-level directory of this distribution and at:
@@ -33,18 +40,24 @@ entity Kc705Pgp is
       SIMULATION_G  : boolean := false);
    port (
       -- LEDs and Reset button
-      extRst : in  sl;
-      led    : out slv(7 downto 0);
+      extRst   : in  sl;
+      led      : out slv(7 downto 0);
       -- XADC Ports
-      vPIn   : in  sl;
-      vNIn   : in  sl;
+      vPIn     : in  sl;
+      vNIn     : in  sl;
+      -- System Ports
+      emcClk   : in  sl;
+      -- Boot Memory Ports
+      bootCsL  : out sl;
+      bootMosi : out sl;
+      bootMiso : in  sl;
       -- GT Pins
-      gtClkP : in  sl;
-      gtClkN : in  sl;
-      gtRxP  : in  sl;
-      gtRxN  : in  sl;
-      gtTxP  : out sl;
-      gtTxN  : out sl);
+      gtClkP   : in  sl;
+      gtClkN   : in  sl;
+      gtRxP    : in  sl;
+      gtRxN    : in  sl;
+      gtTxP    : out sl;
+      gtTxN    : out sl);
 end Kc705Pgp;
 
 architecture top_level of Kc705Pgp is
@@ -58,6 +71,11 @@ architecture top_level of Kc705Pgp is
 
    signal pgpTxOut : Pgp2bTxOutType;
    signal pgpRxOut : Pgp2bRxOutType;
+
+   signal bootReadMasters  : AxiLiteReadMasterArray(1 downto 0);
+   signal bootReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
+   signal bootWriteMasters : AxiLiteWriteMasterArray(1 downto 0);
+   signal bootWriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0);
 
    signal clk : sl;
    signal rst : sl;
@@ -143,16 +161,42 @@ begin
          AXIS_SIZE_G  => AXIS_SIZE_C)
       port map (
          -- Clock and Reset
-         clk       => clk,
-         rst       => rst,
+         clk              => clk,
+         rst              => rst,
          -- AXIS interface
-         txMasters => txMasters,
-         txSlaves  => txSlaves,
-         rxMasters => rxMasters,
-         rxCtrl    => rxCtrl,
+         txMasters        => txMasters,
+         txSlaves         => txSlaves,
+         rxMasters        => rxMasters,
+         rxCtrl           => rxCtrl,
+         -- BOOT Prom Interface
+         bootWriteMasters => bootWriteMasters,
+         bootWriteSlaves  => bootWriteSlaves,
+         bootReadMasters  => bootReadMasters,
+         bootReadSlaves   => bootReadSlaves,
          -- ADC Ports
-         vPIn      => vPIn,
-         vNIn      => vNIn);
+         vPIn             => vPIn,
+         vNIn             => vNIn);
+
+   ------------
+   -- BOOT PROM
+   ------------
+   U_BootProm : entity work.BootProm
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         -- AXI-Lite Interface
+         axilClk          => clk,
+         axilRst          => rst,
+         axilWriteMasters => bootWriteMasters,
+         axilWriteSlaves  => bootWriteSlaves,
+         axilReadMasters  => bootReadMasters,
+         axilReadSlaves   => bootReadSlaves,
+         -- System Ports
+         emcClk           => emcClk,
+         -- Boot Memory Ports
+         bootCsL          => bootCsL,
+         bootMosi         => bootMosi,
+         bootMiso         => bootMiso);
 
    ----------------
    -- Misc. Signals

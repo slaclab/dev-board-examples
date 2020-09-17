@@ -7,6 +7,13 @@
 -- Note: To use this firmware build, you will need the FMC below:
 -- http://www.fastertechnology.com/products/fmc/fm-s14.html
 -------------------------------------------------------------------------------
+-- https://www.xilinx.com/products/boards-and-kits/kc705.html
+--
+-- Note: Using the QSPI (not BPI) for booting from PROM.
+--       J3 needs to have the jumper installed
+--       SW13 needs to be in the "00001" position to set FPGA.M[2:0] = "001"
+--
+-------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the
 -- top-level directory of this distribution and at:
@@ -47,6 +54,12 @@ entity Kc705Xaui is
       -- XADC Ports
       vPIn            : in  sl;
       vNIn            : in  sl;
+      -- System Ports
+      emcClk          : in  sl;
+      -- Boot Memory Ports
+      bootCsL         : out sl;
+      bootMosi        : out sl;
+      bootMiso        : in  sl;
       -- ETH Ports
       ethClkP         : in  sl;
       ethClkN         : in  sl;
@@ -66,6 +79,11 @@ architecture top_level of Kc705Xaui is
    signal txSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
    signal rxMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
    signal rxSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
+
+   signal bootReadMasters  : AxiLiteReadMasterArray(1 downto 0);
+   signal bootReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
+   signal bootWriteMasters : AxiLiteWriteMasterArray(1 downto 0);
+   signal bootWriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0);
 
    signal clk      : sl;
    signal rst      : sl;
@@ -132,16 +150,42 @@ begin
          IP_ADDR_G    => IP_ADDR_C)
       port map (
          -- Clock and Reset
-         clk       => clk,
-         rst       => rst,
+         clk              => clk,
+         rst              => rst,
          -- AXIS interface
-         txMasters => txMasters,
-         txSlaves  => txSlaves,
-         rxMasters => rxMasters,
-         rxSlaves  => rxSlaves,
+         txMasters        => txMasters,
+         txSlaves         => txSlaves,
+         rxMasters        => rxMasters,
+         rxSlaves         => rxSlaves,
+         -- BOOT Prom Interface
+         bootWriteMasters => bootWriteMasters,
+         bootWriteSlaves  => bootWriteSlaves,
+         bootReadMasters  => bootReadMasters,
+         bootReadSlaves   => bootReadSlaves,
          -- ADC Ports
-         vPIn      => vPIn,
-         vNIn      => vNIn);
+         vPIn             => vPIn,
+         vNIn             => vNIn);
+
+   ------------
+   -- BOOT PROM
+   ------------
+   U_BootProm : entity work.BootProm
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         -- AXI-Lite Interface
+         axilClk          => clk,
+         axilRst          => rst,
+         axilWriteMasters => bootWriteMasters,
+         axilWriteSlaves  => bootWriteSlaves,
+         axilReadMasters  => bootReadMasters,
+         axilReadSlaves   => bootReadSlaves,
+         -- System Ports
+         emcClk           => emcClk,
+         -- Boot Memory Ports
+         bootCsL          => bootCsL,
+         bootMosi         => bootMosi,
+         bootMiso         => bootMiso);
 
    ----------------
    -- Misc. Signals

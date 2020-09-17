@@ -7,27 +7,6 @@
 ## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
-# I/O Port Mapping
-set_property PACKAGE_PIN AB7 [get_ports extRst]
-set_property IOSTANDARD LVCMOS15 [get_ports extRst]
-
-set_property PACKAGE_PIN AB8  [get_ports {led[0]}]
-set_property PACKAGE_PIN AA8  [get_ports {led[1]}]
-set_property PACKAGE_PIN AC9  [get_ports {led[2]}]
-set_property PACKAGE_PIN AB9  [get_ports {led[3]}]
-set_property IOSTANDARD LVCMOS15 [get_ports led[0]]
-set_property IOSTANDARD LVCMOS15 [get_ports led[1]]
-set_property IOSTANDARD LVCMOS15 [get_ports led[2]]
-set_property IOSTANDARD LVCMOS15 [get_ports led[3]]
-
-set_property PACKAGE_PIN AE26 [get_ports {led[4]}]
-set_property PACKAGE_PIN G19  [get_ports {led[5]}]
-set_property PACKAGE_PIN E18  [get_ports {led[6]}]
-set_property PACKAGE_PIN F16  [get_ports {led[7]}]
-set_property IOSTANDARD LVCMOS25 [get_ports led[4]]
-set_property IOSTANDARD LVCMOS25 [get_ports led[5]]
-set_property IOSTANDARD LVCMOS25 [get_ports led[6]]
-set_property IOSTANDARD LVCMOS25 [get_ports led[7]]
 
 # 1st SFP channel on FMC card
 set_property PACKAGE_PIN D2 [get_ports ethTxP]
@@ -96,6 +75,3 @@ set_clock_groups -asynchronous -group [get_clocks {ethClk}] -group [get_clocks {
 
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/BUFR_Inst/O]] -group [get_clocks -of_objects [get_pins U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/DNA_CLK_INV_BUFR/O]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_10GigE/TenGigEthGtx7Clk_Inst/IBUFDS_GTE2_Inst/ODIV2]] -group [get_clocks {U_10GigE/GEN_LANE[0].TenGigEthGtx7_Inst/U_TenGigEthGtx7Core/U0/gt0_gtwizard_10gbaser_multi_gt_i/gt0_gtwizard_10gbaser_i/gtxe2_i/TXOUTCLK}]
-
-# .bit File Configuration
-set_property BITSTREAM.CONFIG.CONFIGRATE 9 [current_design]
