@@ -5,11 +5,11 @@
 -- Description: Simulation test bed for AxiStreamPacketizer
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS FTK DF DEV'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'ATLAS FTK DF DEV', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'ATLAS FTK DF DEV', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -30,24 +30,24 @@ architecture testbed of MyAxiStreamPacketizer2Tb is
    constant CLK_PERIOD_C       : time             := 10 ns;
    constant TPD_G              : time             := CLK_PERIOD_C/4;
    constant PKT_SIZE_C         : positive         := 3;
-   
+
    -- constant MAX_PACKET_BYTES_C : positive         := 3+(8*PKT_SIZE_C)/8;
    constant MAX_PACKET_BYTES_C : positive         := 1024;
-   
+
    constant TKEEP_TLAST_C      : slv(15 downto 0) := genTKeep(4);
 
 
    constant BRAM_EN_C : boolean := true;
    -- constant BRAM_EN_C : boolean := false;
 
-   
-   
+
+
    constant CRC_MODE_C : string := "FULL";
    -- constant CRC_MODE_C : string := "DATA";
    -- constant CRC_MODE_C : string := "NONE";
 
-   
-   
+
+
    type RegType is record
       cnt         : slv(31 downto 0);
       sAxisMaster : AxiStreamMasterType;

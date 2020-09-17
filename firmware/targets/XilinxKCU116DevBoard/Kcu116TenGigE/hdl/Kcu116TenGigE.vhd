@@ -5,11 +5,11 @@
 -- Description: Example using 10G-BASER Protocol
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ begin
       port map (
          -- Local Configurations
          localMac     => (others => MAC_ADDR_INIT_C),
-         -- Streaming DMA Interface 
+         -- Streaming DMA Interface
          dmaClk       => (others => clk),
          dmaRst       => (others => rst),
          dmaIbMasters => rxMasters,

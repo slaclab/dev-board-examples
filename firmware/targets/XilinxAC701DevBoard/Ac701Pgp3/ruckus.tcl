@@ -11,7 +11,7 @@ loadConstraints -dir "$::DIR_PATH/hdl"
 # Load local SIM source Code
 set_property top {Pgp3Gtp7Tb} [get_filesets sim_1]
 
-## Place and Route strategies 
+## Place and Route strategies
 set_property strategy Performance_ExplorePostRoutePhysOpt [get_runs impl_1]
 
 ## Skip the utilization check during placement

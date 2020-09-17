@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'Example Project Firmware'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'Example Project Firmware', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'Example Project Firmware', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 # I/O Port Mapping
@@ -79,23 +79,23 @@ set_property PACKAGE_PIN E30 [get_ports {fmcSfpModDef0[2]}]
 set_property PACKAGE_PIN G29 [get_ports {fmcSfpModDef0[3]}]
 set_property IOSTANDARD LVCMOS25 [get_ports fmcSfpModDef0*]
 
-# Timing Constraints 
+# Timing Constraints
 create_clock -name ethClkP -period  3.200 [get_ports {ethClkP}]
 
-create_generated_clock  -name ethClk    [get_pins {U_10GigE/TenGigEthGtx7Clk_Inst/IBUFDS_GTE2_Inst/ODIV2}]  
-create_generated_clock -name dnaClk    [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/BUFR_Inst/O}] 
-create_generated_clock -name dnaClkInv [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/DNA_CLK_INV_BUFR/O}] 
+create_generated_clock  -name ethClk    [get_pins {U_10GigE/TenGigEthGtx7Clk_Inst/IBUFDS_GTE2_Inst/ODIV2}]
+create_generated_clock -name dnaClk    [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/BUFR_Inst/O}]
+create_generated_clock -name dnaClkInv [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/DNA_CLK_INV_BUFR/O}]
 
 set ethTxClk {U_10GigE/GEN_LANE[0].TenGigEthGtx7_Inst/U_TenGigEthGtx7Core/inst/gt0_gtwizard_10gbaser_multi_gt_i/gt0_gtwizard_10gbaser_i/gtxe2_i/TXOUTCLK}
 set ethRxClk {U_10GigE/GEN_LANE[0].TenGigEthGtx7_Inst/U_TenGigEthGtx7Core/inst/gt0_gtwizard_10gbaser_multi_gt_i/gt0_gtwizard_10gbaser_i/gtxe2_i/RXOUTCLK}
 
-set_clock_groups -asynchronous -group [get_clocks {ethClk}] -group [get_clocks ${ethTxClk}]                               
-set_clock_groups -asynchronous -group [get_clocks {ethClk}] -group [get_clocks ${ethRxClk}]                
-set_clock_groups -asynchronous -group [get_clocks {ethClk}] -group [get_clocks {dnaClk}] 
-set_clock_groups -asynchronous -group [get_clocks {ethClk}] -group [get_clocks {dnaClkInv}]                
+set_clock_groups -asynchronous -group [get_clocks {ethClk}] -group [get_clocks ${ethTxClk}]
+set_clock_groups -asynchronous -group [get_clocks {ethClk}] -group [get_clocks ${ethRxClk}]
+set_clock_groups -asynchronous -group [get_clocks {ethClk}] -group [get_clocks {dnaClk}]
+set_clock_groups -asynchronous -group [get_clocks {ethClk}] -group [get_clocks {dnaClkInv}]
 
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/BUFR_Inst/O]] -group [get_clocks -of_objects [get_pins U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/DNA_CLK_INV_BUFR/O]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_10GigE/TenGigEthGtx7Clk_Inst/IBUFDS_GTE2_Inst/ODIV2]] -group [get_clocks {U_10GigE/GEN_LANE[0].TenGigEthGtx7_Inst/U_TenGigEthGtx7Core/U0/gt0_gtwizard_10gbaser_multi_gt_i/gt0_gtwizard_10gbaser_i/gtxe2_i/TXOUTCLK}]
 
 # .bit File Configuration
-set_property BITSTREAM.CONFIG.CONFIGRATE 9 [current_design]  
+set_property BITSTREAM.CONFIG.CONFIGRATE 9 [current_design]

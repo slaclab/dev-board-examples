@@ -5,11 +5,11 @@
 -- Description: Example using 1000BASE-SX Protocol
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ end Kc705GigE;
 architecture top_level of Kc705GigE is
 
    constant AXIS_SIZE_C : positive         := 1;
-   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10  
+   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10
    constant MAC_ADDR_C  : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01
 
    signal txMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
@@ -80,7 +80,7 @@ begin
          -- AXI Streaming Configurations
          AXIS_CONFIG_G      => (others => EMAC_AXIS_CONFIG_C))
       port map (
-         -- Streaming DMA Interface 
+         -- Streaming DMA Interface
          dmaClk       => (others => clk),
          dmaRst       => (others => rst),
          dmaIbMasters => rxMasters,

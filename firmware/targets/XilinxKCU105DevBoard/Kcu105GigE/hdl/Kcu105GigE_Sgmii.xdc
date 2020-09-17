@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'Example Project Firmware'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'Example Project Firmware', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'Example Project Firmware', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 # I/O Port Mapping
@@ -31,12 +31,12 @@ resize_pblock       [get_pblocks SGMII_ETH_BLK] -add {CLOCKREGION_X2Y1:CLOCKREGI
 
 set_property LOC PLL_X1Y3 [get_cells {GEN_SGMII.U_MarvelWrap/U_1GigE/U_PLL}]
 
-# Timing Constraints 
+# Timing Constraints
 create_clock -name lvdsClkP   -period 1.600 [get_ports {ethClkP}]
 create_clock -name sysClk300P -period 3.333 [get_ports {sysClk300P}]
 
-create_generated_clock -name ethClk625MHz [get_pins {GEN_SGMII.U_MarvelWrap/U_1GigE/U_PLL/CLKOUT0}] 
-create_generated_clock -name ethClk312MHz [get_pins {GEN_SGMII.U_MarvelWrap/U_1GigE/U_PLL/CLKOUT1}] 
+create_generated_clock -name ethClk625MHz [get_pins {GEN_SGMII.U_MarvelWrap/U_1GigE/U_PLL/CLKOUT0}]
+create_generated_clock -name ethClk312MHz [get_pins {GEN_SGMII.U_MarvelWrap/U_1GigE/U_PLL/CLKOUT1}]
 create_generated_clock -name ethClk125MHz [get_pins {GEN_SGMII.U_MarvelWrap/U_1GigE/U_sysClk125/O}]
 
 set_property CLOCK_DELAY_GROUP ETH_CLK_GRP [get_nets {GEN_SGMII.U_MarvelWrap/U_1GigE/sysClk312}] [get_nets {GEN_SGMII.U_MarvelWrap/U_1GigE/sysClk625}]

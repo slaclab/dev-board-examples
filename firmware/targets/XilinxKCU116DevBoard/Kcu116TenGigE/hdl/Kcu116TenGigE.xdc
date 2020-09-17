@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'Example Project Firmware'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'Example Project Firmware', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'Example Project Firmware', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
@@ -52,7 +52,7 @@ set_property PACKAGE_PIN F1 [get_ports ethRxN[3]]
 set_property PACKAGE_PIN M7 [get_ports ethClkP]
 set_property PACKAGE_PIN M6 [get_ports ethClkN]
 
-# Timing Constraints 
+# Timing Constraints
 create_clock -name ethClkP -period  6.400 [get_ports {ethClkP}]
 
 create_generated_clock -name dnaClk [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_ULTRA_SCALE.DeviceDnaUltraScale_Inst/BUFGCE_DIV_Inst/O}]

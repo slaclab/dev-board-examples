@@ -5,11 +5,11 @@
 -- Description: XST will infer DSP resources for this counter
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ architecture rtl of CntRtl is
    attribute use_dsp48            : string;
    attribute use_dsp48 of counter : signal is "yes";
    --attribute use_dsp48 of counter : signal is "no";
-   
+
 begin
 
    cnt <= counter;
@@ -45,5 +45,5 @@ begin
          counter <= counter + 1;
       end if;
    end process;
-   
+
 end rtl;

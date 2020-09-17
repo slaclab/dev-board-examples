@@ -1,27 +1,13 @@
 ##############################################################################
 ## This file is part of 'Example Project Firmware'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'Example Project Firmware', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'Example Project Firmware', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 # I/O Port Mapping
-
-set_property -dict { PACKAGE_PIN V12 IOSTANDARD ANALOG } [get_ports { vPIn }]
-set_property -dict { PACKAGE_PIN W11 IOSTANDARD ANALOG } [get_ports { vNIn }]
-
-set_property -dict { PACKAGE_PIN AN8 IOSTANDARD LVCMOS18 } [get_ports { extRst }]
-
-set_property -dict { PACKAGE_PIN AP8 IOSTANDARD LVCMOS18 } [get_ports { led[0] }]
-set_property -dict { PACKAGE_PIN H23 IOSTANDARD LVCMOS18 } [get_ports { led[1] }]
-set_property -dict { PACKAGE_PIN P20 IOSTANDARD LVCMOS18 } [get_ports { led[2] }]
-set_property -dict { PACKAGE_PIN P21 IOSTANDARD LVCMOS18 } [get_ports { led[3] }]
-set_property -dict { PACKAGE_PIN N22 IOSTANDARD LVCMOS18 } [get_ports { led[4] }]
-set_property -dict { PACKAGE_PIN M22 IOSTANDARD LVCMOS18 } [get_ports { led[5] }]
-set_property -dict { PACKAGE_PIN R23 IOSTANDARD LVCMOS18 } [get_ports { led[6] }]
-set_property -dict { PACKAGE_PIN P23 IOSTANDARD LVCMOS18 } [get_ports { led[7] }]
 
 # 1st SFP channel on FMC card
 set_property PACKAGE_PIN F6 [get_ports ethTxP[0]]
@@ -91,7 +77,7 @@ set_property -dict { PACKAGE_PIN E10 IOSTANDARD LVCMOS18 } [get_ports { fmcSfpMo
 set_property -dict { PACKAGE_PIN H8  IOSTANDARD LVCMOS18 } [get_ports { fmcSfpModDef0[2] }]
 set_property -dict { PACKAGE_PIN L13 IOSTANDARD LVCMOS18 } [get_ports { fmcSfpModDef0[3] }]
 
-# Timing Constraints 
+# Timing Constraints
 create_clock -name ethClkP -period  6.400 [get_ports {ethClkP}]
 
 create_generated_clock -name ethClk [get_pins {U_XAUI/XauiGthUltraScale_Inst/GEN_10GIGE.GEN_156p25MHz.U_XauiGthUltraScaleCore/U0/XauiGthUltraScale156p25MHz10GigECore_gt_i/inst/gen_gtwizard_gthe3_top.XauiGthUltraScale156p25MHz10GigECore_gt_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[0].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/TXOUTCLK}]
@@ -99,8 +85,8 @@ create_generated_clock -name dnaClk [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVI
 
 set_clock_groups -asynchronous -group [get_clocks {ethClk}] -group [get_clocks {dnaClk}]
 
-# Placement Constraints 
-# Note: This had to be done because there is a placement bug in Vivado 2014.4 
+# Placement Constraints
+# Note: This had to be done because there is a placement bug in Vivado 2014.4
 #       where declaring the PACKAGE_PIN didn't place GTHE3_CHANNEL correctly.
 set_property LOC GTHE3_CHANNEL_X0Y19 [get_cells {U_XAUI/XauiGthUltraScale_Inst/GEN_10GIGE.GEN_156p25MHz.U_XauiGthUltraScaleCore/U0/XauiGthUltraScale156p25MHz10GigECore_gt_i/inst/gen_gtwizard_gthe3_top.XauiGthUltraScale156p25MHz10GigECore_gt_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[0].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[3].GTHE3_CHANNEL_PRIM_INST}]
 set_property LOC GTHE3_CHANNEL_X0Y18 [get_cells {U_XAUI/XauiGthUltraScale_Inst/GEN_10GIGE.GEN_156p25MHz.U_XauiGthUltraScaleCore/U0/XauiGthUltraScale156p25MHz10GigECore_gt_i/inst/gen_gtwizard_gthe3_top.XauiGthUltraScale156p25MHz10GigECore_gt_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[0].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[2].GTHE3_CHANNEL_PRIM_INST}]

@@ -5,11 +5,11 @@
 -- Description: Simulation test bed for AxiStreamPacketizer
 -------------------------------------------------------------------------------
 -- This file is part of 'ATLAS FTK DF DEV'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'ATLAS FTK DF DEV', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'ATLAS FTK DF DEV', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ architecture testbed of MyAxiStreamPacketizer1Tb is
    constant TPD_G              : time             := CLK_PERIOD_C/4;
    constant PKT_SIZE_C         : positive         := 127;
    constant MAX_PACKET_BYTES_C : positive         := 1024; -- 1024 = 128 x 4
-   
+
    -- constant MAX_PACKET_BYTES_C : positive         := 3+(8*PKT_SIZE_C)/8;
    constant TKEEP_TLAST_C      : slv(15 downto 0) := genTKeep(4);
 

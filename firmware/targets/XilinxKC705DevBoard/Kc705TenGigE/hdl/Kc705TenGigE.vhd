@@ -10,11 +10,11 @@
 --    We use the FMC card's 312.5 MHz OSC for the GT reference clock
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -55,13 +55,13 @@ entity Kc705TenGigE is
       ethRxP          : in  sl;
       ethRxN          : in  sl;
       ethTxP          : out sl;
-      ethTxN          : out sl);       
+      ethTxN          : out sl);
 end Kc705TenGigE;
 
 architecture top_level of Kc705TenGigE is
 
    constant AXIS_SIZE_C : positive         := 1;
-   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";      -- 192.168.2.10  
+   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";      -- 192.168.2.10
    constant MAC_ADDR_C  : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01
 
    signal txMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
@@ -103,7 +103,7 @@ begin
       port map (
          -- Local Configurations
          localMac     => (others => MAC_ADDR_C),
-         -- Streaming DMA Interface 
+         -- Streaming DMA Interface
          dmaClk       => (others => clk),
          dmaRst       => (others => rst),
          dmaIbMasters => rxMasters,
@@ -122,7 +122,7 @@ begin
          gtTxP(0)     => ethTxP,
          gtTxN(0)     => ethTxN,
          gtRxP(0)     => ethRxP,
-         gtRxN(0)     => ethRxN);  
+         gtRxN(0)     => ethRxN);
 
    -------------------
    -- Application Core
@@ -135,7 +135,7 @@ begin
          APP_TYPE_G   => "ETH",
          AXIS_SIZE_G  => AXIS_SIZE_C,
          MAC_ADDR_G   => MAC_ADDR_C,
-         IP_ADDR_G    => IP_ADDR_C)         
+         IP_ADDR_G    => IP_ADDR_C)
       port map (
          -- Clock and Reset
          clk       => clk,
@@ -147,7 +147,7 @@ begin
          rxSlaves  => rxSlaves,
          -- ADC Ports
          vPIn      => vPIn,
-         vNIn      => vNIn);            
+         vNIn      => vNIn);
 
    ----------------
    -- Misc. Signals
@@ -165,5 +165,5 @@ begin
    fmcSfpTxDisable <= (others => '0');
    fmcSfpRateSel   <= (others => '1');
    fmcSfpModDef0   <= (others => '0');
-   
+
 end top_level;

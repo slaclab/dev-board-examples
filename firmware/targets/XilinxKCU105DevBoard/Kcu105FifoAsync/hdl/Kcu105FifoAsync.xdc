@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'Example Project Firmware'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'Example Project Firmware', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'Example Project Firmware', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 # I/O Port Mapping
@@ -25,7 +25,7 @@ set_property -dict { PACKAGE_PIN F10 IOSTANDARD LVDS } [get_ports {clk125N}]
 set_property PACKAGE_PIN P6 [get_ports gtClk156P]
 set_property PACKAGE_PIN P5 [get_ports gtClk156N]
 
-# Timing Constraints 
+# Timing Constraints
 create_clock -name clk125P   -period 8.000 [get_ports {clk125P}]
 create_clock -name gtClk156P -period 6.400 [get_ports {gtClk156P}]
 

@@ -5,11 +5,11 @@
 -- Description: Example using PGP2B Protocol
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ entity NetFpgaSumePgp is
       ETH1_TX_P       : in  sl;
       ETH1_TX_N       : in  sl;
       ETH1_RX_P       : out sl;
-      ETH1_RX_N       : out sl);  
+      ETH1_RX_N       : out sl);
 end NetFpgaSumePgp;
 
 architecture top_level of NetFpgaSumePgp is
@@ -77,7 +77,7 @@ begin
       port map (
          I  => FPGA_SYSCLK_P,
          IB => FPGA_SYSCLK_N,
-         O  => sysClk);     
+         O  => sysClk);
 
    ClockManager7_0 : entity surf.ClockManager7
       generic map(
@@ -127,7 +127,7 @@ begin
             gtTxP        => ETH1_RX_P,
             gtTxN        => ETH1_RX_N,
             gtRxP        => ETH1_TX_P,
-            gtRxN        => ETH1_TX_N);    
+            gtRxN        => ETH1_TX_N);
    end generate REAL_PGP;
 
    SIM_PGP : if (SIMULATION_G) generate
@@ -146,7 +146,7 @@ begin
             pgpTxMasters => txMasters,
             pgpTxSlaves  => txSlaves,
             pgpRxMasters => rxMasters,
-            pgpRxCtrl    => rxCtrl);  
+            pgpRxCtrl    => rxCtrl);
 
       clk <= FPGA_SYSCLK_P;
 

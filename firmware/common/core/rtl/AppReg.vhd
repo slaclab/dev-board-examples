@@ -5,11 +5,11 @@
 -- Description:  Application Registers and Modules
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -33,34 +33,39 @@ entity AppReg is
       XIL_DEVICE_G      : string  := "7SERIES");
    port (
       -- Clock and Reset
-      clk             : in  sl;
-      rst             : in  sl;
+      clk              : in  sl;
+      rst              : in  sl;
       -- AXI-Lite interface
-      axilWriteMaster : in  AxiLiteWriteMasterType;
-      axilWriteSlave  : out AxiLiteWriteSlaveType;
-      axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType;
+      axilWriteMaster  : in  AxiLiteWriteMasterType;
+      axilWriteSlave   : out AxiLiteWriteSlaveType;
+      axilReadMaster   : in  AxiLiteReadMasterType;
+      axilReadSlave    : out AxiLiteReadSlaveType;
       -- Communication AXI-Lite Interface
-      commWriteMaster : out AxiLiteWriteMasterType;
-      commWriteSlave  : in  AxiLiteWriteSlaveType;
-      commReadMaster  : out AxiLiteReadMasterType;
-      commReadSlave   : in  AxiLiteReadSlaveType;
+      commWriteMaster  : out AxiLiteWriteMasterType;
+      commWriteSlave   : in  AxiLiteWriteSlaveType;
+      commReadMaster   : out AxiLiteReadMasterType;
+      commReadSlave    : in  AxiLiteReadSlaveType;
       -- PBRS Interface
-      pbrsTxMaster    : out AxiStreamMasterType;
-      pbrsTxSlave     : in  AxiStreamSlaveType;
-      pbrsRxMaster    : in  AxiStreamMasterType;
-      pbrsRxSlave     : out AxiStreamSlaveType;
+      pbrsTxMaster     : out AxiStreamMasterType;
+      pbrsTxSlave      : in  AxiStreamSlaveType;
+      pbrsRxMaster     : in  AxiStreamMasterType;
+      pbrsRxSlave      : out AxiStreamSlaveType;
       -- HLS Interface
-      hlsTxMaster     : out AxiStreamMasterType;
-      hlsTxSlave      : in  AxiStreamSlaveType;
-      hlsRxMaster     : in  AxiStreamMasterType;
-      hlsRxSlave      : out AxiStreamSlaveType;
+      hlsTxMaster      : out AxiStreamMasterType;
+      hlsTxSlave       : in  AxiStreamSlaveType;
+      hlsRxMaster      : in  AxiStreamMasterType;
+      hlsRxSlave       : out AxiStreamSlaveType;
       -- MB Interface
-      mbTxMaster      : out AxiStreamMasterType;
-      mbTxSlave       : in  AxiStreamSlaveType;
+      mbTxMaster       : out AxiStreamMasterType;
+      mbTxSlave        : in  AxiStreamSlaveType;
+      -- BOOT Prom Interface
+      bootWriteMasters : out AxiLiteWriteMasterArray(1 downto 0);
+      bootWriteSlaves  : in  AxiLiteWriteSlaveArray(1 downto 0);
+      bootReadMasters  : out AxiLiteReadMasterArray(1 downto 0);
+      bootReadSlaves   : in  AxiLiteReadSlaveArray(1 downto 0);
       -- ADC Ports
-      vPIn            : in  sl;
-      vNIn            : in  sl);
+      vPIn             : in  sl;
+      vNIn             : in  sl);
 end AppReg;
 
 architecture mapping of AppReg is
@@ -68,7 +73,7 @@ architecture mapping of AppReg is
    constant SHARED_MEM_WIDTH_C : positive                           := 13;
    constant IRQ_ADDR_C         : slv(SHARED_MEM_WIDTH_C-1 downto 0) := (others => '1');
 
-   constant NUM_AXI_MASTERS_C : natural := 10;
+   constant NUM_AXI_MASTERS_C : natural := 12;
 
    constant VERSION_INDEX_C  : natural := 0;
    constant XADC_INDEX_C     : natural := 1;
@@ -79,7 +84,9 @@ architecture mapping of AppReg is
    constant HLS_INDEX_C      : natural := 6;
    constant COMM_INDEX_C     : natural := 7;
    constant AXIS_MON_INDEX_C : natural := 8;
-   constant TEST_INDEX_C     : natural := 9;
+   constant BOOT0_INDEX_C    : natural := 9;
+   constant BOOT1_INDEX_C    : natural := 10;
+   constant TEST_INDEX_C     : natural := 11;
 
    -- constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, x"0000_0000", 20, 16);
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
@@ -119,6 +126,14 @@ architecture mapping of AppReg is
          baseAddr      => x"0008_0000",
          addrBits      => 16,
          connectivity  => x"FFFF"),
+      BOOT0_INDEX_C    => (
+         baseAddr      => x"0009_0000",
+         addrBits      => 16,
+         connectivity  => x"FFFF"),
+      BOOT1_INDEX_C    => (
+         baseAddr      => x"000A_0000",
+         addrBits      => 16,
+         connectivity  => x"FFFF"),
       TEST_INDEX_C     => (
          baseAddr      => x"8000_0000",
          addrBits      => 31,
@@ -149,7 +164,7 @@ begin
 
    ----------------------------
    -- Microblaze Wrapper Module
-   ----------------------------   
+   ----------------------------
    U_CPU : entity surf.MicroblazeBasicCoreWrapper
       generic map (
          TPD_G => TPD_G)
@@ -192,7 +207,7 @@ begin
 
    ---------------------------
    -- AXI-Lite Crossbar Module
-   ---------------------------         
+   ---------------------------
    U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
@@ -217,7 +232,7 @@ begin
 
    ---------------------------
    -- AXI-Lite: Version Module
-   ---------------------------            
+   ---------------------------
    U_AxiVersion : entity surf.AxiVersion
       generic map (
          TPD_G           => TPD_G,
@@ -270,9 +285,9 @@ begin
             vNIn           => vNIn);
    end generate;
 
-   --------------------------------          
+   --------------------------------
    -- AXI-Lite Shared Memory Module
-   --------------------------------          
+   --------------------------------
    U_Mem : entity surf.AxiDualPortRam
       generic map (
          TPD_G        => TPD_G,
@@ -327,7 +342,7 @@ begin
             TPD_G                        => TPD_G,
             MAX_NUMBER_SUB_FRAMES_G      => 8,
             SUPER_FRAME_BYTE_THRESHOLD_G => 0,  -- 0 = bypass super threshold check
-            MAX_CLK_GAP_G                => 0,  -- 0 = bypass MAX clock GAP 
+            MAX_CLK_GAP_G                => 0,  -- 0 = bypass MAX clock GAP
             AXIS_CONFIG_G                => ssiAxiStreamConfig(16),
             INPUT_PIPE_STAGES_G          => 0,
             OUTPUT_PIPE_STAGES_G         => 0)
@@ -399,7 +414,7 @@ begin
 
    ------------------------------
    -- AXI-Lite HLS Example Module
-   ------------------------------            
+   ------------------------------
    U_AxiLiteExample : entity work.AxiLiteExample
       port map (
          axiClk         => clk,
@@ -436,5 +451,21 @@ begin
    -------------------------------------------------------------
    mAxilReadSlaves(TEST_INDEX_C)  <= AXI_LITE_READ_SLAVE_EMPTY_OK_C;
    mAxilWriteSlaves(TEST_INDEX_C) <= AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
+
+   -----------------------------------------------
+   -- Map the AXI-Lite to BOOT[0] Interface
+   -----------------------------------------------
+   bootReadMasters(0)              <= mAxilReadMasters(BOOT0_INDEX_C);
+   mAxilReadSlaves(BOOT0_INDEX_C)  <= bootReadSlaves(0);
+   bootWriteMasters(0)             <= mAxilWriteMasters(BOOT0_INDEX_C);
+   mAxilWriteSlaves(BOOT0_INDEX_C) <= bootWriteSlaves(0);
+
+   -----------------------------------------------
+   -- Map the AXI-Lite to BOOT[1] Interface
+   -----------------------------------------------
+   bootReadMasters(1)              <= mAxilReadMasters(BOOT1_INDEX_C);
+   mAxilReadSlaves(BOOT1_INDEX_C)  <= bootReadSlaves(1);
+   bootWriteMasters(1)             <= mAxilWriteMasters(BOOT1_INDEX_C);
+   mAxilWriteSlaves(BOOT1_INDEX_C) <= bootWriteSlaves(1);
 
 end mapping;

@@ -5,11 +5,11 @@
 -- Description: Example using PGP2B Protocol
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -33,18 +33,26 @@ entity Kcu105Pgp is
       SIMULATION_G  : boolean := false);
    port (
       -- Misc. IOs
-      extRst  : in  sl;
-      led     : out slv(7 downto 0);
+      extRst     : in  sl;
+      led        : out slv(7 downto 0);
       -- XADC Ports
-      vPIn    : in  sl;
-      vNIn    : in  sl;
+      vPIn       : in  sl;
+      vNIn       : in  sl;
+      -- System Ports
+      emcClk     : in  sl;
+      -- Boot Memory Ports
+      flashCsL   : out sl;
+      flashMosi  : out sl;
+      flashMiso  : in  sl;
+      flashHoldL : out sl;
+      flashWp    : out sl;
       -- ETH GT Pins
-      pgpClkP : in  sl;
-      pgpClkN : in  sl;
-      pgpRxP  : in  sl;
-      pgpRxN  : in  sl;
-      pgpTxP  : out sl;
-      pgpTxN  : out sl);
+      pgpClkP    : in  sl;
+      pgpClkN    : in  sl;
+      pgpRxP     : in  sl;
+      pgpRxN     : in  sl;
+      pgpTxP     : out sl;
+      pgpTxN     : out sl);
 end Kcu105Pgp;
 
 architecture top_level of Kcu105Pgp is
@@ -55,6 +63,11 @@ architecture top_level of Kcu105Pgp is
    signal txSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
    signal rxMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
    signal rxCtrl    : AxiStreamCtrlArray(AXIS_SIZE_C-1 downto 0);
+
+   signal bootReadMasters  : AxiLiteReadMasterArray(1 downto 0);
+   signal bootReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
+   signal bootWriteMasters : AxiLiteWriteMasterArray(1 downto 0);
+   signal bootWriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0);
 
    signal pgpTxOut : Pgp2bTxOutType;
    signal pgpRxOut : Pgp2bRxOutType;
@@ -167,16 +180,44 @@ begin
          AXIS_SIZE_G  => AXIS_SIZE_C)
       port map (
          -- Clock and Reset
-         clk       => clk,
-         rst       => rst,
+         clk              => clk,
+         rst              => rst,
          -- AXIS interface
-         txMasters => txMasters,
-         txSlaves  => txSlaves,
-         rxMasters => rxMasters,
-         rxCtrl    => rxCtrl,
+         txMasters        => txMasters,
+         txSlaves         => txSlaves,
+         rxMasters        => rxMasters,
+         rxCtrl           => rxCtrl,
+         -- BOOT Prom Interface
+         bootWriteMasters => bootWriteMasters,
+         bootWriteSlaves  => bootWriteSlaves,
+         bootReadMasters  => bootReadMasters,
+         bootReadSlaves   => bootReadSlaves,
          -- ADC Ports
-         vPIn      => vPIn,
-         vNIn      => vNIn);
+         vPIn             => vPIn,
+         vNIn             => vNIn);
+
+   ------------
+   -- BOOT PROM
+   ------------
+   U_BootProm : entity work.BootProm
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         -- AXI-Lite Interface
+         axilClk          => clk,
+         axilRst          => rst,
+         axilWriteMasters => bootWriteMasters,
+         axilWriteSlaves  => bootWriteSlaves,
+         axilReadMasters  => bootReadMasters,
+         axilReadSlaves   => bootReadSlaves,
+         -- System Ports
+         emcClk           => emcClk,
+         -- Boot Memory Ports
+         flashCsL         => flashCsL,
+         flashMosi        => flashMosi,
+         flashMiso        => flashMiso,
+         flashHoldL       => flashHoldL,
+         flashWp          => flashWp);
 
    ----------------
    -- Misc. Signals

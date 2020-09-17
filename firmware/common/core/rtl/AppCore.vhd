@@ -5,11 +5,11 @@
 -- Description: Container of all the Application Space
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -36,17 +36,22 @@ entity AppCore is
       JUMBO_G         : boolean          := false);
    port (
       -- Clock and Reset
-      clk       : in  sl;
-      rst       : in  sl;
+      clk              : in  sl;
+      rst              : in  sl;
       -- AXIS interface
-      txMasters : out AxiStreamMasterArray(AXIS_SIZE_G-1 downto 0);
-      txSlaves  : in  AxiStreamSlaveArray(AXIS_SIZE_G-1 downto 0);
-      rxMasters : in  AxiStreamMasterArray(AXIS_SIZE_G-1 downto 0);
-      rxSlaves  : out AxiStreamSlaveArray(AXIS_SIZE_G-1 downto 0);
-      rxCtrl    : out AxiStreamCtrlArray(AXIS_SIZE_G-1 downto 0);
+      txMasters        : out AxiStreamMasterArray(AXIS_SIZE_G-1 downto 0);
+      txSlaves         : in  AxiStreamSlaveArray(AXIS_SIZE_G-1 downto 0);
+      rxMasters        : in  AxiStreamMasterArray(AXIS_SIZE_G-1 downto 0);
+      rxSlaves         : out AxiStreamSlaveArray(AXIS_SIZE_G-1 downto 0);
+      rxCtrl           : out AxiStreamCtrlArray(AXIS_SIZE_G-1 downto 0);
+      -- BOOT Prom Interface
+      bootWriteMasters : out AxiLiteWriteMasterArray(1 downto 0) := (others => AXI_LITE_WRITE_MASTER_INIT_C);
+      bootWriteSlaves  : in  AxiLiteWriteSlaveArray(1 downto 0)  := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
+      bootReadMasters  : out AxiLiteReadMasterArray(1 downto 0)  := (others => AXI_LITE_READ_MASTER_INIT_C);
+      bootReadSlaves   : in  AxiLiteReadSlaveArray(1 downto 0)   := (others => AXI_LITE_READ_SLAVE_EMPTY_DECERR_C);
       -- ADC Ports
-      vPIn      : in  sl;
-      vNIn      : in  sl);
+      vPIn             : in  sl;
+      vNIn             : in  sl);
 end AppCore;
 
 architecture mapping of AppCore is
@@ -181,33 +186,38 @@ begin
          XIL_DEVICE_G    => XIL_DEVICE_G)
       port map (
          -- Clock and Reset
-         clk             => clk,
-         rst             => rst,
+         clk              => clk,
+         rst              => rst,
          -- SRPv3 AXI-Lite interface
-         axilWriteMaster => axilWriteMaster,
-         axilWriteSlave  => axilWriteSlave,
-         axilReadMaster  => axilReadMaster,
-         axilReadSlave   => axilReadSlave,
+         axilWriteMaster  => axilWriteMaster,
+         axilWriteSlave   => axilWriteSlave,
+         axilReadMaster   => axilReadMaster,
+         axilReadSlave    => axilReadSlave,
          -- Communication AXI-Lite Interface
-         commWriteMaster => commWriteMaster,
-         commWriteSlave  => commWriteSlave,
-         commReadMaster  => commReadMaster,
-         commReadSlave   => commReadSlave,
+         commWriteMaster  => commWriteMaster,
+         commWriteSlave   => commWriteSlave,
+         commReadMaster   => commReadMaster,
+         commReadSlave    => commReadSlave,
          -- PBRS Interface
-         pbrsTxMaster    => pbrsTxMaster,
-         pbrsTxSlave     => pbrsTxSlave,
-         pbrsRxMaster    => pbrsRxMaster,
-         pbrsRxSlave     => pbrsRxSlave,
+         pbrsTxMaster     => pbrsTxMaster,
+         pbrsTxSlave      => pbrsTxSlave,
+         pbrsRxMaster     => pbrsRxMaster,
+         pbrsRxSlave      => pbrsRxSlave,
          -- HLS Interface
-         hlsTxMaster     => hlsTxMaster,
-         hlsTxSlave      => hlsTxSlave,
-         hlsRxMaster     => hlsRxMaster,
-         hlsRxSlave      => hlsRxSlave,
+         hlsTxMaster      => hlsTxMaster,
+         hlsTxSlave       => hlsTxSlave,
+         hlsRxMaster      => hlsRxMaster,
+         hlsRxSlave       => hlsRxSlave,
          -- Microblaze stream
-         mbTxMaster      => mbTxMaster,
-         mbTxSlave       => mbTxSlave,
+         mbTxMaster       => mbTxMaster,
+         mbTxSlave        => mbTxSlave,
+         -- BOOT Prom Interface
+         bootWriteMasters => bootWriteMasters,
+         bootWriteSlaves  => bootWriteSlaves,
+         bootReadMasters  => bootReadMasters,
+         bootReadSlaves   => bootReadSlaves,
          -- ADC Ports
-         vPIn            => vPIn,
-         vNIn            => vNIn);
+         vPIn             => vPIn,
+         vNIn             => vNIn);
 
 end mapping;

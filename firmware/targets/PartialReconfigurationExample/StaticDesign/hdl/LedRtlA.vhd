@@ -5,11 +5,11 @@
 -- Description: Blinks the LED @ 1 Hz
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -30,14 +30,14 @@ entity LedRtlA is
 end LedRtlA;
 
 architecture rtl of LedRtlA is
-   
+
    constant TOGGLE_PERIOD_C : real             := (500.0E-3);  -- 500 ms (1 Hz) toggle rate
    constant CLK_PERIOD_C    : real             := 5.0E-9;  -- 5 ns (200 MHz)
    constant MAX_CNT_C       : slv(31 downto 0) := toSlv(getTimeRatio(TOGGLE_PERIOD_C, CLK_PERIOD_C), 32);
 
    signal counter : slv(31 downto 0) := (others => '0');
    signal toggle  : sl               := '0';
-   
+
 begin
 
    led <= toggle;
@@ -56,5 +56,5 @@ begin
          end if;
       end if;
    end process;
-   
+
 end rtl;

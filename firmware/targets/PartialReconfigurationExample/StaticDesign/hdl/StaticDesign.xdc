@@ -1,4 +1,4 @@
-# IO Constraints 
+# IO Constraints
 
 set_property PACKAGE_PIN AB8  [get_ports {led[0]}]
 set_property PACKAGE_PIN AA8  [get_ports {led[1]}]
@@ -30,7 +30,7 @@ set_property DIFF_TERM false  [get_ports {clkN}]
 set_property CFGBVS VCCO [current_design]
 set_property CONFIG_VOLTAGE 3.3 [current_design]
 
-# Timing Constraints 
+# Timing Constraints
 create_clock -period 5 -name clkP [get_ports clkP]
 
 # CntRtl_Inst Area Constraints (static logic)

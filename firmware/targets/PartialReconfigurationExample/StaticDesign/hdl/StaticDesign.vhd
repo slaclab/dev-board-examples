@@ -2,15 +2,15 @@
 -- File       : StaticDesign.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: Simple Partial Reconfiguration Example 
+-- Description: Simple Partial Reconfiguration Example
 --              with LedRtlA & LedRtlB blinking at 1 Hz rate
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -33,8 +33,8 @@ end StaticDesign;
 architecture top_level of StaticDesign is
 
    -- Declare the Reconfigurable RTL as a black box
-   -- and don't include its RTL file (.vhd or .v) 
-   -- during the initial synthesis process 
+   -- and don't include its RTL file (.vhd or .v)
+   -- during the initial synthesis process
    component LedRtlA
       port (
          clk : in  sl;
@@ -50,13 +50,13 @@ architecture top_level of StaticDesign is
    attribute BLACK_BOX                : string;
    attribute BLACK_BOX of LedRtlA : component is "TRUE";
    attribute BLACK_BOX of LedRtlB : component is "TRUE";
-   
+
    -- Signals
    signal clk : sl;
    signal testPointA : sl;
    signal testPointB : sl;
    signal cnt : slv(31 downto 0) := (others => '0');
-   
+
 begin
 
    -- Reference Clock
@@ -64,7 +64,7 @@ begin
       port map (
          I  => clkP,
          IB => clkN,
-         O  => clk);  
+         O  => clk);
 
    -- Static RTL Core
    U_CntRtl : entity work.CntRtl
@@ -78,15 +78,15 @@ begin
          clk => clk,
          cnt => cnt,
          led => testPointA);
-         
+
    -- Reconfigurable RTL Core
    U_LedRtlB : LedRtlB
       port map (
          clk => clk,
          cnt => cnt,
-         led => testPointB);         
+         led => testPointB);
 
    -- Misc.
    led <= x"8" & "00" & testPointB & testPointA;
-   
+
 end top_level;

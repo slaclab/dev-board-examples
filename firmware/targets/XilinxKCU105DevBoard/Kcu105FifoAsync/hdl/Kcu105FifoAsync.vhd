@@ -5,11 +5,11 @@
 -- Description: Hardware Testbed for checking FifoAsync with two ASYNC clocks
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -64,9 +64,9 @@ architecture top_level of Kcu105FifoAsync is
 
 begin
 
-   ---------------------- 
+   ----------------------
    -- Clocking and Resets
-   ---------------------- 
+   ----------------------
    U_IBUFDS0 : IBUFDS
       port map (
          I  => clk125P,
@@ -169,7 +169,7 @@ begin
             -- AXI Stream Configurations
             SLAVE_AXI_STREAM_CONFIG_G  => ssiAxiStreamConfig(4))
          port map (
-            -- Streaming RX Data Interface (sAxisClk domain) 
+            -- Streaming RX Data Interface (sAxisClk domain)
             sAxisClk       => clk125,
             sAxisRst       => rst125,
             sAxisMaster    => axisMasters(i),

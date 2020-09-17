@@ -41,6 +41,14 @@ entity Kcu105GigE is
       -- XADC Ports
       vPIn       : in    sl;
       vNIn       : in    sl;
+      -- System Ports
+      emcClk     : in    sl;
+      -- Boot Memory Ports
+      flashCsL   : out   sl;
+      flashMosi  : out   sl;
+      flashMiso  : in    sl;
+      flashHoldL : out   sl;
+      flashWp    : out   sl;
       -- ETH GT Pins
       ethClkP    : in    sl;
       ethClkN    : in    sl;
@@ -67,6 +75,11 @@ architecture top_level of Kcu105GigE is
    signal txSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
    signal rxMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
    signal rxSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
+
+   signal bootReadMasters  : AxiLiteReadMasterArray(1 downto 0);
+   signal bootReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
+   signal bootWriteMasters : AxiLiteWriteMasterArray(1 downto 0);
+   signal bootWriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0);
 
    signal clk      : sl;
    signal rst      : sl;
@@ -159,7 +172,7 @@ begin
          generic map (
             TPD_G             => TPD_G,
             STABLE_CLK_FREQ_G => 300.0E+6,
-            CLKOUT1_PHASE_G   => 0.0, -- Deskew the 625MHz/312.5MHz
+            CLKOUT1_PHASE_G   => 0.0,   -- Deskew the 625MHz/312.5MHz
             AXIS_CONFIG_G     => ETH_AXIS_CONFIG_C(0))
          port map (
             -- clock and reset
@@ -211,16 +224,44 @@ begin
          MAC_ADDR_G      => MAC_ADDR_INIT_C)
       port map (
          -- Clock and Reset
-         clk       => clk,
-         rst       => rst,
+         clk              => clk,
+         rst              => rst,
          -- AXIS interface
-         txMasters => txMasters,
-         txSlaves  => txSlaves,
-         rxMasters => rxMasters,
-         rxSlaves  => rxSlaves,
+         txMasters        => txMasters,
+         txSlaves         => txSlaves,
+         rxMasters        => rxMasters,
+         rxSlaves         => rxSlaves,
+         -- BOOT Prom Interface
+         bootWriteMasters => bootWriteMasters,
+         bootWriteSlaves  => bootWriteSlaves,
+         bootReadMasters  => bootReadMasters,
+         bootReadSlaves   => bootReadSlaves,
          -- ADC Ports
-         vPIn      => vPIn,
-         vNIn      => vNIn);
+         vPIn             => vPIn,
+         vNIn             => vNIn);
+
+   ------------
+   -- BOOT PROM
+   ------------
+   U_BootProm : entity work.BootProm
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         -- AXI-Lite Interface
+         axilClk          => clk,
+         axilRst          => rst,
+         axilWriteMasters => bootWriteMasters,
+         axilWriteSlaves  => bootWriteSlaves,
+         axilReadMasters  => bootReadMasters,
+         axilReadSlaves   => bootReadSlaves,
+         -- System Ports
+         emcClk           => emcClk,
+         -- Boot Memory Ports
+         flashCsL         => flashCsL,
+         flashMosi        => flashMosi,
+         flashMiso        => flashMiso,
+         flashHoldL       => flashHoldL,
+         flashWp          => flashWp);
 
    ----------------
    -- Misc. Signals

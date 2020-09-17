@@ -16,9 +16,9 @@ if { $::env(PRJ_PART) eq {XC7A200TFBG676-2} } {
    set_property board_part xilinx.com:kcu105:part0:1.3 [current_project]
 
 } elseif { $::env(PRJ_PART) eq {XCKU5P-FFVB676-2-E} } {
-   set_property board_part xilinx.com:kcu116:part0:1.2 [current_project]   
-   
-} else { 
+   set_property board_part xilinx.com:kcu116:part0:1.2 [current_project]
+
+} else {
 }
 
 

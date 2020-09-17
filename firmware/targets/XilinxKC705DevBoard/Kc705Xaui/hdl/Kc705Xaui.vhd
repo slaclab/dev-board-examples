@@ -8,11 +8,11 @@
 -- http://www.fastertechnology.com/products/fmc/fm-s14.html
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'Example Project Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'Example Project Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -53,13 +53,13 @@ entity Kc705Xaui is
       ethRxP          : in  slv(3 downto 0);
       ethRxN          : in  slv(3 downto 0);
       ethTxP          : out slv(3 downto 0);
-      ethTxN          : out slv(3 downto 0));       
+      ethTxN          : out slv(3 downto 0));
 end Kc705Xaui;
 
 architecture top_level of Kc705Xaui is
 
    constant AXIS_SIZE_C : positive         := 1;
-   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";      -- 192.168.2.10  
+   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";      -- 192.168.2.10
    constant MAC_ADDR_C  : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01
 
    signal txMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
@@ -95,9 +95,9 @@ begin
          USE_GTREFCLK_G => false,       -- FALSE: gtClkP/N
          REFCLK_DIV2_G  => true,        -- TRUE: gtClkP/N = 312.5 MHz
          -- AXI Streaming Configurations
-         AXIS_CONFIG_G  => EMAC_AXIS_CONFIG_C)  
+         AXIS_CONFIG_G  => EMAC_AXIS_CONFIG_C)
       port map (
-         -- Streaming DMA Interface 
+         -- Streaming DMA Interface
          dmaClk      => clk,
          dmaRst      => rst,
          dmaIbMaster => rxMasters(0),
@@ -116,7 +116,7 @@ begin
          gtTxP       => ethTxP,
          gtTxN       => ethTxN,
          gtRxP       => ethRxP,
-         gtRxN       => ethRxN); 
+         gtRxN       => ethRxN);
 
    -------------------
    -- Application Core
@@ -129,7 +129,7 @@ begin
          APP_TYPE_G   => "ETH",
          AXIS_SIZE_G  => AXIS_SIZE_C,
          MAC_ADDR_G   => MAC_ADDR_C,
-         IP_ADDR_G    => IP_ADDR_C)         
+         IP_ADDR_G    => IP_ADDR_C)
       port map (
          -- Clock and Reset
          clk       => clk,
@@ -159,5 +159,5 @@ begin
    fmcSfpTxDisable <= (others => '0');
    fmcSfpRateSel   <= (others => '1');
    fmcSfpModDef0   <= (others => '0');
-   
+
 end top_level;

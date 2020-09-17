@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'Example Project Firmware'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'Example Project Firmware', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'Example Project Firmware', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
@@ -56,13 +56,13 @@ set_property PACKAGE_PIN D7 [get_ports {ethRxN[3]}]
 set_property PACKAGE_PIN E2 [get_ports {ethTxP[3]}]
 set_property PACKAGE_PIN E1 [get_ports {ethTxN[3]}]
 
-# Timing Constraints 
+# Timing Constraints
 create_clock -name sysClkP -period  5.000 [get_ports {sysClkP}]
 create_clock -name ethClk  -period  6.400 [get_pins {U_XAUI/XauiGth7_Inst/U_XauiGth7Core/U0/gt_wrapper_i/gt0_XauiGth7Core_gt_wrapper_i/gthe2_i/TXOUTCLK}]
 
-create_generated_clock -name ethRefClk [get_pins {ClockManager7_0/MmcmGen.U_Mmcm/CLKOUT0}] 
-create_generated_clock -name dnaClk    [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/BUFR_Inst/O}] 
-create_generated_clock -name dnaClkInv [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/DNA_CLK_INV_BUFR/O}] 
+create_generated_clock -name ethRefClk [get_pins {ClockManager7_0/MmcmGen.U_Mmcm/CLKOUT0}]
+create_generated_clock -name dnaClk    [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/BUFR_Inst/O}]
+create_generated_clock -name dnaClkInv [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_7SERIES.DeviceDna7Series_Inst/DNA_CLK_INV_BUFR/O}]
 
 set_clock_groups -asynchronous -group [get_clocks ethRefClk] -group [get_clocks sysClkP]
 set_clock_groups -asynchronous -group [get_clocks ethRefClk] -group [get_clocks ethClk]
