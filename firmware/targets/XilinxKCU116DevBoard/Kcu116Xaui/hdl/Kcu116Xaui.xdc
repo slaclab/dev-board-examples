@@ -8,27 +8,6 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-# I/O Port Mapping
-
-set_property -dict { PACKAGE_PIN P14 IOSTANDARD ANALOG } [get_ports { vPIn }]
-set_property -dict { PACKAGE_PIN R13 IOSTANDARD ANALOG } [get_ports { vNIn }]
-
-set_property -dict { PACKAGE_PIN B9  IOSTANDARD LVCMOS33 } [get_ports { extRst }]
-
-set_property -dict { PACKAGE_PIN C9  IOSTANDARD LVCMOS33 } [get_ports { led[0] }]
-set_property -dict { PACKAGE_PIN D9  IOSTANDARD LVCMOS33 } [get_ports { led[1] }]
-set_property -dict { PACKAGE_PIN E10 IOSTANDARD LVCMOS33 } [get_ports { led[2] }]
-set_property -dict { PACKAGE_PIN E11 IOSTANDARD LVCMOS33 } [get_ports { led[3] }]
-set_property -dict { PACKAGE_PIN F9  IOSTANDARD LVCMOS33 } [get_ports { led[4] }]
-set_property -dict { PACKAGE_PIN F10 IOSTANDARD LVCMOS33 } [get_ports { led[5] }]
-set_property -dict { PACKAGE_PIN G9  IOSTANDARD LVCMOS33 } [get_ports { led[6] }]
-set_property -dict { PACKAGE_PIN G10 IOSTANDARD LVCMOS33 } [get_ports { led[7] }]
-
-set_property -dict { PACKAGE_PIN AB14 IOSTANDARD LVCMOS33 } [get_ports { sfpTxDisL[0] }]
-set_property -dict { PACKAGE_PIN AA14 IOSTANDARD LVCMOS33 } [get_ports { sfpTxDisL[1] }]
-set_property -dict { PACKAGE_PIN AA15 IOSTANDARD LVCMOS33 } [get_ports { sfpTxDisL[2] }]
-set_property -dict { PACKAGE_PIN Y15  IOSTANDARD LVCMOS33 } [get_ports { sfpTxDisL[3] }]
-
 set_property PACKAGE_PIN N5 [get_ports ethTxP[0]]
 set_property PACKAGE_PIN N4 [get_ports ethTxN[0]]
 set_property PACKAGE_PIN M2 [get_ports ethRxP[0]]
@@ -63,5 +42,3 @@ set_clock_groups -asynchronous -group [get_clocks {ethClk}] -group [get_clocks -
 set_clock_groups -asynchronous -group [get_clocks {ethClk}] -group [get_clocks -of_objects [get_pins {U_XAUI/XauiGtyUltraScale_Inst/U_XauiGtyUltraScaleCore/U0/XauiGtyUltraScale156p25MHz10GigECore_gt_i/inst/gen_gtwizard_gtye4_top.XauiGtyUltraScale156p25MHz10GigECore_gt_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[0].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[1].GTYE4_CHANNEL_PRIM_INST/TXOUTCLKPCS}]]
 set_clock_groups -asynchronous -group [get_clocks {ethClk}] -group [get_clocks -of_objects [get_pins {U_XAUI/XauiGtyUltraScale_Inst/U_XauiGtyUltraScaleCore/U0/XauiGtyUltraScale156p25MHz10GigECore_gt_i/inst/gen_gtwizard_gtye4_top.XauiGtyUltraScale156p25MHz10GigECore_gt_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[0].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[2].GTYE4_CHANNEL_PRIM_INST/TXOUTCLKPCS}]]
 set_clock_groups -asynchronous -group [get_clocks {ethClk}] -group [get_clocks -of_objects [get_pins {U_XAUI/XauiGtyUltraScale_Inst/U_XauiGtyUltraScaleCore/U0/XauiGtyUltraScale156p25MHz10GigECore_gt_i/inst/gen_gtwizard_gtye4_top.XauiGtyUltraScale156p25MHz10GigECore_gt_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[0].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[3].GTYE4_CHANNEL_PRIM_INST/TXOUTCLKPCS}]]
-
-

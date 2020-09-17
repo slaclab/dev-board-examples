@@ -8,14 +8,6 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-set_property -dict { PACKAGE_PIN G10 IOSTANDARD LVDS } [get_ports {clk125P}]
-set_property -dict { PACKAGE_PIN F10 IOSTANDARD LVDS } [get_ports {clk125N}]
-
-set_property PACKAGE_PIN P6 [get_ports gtClk156P]
-set_property PACKAGE_PIN P5 [get_ports gtClk156N]
-
-# Timing Constraints
-create_clock -name clk125P   -period 8.000 [get_ports {clk125P}]
-create_clock -name gtClk156P -period 6.400 [get_ports {gtClk156P}]
-
-set_clock_groups -asynchronous -group [get_clocks {clk125P}] -group [get_clocks {gtClk156P}]
+set format     "mcs"
+set inteface   "SPIx8"
+set size       "2048"
