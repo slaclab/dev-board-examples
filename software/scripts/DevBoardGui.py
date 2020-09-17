@@ -223,12 +223,6 @@ with MyRoot(
         initRead    = args.initRead,
     ) as root:
 
-
-    # Load the YAML configurations
-    for i in range(10000):
-        print(i)
-        root.LoadConfig('scripts/config_test.yml')
-
     ######################
     # Development PyDM GUI
     ######################
