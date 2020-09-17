@@ -18,6 +18,7 @@ import logging
 
 import pyrogue as pr
 import pyrogue.gui
+import pyrogue.pydm
 import pyrogue.protocols
 import pyrogue.utilities.prbs
 
@@ -129,6 +130,14 @@ parser.add_argument(
     help     = "Enable PRBS testing",
 ) 
 
+parser.add_argument(
+    "--guiType",
+    type     = str,
+    required = False,
+    default  = 'PyDM',
+    help     = "Sets the GUI type (PyDM or PyQt)",
+)   
+
 parser.add_argument('--html', help='Use html for tables', action="store_true")
 # Get the arguments
 args = parser.parse_args()
@@ -204,45 +213,48 @@ class MyRoot(pr.Root):
             memBase  = self.srp,
             commType = args.type,
             fpgaType = args.fpgaType,
+            expand   = True,
         ))        
         
-# Set base
-rootTop = MyRoot(name='System',description='Front End Board')
-    
-#################################################################    
-# Start the system
-rootTop.start(
-    pollEn   = args.pollEn,
-    initRead = args.initRead,
-)
-
-print('before')
-# time.sleep(10)
+with MyRoot(
+        name        = 'System',
+        description = 'Front End Board',
+        pollEn      = args.pollEn,
+        initRead    = args.initRead,
+    ) as root:
 
 
-# # Print the AxiVersion Summary
-# rootTop.Fpga.AxiVersion.printStatus()
+    # Load the YAML configurations
+    for i in range(10000):
+        print(i)
+        root.LoadConfig('scripts/config_test.yml')
 
-# # Rate testers
-# if args.varRate: rootTop.Fpga.varRateTest()
-# if args.rawRate: rootTop.Fpga.rawRateTest()
+    ######################
+    # Development PyDM GUI
+    ######################
+    if (args.guiType == 'PyDM'):
 
-# Create GUI
-appTop = pr.gui.application(sys.argv)
-guiTop = pr.gui.GuiTop()
-guiTop.addTree(rootTop)
-guiTop.resize(800, 1200)
+        pyrogue.pydm.runPyDM(root=root)
 
-print("Starting GUI...\n");
-print('after')
+    #################
+    # Legacy PyQT GUI
+    #################
+    elif (args.guiType == 'PyQt'):
 
-# Run gui
-appTop.exec_()
+        # Create GUI
+        appTop = pyrogue.gui.application(sys.argv)
+        guiTop = pyrogue.gui.GuiTop()
+        guiTop.addTree(root)
+        guiTop.resize(800, 1000)
 
-#################################################################    
+        # Run gui
+        appTop.exec_()
+        root.stop()
 
-# Stop mesh after gui exits
-rootTop.stop()
-exit()
+    ####################
+    # Undefined GUI type
+    ####################
+    else:
+        raise ValueError("Invalid GUI type (%s)" % (args.guiType) )
 
 #################################################################
