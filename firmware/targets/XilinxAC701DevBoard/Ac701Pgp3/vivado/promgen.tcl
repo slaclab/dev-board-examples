@@ -8,5 +8,5 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 set format     "mcs"
-set inteface   "spix1"
+set inteface   "spix4"
 set size       "256"

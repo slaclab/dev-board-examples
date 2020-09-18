@@ -7,23 +7,6 @@
 ## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
-# I/O Port Mapping
-set_property PACKAGE_PIN U4 [get_ports extRst]
-set_property IOSTANDARD LVCMOS25 [get_ports extRst]
-
-set_property PACKAGE_PIN A24 [get_ports {clkSelA[0]}]
-set_property PACKAGE_PIN C26 [get_ports {clkSelA[1]}]
-set_property IOSTANDARD LVCMOS25 [get_ports clkSelA*]
-
-set_property PACKAGE_PIN B26 [get_ports {clkSelB[0]}]
-set_property PACKAGE_PIN C24 [get_ports {clkSelB[1]}]
-set_property IOSTANDARD LVCMOS25 [get_ports clkSelB*]
-
-set_property PACKAGE_PIN M26 [get_ports {led[0]}]
-set_property PACKAGE_PIN T24 [get_ports {led[1]}]
-set_property PACKAGE_PIN T25 [get_ports {led[2]}]
-set_property PACKAGE_PIN R26 [get_ports {led[3]}]
-set_property IOSTANDARD LVCMOS15 [get_ports led*]
 
 set_property PACKAGE_PIN AC10 [get_ports gtTxP]
 set_property PACKAGE_PIN AD10 [get_ports gtTxN]
@@ -32,9 +15,6 @@ set_property PACKAGE_PIN AD12 [get_ports gtRxN]
 
 set_property PACKAGE_PIN AA13 [get_ports gtClkP]
 set_property PACKAGE_PIN AB13 [get_ports gtClkN]
-
-# XADC ports
-set_property PACKAGE_PIN N12 [get_ports vPIn] set_property PACKAGE_PIN P11 [get_ports vNIn]
 
 # Timing Constraints
 create_clock -name gtClkP    -period 8.000 [get_ports {gtClkP}]
@@ -67,5 +47,4 @@ set_clock_groups -asynchronous \
 set_clock_groups -asynchronous -group [get_clocks {pgpTxClk1x}] -group [get_clocks {dnaClk}] -group [get_clocks {dnaClkInv}]
 set_clock_groups -asynchronous -group [get_clocks {stableClk}]  -group [get_clocks {U_PGP/REAL_PGP.GEN_LANE[0].U_Pgp/U_Pgp3Gtp7IpWrapper/GEN_6G.U_Pgp3Gtp7Ip6G/U0/Pgp3Gtp7Ip6G_i/gt0_Pgp3Gtp7Ip6G_i/gtpe2_i/RXOUTCLK}]
 
-# .bit File Configuration
-set_property BITSTREAM.CONFIG.CONFIGRATE 33 [current_design]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_PGP/REAL_PGP.U_TX_PLL/CLKOUT0]] -group [get_clocks -of_objects [get_pins U_App/U_Reg/U_AxiVersion/GEN_ICAP.Iprog_1/GEN_7SERIES.Iprog7Series_Inst/DIVCLK_GEN.BUFR_ICPAPE2/O]]

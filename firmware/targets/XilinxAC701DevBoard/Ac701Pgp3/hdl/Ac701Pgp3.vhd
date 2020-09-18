@@ -32,21 +32,27 @@ entity Ac701Pgp3 is
       SIMULATION_G : boolean := false);
    port (
       -- LEDs and Reset button
-      extRst  : in  sl;
-      led     : out slv(3 downto 0);
+      extRst   : in  sl;
+      led      : out slv(3 downto 0);
       -- XADC Ports
-      vPIn    : in  sl;
-      vNIn    : in  sl;
+      vPIn     : in  sl;
+      vNIn     : in  sl;
+      -- System Ports
+      emcClk   : in  sl;
+      -- Boot Memory Ports
+      bootCsL  : out sl;
+      bootMosi : out sl;
+      bootMiso : in  sl;
       -- MGT Clock Select
-      clkSelA : out slv(1 downto 0);
-      clkSelB : out slv(1 downto 0);
+      clkSelA  : out slv(1 downto 0);
+      clkSelB  : out slv(1 downto 0);
       -- GT Pins
-      gtClkP  : in  sl;
-      gtClkN  : in  sl;
-      gtRxP   : in  sl;
-      gtRxN   : in  sl;
-      gtTxP   : out sl;
-      gtTxN   : out sl);
+      gtClkP   : in  sl;
+      gtClkN   : in  sl;
+      gtRxP    : in  sl;
+      gtRxN    : in  sl;
+      gtTxP    : out sl;
+      gtTxN    : out sl);
 end Ac701Pgp3;
 
 architecture top_level of Ac701Pgp3 is
@@ -60,6 +66,11 @@ architecture top_level of Ac701Pgp3 is
 
    signal pgpTxOut : Pgp3TxOutType;
    signal pgpRxOut : Pgp3RxOutType;
+
+   signal bootReadMasters  : AxiLiteReadMasterArray(1 downto 0);
+   signal bootReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
+   signal bootWriteMasters : AxiLiteWriteMasterArray(1 downto 0);
+   signal bootWriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0);
 
    signal clk : sl;
    signal rst : sl;
@@ -133,16 +144,42 @@ begin
          AXIS_SIZE_G     => AXIS_SIZE_C)
       port map (
          -- Clock and Reset
-         clk       => clk,
-         rst       => rst,
+         clk              => clk,
+         rst              => rst,
          -- AXIS interface
-         txMasters => txMasters,
-         txSlaves  => txSlaves,
-         rxMasters => rxMasters,
-         rxCtrl    => rxCtrl,
+         txMasters        => txMasters,
+         txSlaves         => txSlaves,
+         rxMasters        => rxMasters,
+         rxCtrl           => rxCtrl,
+         -- BOOT Prom Interface
+         bootWriteMasters => bootWriteMasters,
+         bootWriteSlaves  => bootWriteSlaves,
+         bootReadMasters  => bootReadMasters,
+         bootReadSlaves   => bootReadSlaves,
          -- ADC Ports
-         vPIn      => vPIn,
-         vNIn      => vNIn);
+         vPIn             => vPIn,
+         vNIn             => vNIn);
+
+   ------------
+   -- BOOT PROM
+   ------------
+   U_BootProm : entity work.BootProm
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         -- AXI-Lite Interface
+         axilClk          => clk,
+         axilRst          => rst,
+         axilWriteMasters => bootWriteMasters,
+         axilWriteSlaves  => bootWriteSlaves,
+         axilReadMasters  => bootReadMasters,
+         axilReadSlaves   => bootReadSlaves,
+         -- System Ports
+         emcClk           => emcClk,
+         -- Boot Memory Ports
+         bootCsL          => bootCsL,
+         bootMosi         => bootMosi,
+         bootMiso         => bootMiso);
 
    ----------------
    -- Misc. Signals
