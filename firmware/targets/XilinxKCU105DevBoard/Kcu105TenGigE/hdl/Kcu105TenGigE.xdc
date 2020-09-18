@@ -25,3 +25,5 @@ create_generated_clock -name dnaClk [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVI
 set_clock_groups -asynchronous -group [get_clocks {ethClk}]  -group [get_clocks {dnaClk}]
 set_clock_groups -asynchronous -group [get_clocks {ethClkP}] -group [get_clocks {dnaClk}]
 set_clock_groups -asynchronous -group [get_clocks {ethClkP}] -group [get_clocks {ethClk}]
+
+set_clock_groups -asynchronous -group [get_clocks ethClkP] -group [get_clocks -of_objects [get_pins U_App/U_Reg/U_AxiVersion/GEN_ICAP.Iprog_1/GEN_ULTRA_SCALE.IprogUltraScale_Inst/BUFGCE_DIV_Inst/O]]

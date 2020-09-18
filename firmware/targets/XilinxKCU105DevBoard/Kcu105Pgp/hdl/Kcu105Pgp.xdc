@@ -22,3 +22,5 @@ create_clock -name pgpClkP -period  6.400 [get_ports {pgpClkP}]
 create_generated_clock -name dnaClk [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_ULTRA_SCALE.DeviceDnaUltraScale_Inst/BUFGCE_DIV_Inst/O}]
 
 set_clock_groups -asynchronous   -group [get_clocks {pgpClkP}] -group [get_clocks {dnaClk}]
+
+set_clock_groups -asynchronous -group [get_clocks pgpClkP] -group [get_clocks -of_objects [get_pins U_App/U_Reg/U_AxiVersion/GEN_ICAP.Iprog_1/GEN_ULTRA_SCALE.IprogUltraScale_Inst/BUFGCE_DIV_Inst/O]]
