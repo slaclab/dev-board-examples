@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 #-----------------------------------------------------------------------------
-# This file is part of the 'Development Board Examples'. It is subject to 
-# the license terms in the LICENSE.txt file found in the top-level directory 
-# of this distribution and at: 
-#    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-# No part of the 'Development Board Examples', including this file, may be 
-# copied, modified, propagated, or distributed except according to the terms 
+# This file is part of the 'Development Board Examples'. It is subject to
+# the license terms in the LICENSE.txt file found in the top-level directory
+# of this distribution and at:
+#    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+# No part of the 'Development Board Examples', including this file, may be
+# copied, modified, propagated, or distributed except according to the terms
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
@@ -49,14 +49,14 @@ parser = argparse.ArgumentParser()
 
 # Add arguments
 parser.add_argument(
-    "--type", 
+    "--type",
     type     = str,
     required = True,
     help     = "define the type of interface",
-)  
+)
 
 parser.add_argument(
-    "--dev", 
+    "--dev",
     type     = str,
     required = False,
     default  = '/dev/datadev_0',
@@ -64,67 +64,61 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--ip", 
+    "--ip",
     type     = str,
     required = False,
     default  = '192.168.2.10',
     help     = "IP address",
-) 
+)
 
 parser.add_argument(
-    "--lane", 
+    "--lane",
     type     = int,
     required = False,
     default  = 0,
     help     = "PGP Lane",
-) 
+)
 
 parser.add_argument(
-    "--packVer", 
+    "--packVer",
     type     = int,
     required = False,
     default  = 2,
     help     = "RSSI's Packetizer Version",
-) 
+)
 
 parser.add_argument(
-    "--fpgaType", 
+    "--fpgaType",
     type     = str,
     required = False,
     default  = '',
     help     = "fpgaType = [empty_string,7series,ultrascale]",
-) 
+)
 
 parser.add_argument(
-    "--pollEn", 
+    "--pollEn",
     type     = argBool,
     required = False,
     default  = True,
     help     = "auto-polling",
-)  
+)
 
 parser.add_argument(
-    "--initRead", 
+    "--initRead",
     type     = argBool,
     required = False,
     default  = True,
     help     = "Enable read all variables at start",
-)  
+)
 
 parser.add_argument(
-    "--rawRate", 
-    action   = "store_true",
-    help     = "Run raw register rate test"
-)  
-
-parser.add_argument(
-    "--varRate", 
+    "--varRate",
     action   = "store_true",
     help     = "Run variable register rate test"
-)  
+)
 
 parser.add_argument(
-    "--enPrbs", 
+    "--enPrbs",
     type     = argBool,
     required = False,
     default  = True,
@@ -132,12 +126,12 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--ooo", 
+    "--ooo",
     type     = argBool,
     required = False,
     default  = True,
     help     = "Force Ethernet Out-of-order",
-)   
+)
 
 parser.add_argument('--html', help='Use html for tables', action="store_true")
 
@@ -193,12 +187,12 @@ class RssiOutOfOrder(rogue.interfaces.stream.Slave, rogue.interfaces.stream.Mast
 #################################################################
 
 class MyRoot(pr.Root):
-    def __init__(   self,       
+    def __init__(   self,
             name        = "MyRoot",
             description = "my root container",
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-        
+
         #################################################################
 
         # DataDev PCIe Card
@@ -207,39 +201,39 @@ class MyRoot(pr.Root):
             self.vc0Srp  = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*0x100)+0,True)
             self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*0x100)+1,True)
             # self.vc1Prbs.setZeroCopyEn(False)
-            
+
         # RUDP Ethernet
         elif ( args.type == 'eth' ):
-        
+
             # Check for forcing out-of-order ETH frames on outbound
             if ( args.ooo ):
-            
+
                 # UDP Client
-                self.cUdp = rogue.protocols.udp.Client(args.ip,8192,True);            
-                
+                self.cUdp = rogue.protocols.udp.Client(args.ip,8192,True);
+
                 # RSSI Client
                 self.cRssi = rogue.protocols.rssi.Client(self.cUdp.maxPayload())
-                
+
                 # Packetizer
                 if args.packVer == 1:
                     self.rudp = rogue.protocols.packetizer.Core(True)
                 else:
                     self.rudp = rogue.protocols.packetizer.CoreV2(True,True,True)
-            
+
                 # Out of order module on client side
-                self.coo = RssiOutOfOrder(period=0)            
-            
+                self.coo = RssiOutOfOrder(period=0)
+
                 # Client stream
-                pyrogue.streamConnectBiDir(self.cRssi.application(),self.rudp.transport())            
-            
+                pyrogue.streamConnectBiDir(self.cRssi.application(),self.rudp.transport())
+
                 # Insert out of order in the outbound direction
                 pyrogue.streamConnect(self.cRssi.transport(),self.coo)
                 pyrogue.streamConnect(self.coo, self.cUdp)
-                pyrogue.streamConnect(self.cUdp,self.cRssi.transport())  
+                pyrogue.streamConnect(self.cUdp,self.cRssi.transport())
 
                 # Start RSSI with out of order disabled
-                self.cRssi.start()                
-            
+                self.cRssi.start()
+
             else:
                 # Create the ETH interface @ IP Address = args.dev
                 self.rudp = pr.protocols.UdpRssiPack(
@@ -248,14 +242,14 @@ class MyRoot(pr.Root):
                     packVer = args.packVer,
                     jumbo   = True,
                     expand  = False,
-                    )    
-                # self.add(self.rudp) 
-                
+                    )
+                # self.add(self.rudp)
+
             # Map the AxiStream.TDEST
             self.vc0Srp  = self.rudp.application(0); # AxiStream.tDest = 0x0
             self.vc1Prbs = self.rudp.application(1); # AxiStream.tDest = 0x1
             # self.vc1Prbs.setZeroCopyEn(False)
-                
+
         # Legacy PGP PCIe Card
         elif ( args.type == 'pgp' ):
 
@@ -266,39 +260,39 @@ class MyRoot(pr.Root):
         # Undefined device type
         else:
             raise ValueError("Invalid type (%s)" % (args.type) )
-    
-        #################################################################    
+
+        #################################################################
 
         # Connect VC0 to SRPv3
         self.srp = rogue.protocols.srp.SrpV3()
-        pr.streamConnectBiDir(self.vc0Srp,self.srp)          
-        
-        if args.enPrbs:        
-        
+        pr.streamConnectBiDir(self.vc0Srp,self.srp)
+
+        if args.enPrbs:
+
             # Connect VC1 to FW TX PRBS
             self.prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=False)
             pyrogue.streamConnect(self.vc1Prbs,self.prbsRx)
-            self.add(self.prbsRx)  
-                
+            self.add(self.prbsRx)
+
             # Connect VC1 to FW RX PRBS
             self.prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
             pyrogue.streamConnect(self.prbTx, self.vc1Prbs)
-            self.add(self.prbTx)  
-            
+            self.add(self.prbTx)
+
         else:
-            pyrogue.streamConnect(self.vc1Prbs,self.vc1Prbs) 
-            
+            pyrogue.streamConnect(self.vc1Prbs,self.vc1Prbs)
+
         # Add registers
         self.add(devBoard.Fpga(
             memBase  = self.srp,
             commType = args.type,
             fpgaType = args.fpgaType,
-        ))        
-        
+        ))
+
 # Set base
 rootTop = MyRoot(name='System',description='Front End Board')
-    
-#################################################################    
+
+#################################################################
 # Start the system
 rootTop.start(
     pollEn   = args.pollEn,
@@ -306,7 +300,7 @@ rootTop.start(
 )
 
 # Check for forcing out-of-order ETH frames on outbound
-if ( args.type == 'eth' ) and (args.ooo) : 
+if ( args.type == 'eth' ) and (args.ooo) :
     print ('Enable out of order with a period of 3')
     rootTop.coo.period = 0
 
@@ -318,7 +312,6 @@ if ( args.type == 'eth' ) and (args.ooo) :
 
 # # Rate testers
 # if args.varRate: rootTop.Fpga.varRateTest()
-# if args.rawRate: rootTop.Fpga.rawRateTest()
 
 # Create GUI
 appTop = pr.gui.application(sys.argv)
@@ -331,7 +324,7 @@ print("Starting GUI...\n");
 # Run gui
 appTop.exec_()
 
-#################################################################    
+#################################################################
 
 # Stop mesh after gui exits
 rootTop.stop()
