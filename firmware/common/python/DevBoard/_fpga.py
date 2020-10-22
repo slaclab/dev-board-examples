@@ -57,12 +57,12 @@ class Fpga(pr.Device):
                 expand = False,
             ))
 
-        self.add(MbSharedMem(
-            name   = 'MbSharedMem',
-            offset = 0x00030000,
-            size   = 0x10000,
-            expand = False,
-        ))
+#        self.add(MbSharedMem(
+#            name   = 'MbSharedMem',
+#            offset = 0x00030000,
+#            size   = 0x10000,
+#            expand = False,
+#        ))
 
         self.add(ssi.SsiPrbsTx(
             offset = 0x00040000,
@@ -93,12 +93,12 @@ class Fpga(pr.Device):
             expand      = False,
         ))
 
-        self.add(MbSharedMem(
-            name   = 'TestEmptyMem',
-            offset = 0x80000000,
-            size   = 0x80000000,
-            expand = False,
-        ))
+#        self.add(MbSharedMem(
+#            name   = 'TestEmptyMem',
+#            offset = 0x80000000,
+#            size   = 0x80000000,
+#            expand = False,
+#        ))
 
     # Normal register rate tester
     def varRateTest(self):
@@ -122,50 +122,48 @@ class Fpga(pr.Device):
         except KeyboardInterrupt:
             return
 
-class MbSharedMem(pr.Device):
-    def __init__( self,
-        name        = 'MbSharedMem',
-        description = 'MbSharedMem Container',
-        **kwargs):
-
-        super().__init__(
-            name        = name,
-            description = description,
-            size        = size,
-            **kwargs)
-
-        for i in range(16):
-            self.add(pr.RemoteVariable(name=f'MemBlock[{i}]',
-                                       offset=0x1000*i,
-                                       base=pr.UInt,
-                                       bitSize=32*4096,
-                                       bitOffset=0,
-                                       numValues=1024,
-                                       valueBits=32,
-                                       valueStride=32,
-                                       retryCount=tryCount,
-                                       updateNotify=False,
-                                       bulkOpEn=False,
-                                       hidden=True,
-                                       verify=False))
-
-
-        @self.command(description='rawBurstWriteTest')
-        def rawBurstWriteTest(arg):
-            smpl = 0x4000
-
-            data = [[] for i in in range(16)]]
-            for i in range(smpl):
-                data[i//0x400][i%0x400].append(i)
-
-            click.secho( 'MbSharedMem.rawBurstWriteTest(%d): %d' % (smpl,len(data)), fg='green')
-            for i in range(16):
-                self.MemBlock[i].set(data[i],write=True)
-
-        @self.command(description='rawBurstReadTest')
-        def rawBurstReadTest(arg):
-
-            click.secho( 'MbSharedMem.rawBurstReadTest(%d): %d' % (smpl,len(data)), fg='green')
-            for i in range(16):
-                self.MemBlock[i].get(read=True)
-
+#class MbSharedMem(pr.Device):
+#    def __init__( self,
+#        name        = 'MbSharedMem',
+#        description = 'MbSharedMem Container',
+#        **kwargs):
+#
+#        super().__init__(
+#            name        = name,
+#            description = description,
+#            **kwargs)
+#
+#        for i in range(16):
+#            self.add(pr.RemoteVariable(name=f'MemBlock[{i}]',
+#                                       offset=0x1000*i,
+#                                       base=pr.UInt,
+#                                       bitSize=32*4096,
+#                                       bitOffset=0,
+#                                       numValues=1024,
+#                                       valueBits=32,
+#                                       valueStride=32,
+#                                       retryCount=0,
+#                                       updateNotify=False,
+#                                       bulkOpEn=False,
+#                                       hidden=True,
+#                                       verify=False))
+#
+#
+#        @self.command(description='rawBurstWriteTest')
+#        def rawBurstWriteTest(arg):
+#            smpl = 0x4000
+#
+#            data = [[] for i in range(16)]
+#            for i in range(smpl):
+#                data[i//0x400][i%0x400].append(i)
+#
+#            click.secho( 'MbSharedMem.rawBurstWriteTest(%d): %d' % (smpl,len(data)), fg='green')
+#            for i in range(16):
+#                self.MemBlock[i].set(data[i],write=True)
+#
+#        @self.command(description='rawBurstReadTest')
+#        def rawBurstReadTest(arg):
+#
+#            click.secho( 'MbSharedMem.rawBurstReadTest(%d): %d' % (smpl,len(data)), fg='green')
+#            for i in range(16):
+#                self.MemBlock[i].get(read=True)
