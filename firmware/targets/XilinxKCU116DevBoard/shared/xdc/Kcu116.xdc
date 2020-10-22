@@ -8,6 +8,29 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
+set_property PACKAGE_PIN N5 [get_ports gtTxP[0]]
+set_property PACKAGE_PIN N4 [get_ports gtTxN[0]]
+set_property PACKAGE_PIN M2 [get_ports gtRxP[0]]
+set_property PACKAGE_PIN M1 [get_ports gtRxN[0]]
+
+set_property PACKAGE_PIN L5 [get_ports gtTxP[1]]
+set_property PACKAGE_PIN L4 [get_ports gtTxN[1]]
+set_property PACKAGE_PIN K2 [get_ports gtRxP[1]]
+set_property PACKAGE_PIN K1 [get_ports gtRxN[1]]
+
+set_property PACKAGE_PIN J5 [get_ports gtTxP[2]]
+set_property PACKAGE_PIN J4 [get_ports gtTxN[2]]
+set_property PACKAGE_PIN H2 [get_ports gtRxP[2]]
+set_property PACKAGE_PIN H1 [get_ports gtRxN[2]]
+
+set_property PACKAGE_PIN G5 [get_ports gtTxP[3]]
+set_property PACKAGE_PIN G4 [get_ports gtTxN[3]]
+set_property PACKAGE_PIN F2 [get_ports gtRxP[3]]
+set_property PACKAGE_PIN F1 [get_ports gtRxN[3]]
+
+set_property PACKAGE_PIN M7 [get_ports gtClkP]
+set_property PACKAGE_PIN M6 [get_ports gtClkN]
+
 set_property -dict { PACKAGE_PIN P14 IOSTANDARD ANALOG } [get_ports { vPIn }]
 set_property -dict { PACKAGE_PIN R13 IOSTANDARD ANALOG } [get_ports { vNIn }]
 
@@ -38,6 +61,17 @@ set_property -dict { PACKAGE_PIN R20 IOSTANDARD LVCMOS18 } [get_ports { flashWp 
 set_property -dict { PACKAGE_PIN R21 IOSTANDARD LVCMOS18 } [get_ports { flashHoldL }]; # QSPI1_IO[3]
 
 set_property -dict { PACKAGE_PIN N21 IOSTANDARD LVCMOS18 } [get_ports { emcClk }]
+
+######################
+# Timing Constraints #
+######################
+
+create_clock -name gtClkP -period  6.400 [get_ports {gtClkP}]
+
+create_generated_clock -name dnaClk [get_pins {U_App/U_Reg/U_AxiVersion/GEN_DEVICE_DNA.DeviceDna_1/GEN_ULTRA_SCALE.DeviceDnaUltraScale_Inst/BUFGCE_DIV_Inst/O}]
+
+set_clock_groups -asynchronous -group [get_clocks {gtClkP}] -group [get_clocks {dnaClk}]
+set_clock_groups -asynchronous -group [get_clocks gtClkP] -group [get_clocks -of_objects [get_pins U_App/U_Reg/U_AxiVersion/GEN_ICAP.Iprog_1/GEN_ULTRA_SCALE.IprogUltraScale_Inst/BUFGCE_DIV_Inst/O]]
 
 ######################################
 # BITSTREAM: .bit file Configuration #

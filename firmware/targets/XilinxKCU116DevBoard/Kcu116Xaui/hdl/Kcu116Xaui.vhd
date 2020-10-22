@@ -45,13 +45,13 @@ entity Kcu116Xaui is
       flashMiso  : in  sl;
       flashHoldL : out sl;
       flashWp    : out sl;
-      -- ETH GT Pins
-      ethClkP    : in  sl;
-      ethClkN    : in  sl;
-      ethRxP     : in  slv(3 downto 0);
-      ethRxN     : in  slv(3 downto 0);
-      ethTxP     : out slv(3 downto 0);
-      ethTxN     : out slv(3 downto 0));
+      -- GT Ports
+      gtClkP    : in  sl;
+      gtClkN    : in  sl;
+      gtRxP     : in  slv(3 downto 0);
+      gtRxN     : in  slv(3 downto 0);
+      gtTxP     : out slv(3 downto 0);
+      gtTxN     : out slv(3 downto 0));
 end Kcu116Xaui;
 
 architecture top_level of Kcu116Xaui is
@@ -109,13 +109,13 @@ begin
          phyRst      => rst,
          phyReady    => phyReady,
          -- MGT Clock Port (156.25 MHz or 312.5 MHz)
-         gtClkP      => ethClkP,
-         gtClkN      => ethClkN,
+         gtClkP      => gtClkP,
+         gtClkN      => gtClkN,
          -- MGT Ports
-         gtTxP       => ethTxP,
-         gtTxN       => ethTxN,
-         gtRxP       => ethRxP,
-         gtRxN       => ethRxN);
+         gtTxP       => gtTxP,
+         gtTxN       => gtTxN,
+         gtRxP       => gtRxP,
+         gtRxN       => gtRxN);
 
    -------------------
    -- Application Core

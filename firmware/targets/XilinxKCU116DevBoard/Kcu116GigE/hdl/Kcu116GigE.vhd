@@ -45,13 +45,13 @@ entity Kcu116GigE is
       flashMiso  : in  sl;
       flashHoldL : out sl;
       flashWp    : out sl;
-      -- ETH GT Pins
-      ethClkP    : in  sl;
-      ethClkN    : in  sl;
-      ethRxP     : in  slv(3 downto 0);
-      ethRxN     : in  slv(3 downto 0);
-      ethTxP     : out slv(3 downto 0);
-      ethTxN     : out slv(3 downto 0));
+      -- GT Ports
+      gtClkP    : in  sl;
+      gtClkN    : in  sl;
+      gtRxP     : in  slv(3 downto 0);
+      gtRxN     : in  slv(3 downto 0);
+      gtTxP     : out slv(3 downto 0);
+      gtTxN     : out slv(3 downto 0));
 end Kcu116GigE;
 
 architecture top_level of Kcu116GigE is
@@ -107,13 +107,13 @@ begin
          phyRst       => rst,
          phyReady(0)  => phyReady,
          -- MGT Clock Port
-         gtClkP       => ethClkP,
-         gtClkN       => ethClkN,
+         gtClkP       => gtClkP,
+         gtClkN       => gtClkN,
          -- MGT Ports
-         gtTxP(0)     => ethTxP(0),
-         gtTxN(0)     => ethTxN(0),
-         gtRxP(0)     => ethRxP(0),
-         gtRxN(0)     => ethRxN(0));
+         gtTxP(0)     => gtTxP(0),
+         gtTxN(0)     => gtTxN(0),
+         gtRxP(0)     => gtRxP(0),
+         gtRxN(0)     => gtRxN(0));
 
    -------------------------
    -- Terminate Unused Lanes
@@ -124,10 +124,10 @@ begin
          WIDTH_G => 3)
       port map (
          refClk => clk,
-         gtRxP  => ethRxP(3 downto 1),
-         gtRxN  => ethRxN(3 downto 1),
-         gtTxP  => ethTxP(3 downto 1),
-         gtTxN  => ethTxN(3 downto 1));
+         gtRxP  => gtRxP(3 downto 1),
+         gtRxN  => gtRxN(3 downto 1),
+         gtTxP  => gtTxP(3 downto 1),
+         gtTxN  => gtTxN(3 downto 1));
 
    -------------------
    -- Application Core
