@@ -77,4 +77,4 @@ ConfigProbe ${ilaName} {REAL_PGP.U_PGP/gtHardReset}
 ##########################
 ## Write the port map file
 ##########################
-WriteDebugProbes ${ilaName} 
+WriteDebugProbes ${ilaName}

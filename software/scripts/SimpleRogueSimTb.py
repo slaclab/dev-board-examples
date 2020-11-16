@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 #-----------------------------------------------------------------------------
-# This file is part of the 'Development Board Examples'. It is subject to 
-# the license terms in the LICENSE.txt file found in the top-level directory 
-# of this distribution and at: 
-#    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-# No part of the 'Development Board Examples', including this file, may be 
-# copied, modified, propagated, or distributed except according to the terms 
+# This file is part of the 'Development Board Examples'. It is subject to
+# the license terms in the LICENSE.txt file found in the top-level directory
+# of this distribution and at:
+#    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+# No part of the 'Development Board Examples', including this file, may be
+# copied, modified, propagated, or distributed except according to the terms
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
@@ -33,20 +33,20 @@ argBool = lambda s: s.lower() in ['true', 't', 'yes', '1']
 
 # Add arguments
 parser.add_argument(
-    "--pollEn", 
+    "--pollEn",
     type     = argBool,
     required = False,
     default  = False,
     help     = "Enable auto-polling",
-) 
+)
 
 parser.add_argument(
-    "--initRead", 
+    "--initRead",
     type     = argBool,
     required = False,
     default  = True,
     help     = "Enable read all variables at start",
-)  
+)
 
 # Get the arguments
 args = parser.parse_args()
@@ -58,14 +58,14 @@ base = pr.Root(name='simulation',description='Simple RogueSim Example')
 
 # Connect the SRPv3 stream port
 srpStream = pr.interfaces.simulation.StreamSim(host='localhost', dest=0, uid=1, ssi=True)
-memMap = rogue.protocols.srp.SrpV3()                
-pr.streamConnectBiDir( memMap, srpStream )  
+memMap = rogue.protocols.srp.SrpV3()
+pr.streamConnectBiDir( memMap, srpStream )
 
 # Add devices
-base.add(axiVer.AxiVersion( 
-    name    = 'AxiVersion', 
-    memBase = memMap, 
-    offset  = 0x00000000, 
+base.add(axiVer.AxiVersion(
+    name    = 'AxiVersion',
+    memBase = memMap,
+    offset  = 0x00000000,
     expand  = False,
 ))
 
@@ -73,7 +73,7 @@ base.add(axiVer.AxiVersion(
 base.start(
     pollEn   = args.pollEn,
     initRead = args.initRead,
-    timeout  = 1.0,    
+    timeout  = 1.0,
 )
 
 # Create GUI
@@ -86,8 +86,8 @@ guiTop.resize(600, 800)
 print("Starting GUI...\n");
 
 # Run GUI
-appTop.exec_()    
-    
+appTop.exec_()
+
 # Close
 base.stop()
-exit()   
+exit()

@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 #-----------------------------------------------------------------------------
-# This file is part of the 'Development Board Examples'. It is subject to 
-# the license terms in the LICENSE.txt file found in the top-level directory 
-# of this distribution and at: 
-#    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-# No part of the 'Development Board Examples', including this file, may be 
-# copied, modified, propagated, or distributed except according to the terms 
+# This file is part of the 'Development Board Examples'. It is subject to
+# the license terms in the LICENSE.txt file found in the top-level directory
+# of this distribution and at:
+#    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+# No part of the 'Development Board Examples', including this file, may be
+# copied, modified, propagated, or distributed except according to the terms
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import rogue.utilities 
+import rogue.utilities
 import rogue.protocols.udp
 import rogue.interfaces.stream
 import pyrogue.interfaces.simulation
@@ -67,15 +67,15 @@ class RssiOutOfOrder(rogue.interfaces.stream.Slave, rogue.interfaces.stream.Mast
 #################################################################
 
 class MyRoot(pyrogue.Root):
-    def __init__(   self,       
+    def __init__(   self,
             name        = "MyRoot",
             description = "my root container",
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-                
+
         # Setup the TCP sockets connections
         self.srv = rogue.interfaces.stream.TcpClient('localhost',9000)
-        self.clt = rogue.interfaces.stream.TcpClient('localhost',9002)  
+        self.clt = rogue.interfaces.stream.TcpClient('localhost',9002)
 
         # Out of order module on client side
         self.srvToClt = RssiOutOfOrder(period=2)
@@ -97,4 +97,4 @@ rootTop = MyRoot(timeout=100.0)
 # Stop the system
 input("Press any key to exit...")
 rootTop.stop()
-exit()  
+exit()
