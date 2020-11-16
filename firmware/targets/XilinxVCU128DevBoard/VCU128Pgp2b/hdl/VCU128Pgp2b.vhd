@@ -27,10 +27,9 @@ use unisim.vcomponents.all;
 
 entity VCU128Pgp2b is
    generic (
-      TPD_G         : time    := 1 ns;
-      BUILD_INFO_G  : BuildInfoType;
-      SIM_SPEEDUP_G : boolean := false;
-      SIMULATION_G  : boolean := false);
+      TPD_G        : time    := 1 ns;
+      BUILD_INFO_G : BuildInfoType;
+      SIMULATION_G : boolean := false);
    port (
       -- Misc. IOs
       extRst      : in  sl;
@@ -73,8 +72,15 @@ architecture top_level of VCU128Pgp2b is
    signal clk           : sl;
    signal rst           : sl;
    signal rstL          : sl;
-   signal reset         : sl;
-   signal phyReady      : sl;
+   signal ledInt        : slv(7 downto 0);
+
+   attribute dont_touch             : string;
+   attribute dont_touch of clk : signal is "TRUE";
+   attribute dont_touch of rst : signal is "TRUE";
+   attribute dont_touch of rstL : signal is "TRUE";
+   attribute dont_touch of ledInt   : signal is "TRUE";
+   attribute dont_touch of pgpTxOut : signal is "TRUE";
+   attribute dont_touch of pgpRxOut : signal is "TRUE";
 
 begin
 
@@ -167,18 +173,18 @@ begin
 
       clk <= qsfpRefClkP(0);
 
-      U_PwrUpRst : entity surf.PwrUpRst
-         generic map (
-            TPD_G          => TPD_G,
-            SIM_SPEEDUP_G  => SIM_SPEEDUP_G,
-            IN_POLARITY_G  => '1',
-            OUT_POLARITY_G => '1')
-         port map (
-            clk    => clk,
-            arst   => extRst,
-            rstOut => rst);
-
    end generate SIM_PGP;
+
+   U_PwrUpRst : entity surf.PwrUpRst
+      generic map (
+         TPD_G          => TPD_G,
+         SIM_SPEEDUP_G  => SIMULATION_G,
+         IN_POLARITY_G  => '1',
+         OUT_POLARITY_G => '1')
+      port map (
+         clk    => clk,
+         arst   => extRst,
+         rstOut => rst);
 
    -------------------
    -- Application Core
@@ -226,14 +232,15 @@ begin
    ----------------
    -- Misc. Signals
    ----------------
-   led(7) <= extRst;
-   led(6) <= rst;
-   led(5) <= pgpTxOut.linkReady and not(rst);
-   led(4) <= pgpTxOut.phyTxReady and not(rst);
-   led(3) <= pgpRxOut.remLinkReady and not(rst);
-   led(2) <= pgpRxOut.linkDown and not(rst);
-   led(1) <= pgpRxOut.linkReady and not(rst);
-   led(0) <= pgpRxOut.phyRxReady and not(rst);
+   led       <= ledInt;
+   ledInt(7) <= extRst;
+   ledInt(6) <= rst;
+   ledInt(5) <= pgpTxOut.linkReady and not(rst);
+   ledInt(4) <= pgpTxOut.phyTxReady and not(rst);
+   ledInt(3) <= pgpRxOut.remLinkReady and not(rst);
+   ledInt(2) <= pgpRxOut.linkDown and not(rst);
+   ledInt(1) <= pgpRxOut.linkReady and not(rst);
+   ledInt(0) <= pgpRxOut.phyRxReady and not(rst);
 
    rstL        <= not(rst);
    qsfpRstL    <= (others => rstL);
