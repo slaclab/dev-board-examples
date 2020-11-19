@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #-----------------------------------------------------------------------------
 # This file is part of the 'Development Board Examples'. It is subject to
 # the license terms in the LICENSE.txt file found in the top-level directory

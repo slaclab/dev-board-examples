@@ -1,0 +1,27 @@
+MyRoot:
+  PrbsRx:
+    rxEnable: True
+    checkPayload: True
+  PrbsTx:
+    txSize: 1024
+    txEnable: False
+    genPayload: True
+  Fpga:
+    AxiVersion:
+      enable: True
+      ScratchPad: 0x000000
+      FpgaReloadHalt: 0x0
+      FpgaReloadAddress: 0x0
+      UserReset: 0x0
+    SsiPrbsTx:
+      AxiEn: True
+      TxEn: False
+      FwCnt: False
+      PacketLength: 0xfff
+      tDest: 0x0
+      tId: 0x0
+      TrigDly: 0x0
+    SsiPrbsRx:
+      Dummy: 0x0
+      RolloverEnable: 0x0
+      BypassErrorChecking: 0x0
