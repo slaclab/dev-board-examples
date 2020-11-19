@@ -16,20 +16,11 @@ import click
 import time
 import random
 
+import rogue
 import pyrogue as pr
 import pyrogue.pydm
 
 import DevBoard as devBoard
-
-#################################################################
-
-# rogue.Logging.setFilter("pyrogue.SrpV3",rogue.Logging.Debug)
-
-#rogue.Logging.setLevel(rogue.Logging.Warning)
-#rogue.Logging.setLevel(rogue.Logging.Debug)
-#rogue.Logging.setFilter("pyrogue.rssi",rogue.Logging.Info)
-#rogue.Logging.setFilter("pyrogue.packetizer",rogue.Logging.Info)
-#rogue.Logging.setLevel(rogue.Logging.Debug)
 
 #################################################################
 
@@ -142,7 +133,7 @@ if __name__ == "__main__":
                     bar.update(throttle)
 
                 # Add some time randomness between loads
-                time.sleep(round(random.random()/10.0,6))
+                time.sleep(round(random.random()/100.0,6))
 
             # Close out the progressbar
             bar.update(eventSize)
