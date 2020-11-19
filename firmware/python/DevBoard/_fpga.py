@@ -76,7 +76,7 @@ class Fpga(pr.Device):
                 # expand = False,
             # ))
 
-        self.add(axi.AxiStreamMonitoring(
+        self.add(axi.AxiStreamMonAxiL(
             name        = 'AxisMon',
             offset      = 0x00080000,
             numberLanes = 2,
