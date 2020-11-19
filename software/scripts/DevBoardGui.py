@@ -7,36 +7,25 @@
 # copied, modified, propagated, or distributed except according to the terms
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
-
 import setupLibPaths
 
 import sys
 import argparse
-import time
-import logging
 
 import pyrogue as pr
-import pyrogue.gui
 import pyrogue.pydm
-import pyrogue.protocols
-import pyrogue.utilities.prbs
-
-import rogue
-import rogue.hardware.axi
-import rogue.interfaces.stream
 
 import DevBoard as devBoard
 
 #################################################################
 
+# rogue.Logging.setFilter("pyrogue.SrpV3",rogue.Logging.Debug)
+
 #rogue.Logging.setLevel(rogue.Logging.Warning)
 #rogue.Logging.setLevel(rogue.Logging.Debug)
 #rogue.Logging.setFilter("pyrogue.rssi",rogue.Logging.Info)
 #rogue.Logging.setFilter("pyrogue.packetizer",rogue.Logging.Info)
-# # rogue.Logging.setLevel(rogue.Logging.Debug)
-
-#logger = logging.getLogger('pyrogue')
-#logger.setLevel(logging.DEBUG)
+#rogue.Logging.setLevel(rogue.Logging.Debug)
 
 #################################################################
 
@@ -117,76 +106,15 @@ args = parser.parse_args()
 
 #################################################################
 
-class MyRoot(pr.Root):
-    def __init__(   self,
-            name        = "MyRoot",
-            description = "my root container",
-            **kwargs):
-        super().__init__(name=name, description=description, **kwargs)
-
-        #################################################################
-
-        # DataDev PCIe Card (used for PGP PCIe applications)
-        if ( args.type == 'datadev' ):
-
-            self.vc0Srp  = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*0x100)+0,True)
-            self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(args.dev,(args.lane*0x100)+1,True)
-
-        # RUDP Ethernet
-        elif ( args.type == 'eth' ):
-
-            # Create the ETH interface @ IP Address = args.dev
-            self.rudp = pr.protocols.UdpRssiPack(
-                host    = args.ip,
-                port    = 8192,
-                packVer = 2,
-                jumbo   = True,
-                expand  = False,
-                )
-            self.add(self.rudp)
-
-            # Map the AxiStream.TDEST
-            self.vc0Srp  = self.rudp.application(0); # AxiStream.tDest = 0x0
-            self.vc1Prbs = self.rudp.application(1); # AxiStream.tDest = 0x1
-
-        # Undefined device type
-        else:
-            raise ValueError("Invalid type (%s)" % (args.type) )
-
-        #################################################################
-
-        # Connect VC0 to SRPv3
-        self.srp = rogue.protocols.srp.SrpV3()
-        pr.streamConnectBiDir(self.vc0Srp,self.srp)
-
-        if args.enPrbs:
-
-            # Connect VC1 to FW TX PRBS
-            self.prbsRx = pyrogue.utilities.prbs.PrbsRx(name='PrbsRx',width=128,expand=False)
-            pyrogue.streamConnect(self.vc1Prbs,self.prbsRx)
-            self.add(self.prbsRx)
-
-            # Connect VC1 to FW RX PRBS
-            self.prbTx = pyrogue.utilities.prbs.PrbsTx(name="PrbsTx",width=128,expand=False)
-            pyrogue.streamConnect(self.prbTx, self.vc1Prbs)
-            self.add(self.prbTx)
-
-        else:
-            pyrogue.streamConnect(self.vc1Prbs,self.vc1Prbs)
-
-        # Add registers
-        self.add(devBoard.Fpga(
-            memBase  = self.srp,
-            commType = args.type,
-            fpgaType = args.fpgaType,
-            expand   = True,
-        ))
-
-#################################################################
-
-with MyRoot(
+with devBoard.MyRoot(
         name        = 'System',
         description = 'Front End Board',
+        type        = args.type,
+        dev         = args.dev,
+        ip          = args.ip,
+        lane        = args.lane,
+        enPrbs      = args.enPrbs,
+        fpgaType    = args.fpgaType,
         pollEn      = args.pollEn,
         initRead    = args.initRead,
     ) as root:

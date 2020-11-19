@@ -8,6 +8,7 @@
 # copied, modified, propagated, or distributed except according to the terms
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
+import setupLibPaths
 
 import rogue.utilities
 import rogue.protocols.udp

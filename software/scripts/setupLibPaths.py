@@ -9,7 +9,9 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 import pyrogue as pr
+import os
 
-# pr.addLibraryPath('../../firmware/common/python')
-# pr.addLibraryPath('../../firmware/submodules/surf/python')
-# pr.addLibraryPath('python')
+top_level = os.path.realpath(__file__).split('software')[0]
+
+pr.addLibraryPath(top_level+'firmware/submodules/surf/python')
+pr.addLibraryPath(top_level+'firmware/python')

@@ -29,7 +29,7 @@ class Fpga(pr.Device):
 
         self.add(axi.AxiVersion(
             offset = 0x00000000,
-            expand = False,
+            expand = True,
         ))
 
         if(fpgaType=='7series'):
