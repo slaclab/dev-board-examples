@@ -7,10 +7,6 @@
 // may be copied, modified, propagated, or distributed except according to 
 // the terms contained in the LICENSE.txt file.
 //////////////////////////////////////////////////////////////////////////////
-// https://forums.xilinx.com/t5/High-Level-Synthesis-HLS/Vivado-2015-3-HLS-Bug-gmp-h/td-p/661141
-#include <gmp.h>
-#define __gmp_const const
-//////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
 #include "ap_axi_sdata.h"
