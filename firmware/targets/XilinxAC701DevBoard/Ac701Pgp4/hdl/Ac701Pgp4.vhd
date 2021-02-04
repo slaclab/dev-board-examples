@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
--- File       : Kcu105Pgp3.vhd
+-- File       : Ac701Pgp4.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: Example using PGPv3 Protocol
+-- Description: Example using PGPv4 Protocol
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the
@@ -20,42 +20,42 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiStreamPkg.all;
 use surf.AxiLitePkg.all;
-use surf.Pgp3Pkg.all;
+use surf.Pgp4Pkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
 
-entity Kcu105Pgp3 is
+entity Ac701Pgp4 is
    generic (
-      TPD_G         : time    := 1 ns;
-      BUILD_INFO_G  : BuildInfoType;
-      SIM_SPEEDUP_G : boolean := false;
-      SIMULATION_G  : boolean := false);
+      TPD_G        : time    := 1 ns;
+      BUILD_INFO_G : BuildInfoType;
+      SIMULATION_G : boolean := false);
    port (
-      -- Misc. Ports
-      extRst     : in  sl;
-      led        : out slv(7 downto 0);
+      -- LEDs and Reset button
+      extRst   : in  sl;
+      led      : out slv(3 downto 0);
       -- XADC Ports
-      vPIn       : in  sl;
-      vNIn       : in  sl;
+      vPIn     : in  sl;
+      vNIn     : in  sl;
       -- System Ports
-      emcClk     : in  sl;
+      emcClk   : in  sl;
       -- Boot Memory Ports
-      flashCsL   : out sl;
-      flashMosi  : out sl;
-      flashMiso  : in  sl;
-      flashHoldL : out sl;
-      flashWp    : out sl;
-      -- GT Ports
-      pgpClkP    : in  sl;
-      pgpClkN    : in  sl;
-      pgpRxP     : in  sl;
-      pgpRxN     : in  sl;
-      pgpTxP     : out sl;
-      pgpTxN     : out sl);
-end Kcu105Pgp3;
+      bootCsL  : out sl;
+      bootMosi : out sl;
+      bootMiso : in  sl;
+      -- MGT Clock Select
+      clkSelA  : out slv(1 downto 0);
+      clkSelB  : out slv(1 downto 0);
+      -- GT Pins
+      gtClkP   : in  sl;
+      gtClkN   : in  sl;
+      gtRxP    : in  sl;
+      gtRxN    : in  sl;
+      gtTxP    : out sl;
+      gtTxN    : out sl);
+end Ac701Pgp4;
 
-architecture top_level of Kcu105Pgp3 is
+architecture top_level of Ac701Pgp4 is
 
    constant AXIS_SIZE_C : positive := 4;
 
@@ -64,11 +64,8 @@ architecture top_level of Kcu105Pgp3 is
    signal rxMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
    signal rxCtrl    : AxiStreamCtrlArray(AXIS_SIZE_C-1 downto 0);
 
-   signal pgpTxOut : Pgp3TxOutType;
-   signal pgpRxOut : Pgp3RxOutType;
-
-   signal stableClk : sl;
-   signal stableRst : sl;
+   signal pgpTxOut : Pgp4TxOutType;
+   signal pgpRxOut : Pgp4RxOutType;
 
    signal bootReadMasters  : AxiLiteReadMasterArray(1 downto 0);
    signal bootReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
@@ -78,45 +75,55 @@ architecture top_level of Kcu105Pgp3 is
    signal clk : sl;
    signal rst : sl;
 
+   signal stableClk : sl;
+   signal stableRst : sl;
+
+
 begin
 
    U_PwrUpRst : entity surf.PwrUpRst
       generic map (
-         TPD_G          => TPD_G,
-         IN_POLARITY_G  => '1',
-         OUT_POLARITY_G => '1')
+         TPD_G => TPD_G)
       port map (
-         clk    => stableClk,
          arst   => extRst,
+         clk    => stableClk,
          rstOut => stableRst);
 
-   U_Pgp : entity surf.Pgp3GthUsWrapper
+   -----------------------
+   -- PGP Core for ARTIX-7
+   -----------------------
+   U_PGP : entity surf.Pgp4Gtp7Wrapper
       generic map (
-         TPD_G       => TPD_G,
-         NUM_LANES_G => 1,
-         NUM_VC_G    => 4)
+         TPD_G                => TPD_G,
+         ROGUE_SIM_EN_G       => SIMULATION_G,
+         ROGUE_SIM_PORT_NUM_G => 9000,
+         NUM_LANES_G          => 1,
+         NUM_VC_G             => 4,
+         SPEED_GRADE_G        => 2,
+         RATE_G               => "6.25Gbps",
+         REFCLK_FREQ_G        => 125.0E+6)
       port map (
          -- Stable Clock and Reset
          stableClk         => stableClk,
          stableRst         => stableRst,
          -- Gt Serial IO
-         pgpGtTxP(0)       => pgpTxP,
-         pgpGtTxN(0)       => pgpTxN,
-         pgpGtRxP(0)       => pgpRxP,
-         pgpGtRxN(0)       => pgpRxN,
+         pgpGtTxP(0)       => gtTxP,
+         pgpGtTxN(0)       => gtTxN,
+         pgpGtRxP(0)       => gtRxP,
+         pgpGtRxN(0)       => gtRxN,
          -- GT Clocking
-         pgpRefClkP        => pgpClkP,
-         pgpRefClkN        => pgpClkN,
+         pgpRefClkP        => gtClkP,
+         pgpRefClkN        => gtClkN,
          pgpRefClkDiv2Bufg => stableClk,
          -- Clocking
          pgpClk(0)         => clk,
          pgpClkRst(0)      => rst,
-         -- Non VC Rx Signals
-         pgpRxIn(0)        => PGP3_RX_IN_INIT_C,
-         pgpRxOut(0)       => pgpRxOut,
-         -- Non VC Tx Signals
-         pgpTxIn(0)        => PGP3_TX_IN_INIT_C,
+         -- Non VC TX Signals
+         pgpTxIn(0)        => PGP4_TX_IN_INIT_C,
          pgpTxOut(0)       => pgpTxOut,
+         -- Non VC RX Signals
+         pgpRxIn(0)        => PGP4_RX_IN_INIT_C,
+         pgpRxOut(0)       => pgpRxOut,
          -- Frame Transmit Interface
          pgpTxMasters      => txMasters,
          pgpTxSlaves       => txSlaves,
@@ -129,11 +136,12 @@ begin
    -------------------
    U_App : entity work.AppCore
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         XIL_DEVICE_G => "ULTRASCALE",
-         APP_TYPE_G   => "PGP3",
-         AXIS_SIZE_G  => AXIS_SIZE_C)
+         TPD_G           => TPD_G,
+         BUILD_INFO_G    => BUILD_INFO_G,
+         XIL_DEVICE_G    => "7SERIES",
+         APP_TYPE_G      => "PGP4",
+         CLK_FREQUENCY_G => (6.25E+9/64.0),
+         AXIS_SIZE_G     => AXIS_SIZE_C)
       port map (
          -- Clock and Reset
          clk              => clk,
@@ -169,22 +177,19 @@ begin
          -- System Ports
          emcClk           => emcClk,
          -- Boot Memory Ports
-         flashCsL         => flashCsL,
-         flashMosi        => flashMosi,
-         flashMiso        => flashMiso,
-         flashHoldL       => flashHoldL,
-         flashWp          => flashWp);
+         bootCsL          => bootCsL,
+         bootMosi         => bootMosi,
+         bootMiso         => bootMiso);
 
    ----------------
    -- Misc. Signals
    ----------------
-   led(7) <= extRst;
-   led(6) <= rst;
-   led(5) <= pgpTxOut.linkReady and not(rst);
-   led(4) <= pgpTxOut.phyTxActive and not(rst);
-   led(3) <= pgpRxOut.remRxLinkReady and not(rst);
-   led(2) <= pgpRxOut.linkDown and not(rst);
-   led(1) <= pgpRxOut.linkReady and not(rst);
-   led(0) <= pgpRxOut.phyRxActive and not(rst);
+   clkSelA <= "00";
+   clkSelB <= "00";
+
+   led(3) <= pgpTxOut.linkReady and not(stableRst);
+   led(2) <= pgpRxOut.linkReady and not(stableRst);
+   led(1) <= pgpRxOut.remRxLinkReady and not(stableRst);
+   led(0) <= pgpRxOut.phyRxActive and not(stableRst);
 
 end top_level;

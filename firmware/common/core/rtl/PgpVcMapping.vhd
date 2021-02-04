@@ -22,7 +22,7 @@ use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
 use surf.AxiLitePkg.all;
 use surf.Pgp2bPkg.all;
-use surf.Pgp3Pkg.all;
+use surf.Pgp4Pkg.all;
 
 entity PgpVcMapping is
    generic (
@@ -65,7 +65,7 @@ end PgpVcMapping;
 
 architecture mapping of PgpVcMapping is
 
-   constant AXIS_CONFIG_C : AxiStreamConfigType := ite(APP_TYPE_G = "PGP", SSI_PGP2B_CONFIG_C, PGP3_AXIS_CONFIG_C);
+   constant AXIS_CONFIG_C : AxiStreamConfigType := ite(APP_TYPE_G = "PGP", SSI_PGP2B_CONFIG_C, PGP4_AXIS_CONFIG_C);
 
    constant MB_STREAM_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
@@ -81,8 +81,8 @@ begin
    commWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_SLVERR_C;
    commReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_SLVERR_C;
 
-   assert ((APP_TYPE_G = "PGP") or (APP_TYPE_G = "PGP3"))
-      report "APP_TYPE_G must be PGP or PGP3" severity error;
+   assert ((APP_TYPE_G = "PGP") or (APP_TYPE_G = "PGP4"))
+      report "APP_TYPE_G must be PGP or PGP4" severity error;
 
    -- VC0 RX/TX, SRPv3 register Module
    U_SRPv3 : entity surf.SrpV3AxiLite

@@ -81,8 +81,8 @@ architecture mapping of AppCore is
 
 begin
 
-   assert ((APP_TYPE_G = "ETH") or (APP_TYPE_G = "PGP") or (APP_TYPE_G = "PGP3"))
-      report "APP_TYPE_G must be ETH or PGP or PGP3" severity error;
+   assert ((APP_TYPE_G = "ETH") or (APP_TYPE_G = "PGP") or (APP_TYPE_G = "PGP4"))
+      report "APP_TYPE_G must be ETH or PGP or PGP4" severity error;
 
    --------------------------
    -- UDP Port Mapping Module
@@ -135,7 +135,7 @@ begin
    ---------------------------------
    -- Virtual Channel Mapping Module
    ---------------------------------
-   GEN_PGP : if (APP_TYPE_G = "PGP") or (APP_TYPE_G = "PGP3") generate
+   GEN_PGP : if (APP_TYPE_G = "PGP") or (APP_TYPE_G = "PGP4") generate
       U_PgpVcMapping : entity work.PgpVcMapping
          generic map (
             TPD_G      => TPD_G,

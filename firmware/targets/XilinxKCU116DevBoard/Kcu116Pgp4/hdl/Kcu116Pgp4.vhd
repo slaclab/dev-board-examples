@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
--- File       : VCU128Pgp3.vhd
+-- File       : Kcu116Pgp4.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: Example using PGP3 Protocol
+-- Description: Example using PGPv4 Protocol
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the
@@ -20,37 +20,43 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiStreamPkg.all;
 use surf.AxiLitePkg.all;
-use surf.Pgp3Pkg.all;
+use surf.Pgp4Pkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
 
-entity VCU128Pgp3 is
+entity Kcu116Pgp4 is
    generic (
-      TPD_G        : time    := 1 ns;
-      BUILD_INFO_G : BuildInfoType;
-      SIMULATION_G : boolean := false);
+      TPD_G         : time    := 1 ns;
+      BUILD_INFO_G  : BuildInfoType;
+      SIM_SPEEDUP_G : boolean := false;
+      SIMULATION_G  : boolean := false);
    port (
       -- Misc. IOs
-      extRst      : in  sl;
-      led         : out slv(7 downto 0);
+      extRst     : in  sl;
+      led        : out slv(7 downto 0);
+      sfpTxDisL  : out slv(3 downto 0);
       -- XADC Ports
-      vPIn        : in  sl;
-      vNIn        : in  sl;
-      -- QSFP[3:0] Ports
-      qsfpRstL    : out slv(3 downto 0);
-      qsfpLpMode  : out slv(3 downto 0);
-      qsfpModSelL : out slv(3 downto 0);
-      qsfpModPrsL : in  slv(3 downto 0);
-      qsfpRefClkP : in  slv(3 downto 0);
-      qsfpRefClkN : in  slv(3 downto 0);
-      qsfpRxP     : in  slv(15 downto 0);
-      qsfpRxN     : in  slv(15 downto 0);
-      qsfpTxP     : out slv(15 downto 0);
-      qsfpTxN     : out slv(15 downto 0));
-end VCU128Pgp3;
+      vPIn       : in  sl;
+      vNIn       : in  sl;
+      -- System Ports
+      emcClk     : in  sl;
+      -- Boot Memory Ports
+      flashCsL   : out sl;
+      flashMosi  : out sl;
+      flashMiso  : in  sl;
+      flashHoldL : out sl;
+      flashWp    : out sl;
+      -- GT Ports
+      gtClkP     : in  sl;
+      gtClkN     : in  sl;
+      gtRxP      : in  slv(3 downto 0);
+      gtRxN      : in  slv(3 downto 0);
+      gtTxP      : out slv(3 downto 0);
+      gtTxN      : out slv(3 downto 0));
+end Kcu116Pgp4;
 
-architecture top_level of VCU128Pgp3 is
+architecture top_level of Kcu116Pgp4 is
 
    constant AXIS_SIZE_C : positive := 4;
 
@@ -59,8 +65,8 @@ architecture top_level of VCU128Pgp3 is
    signal rxMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
    signal rxCtrl    : AxiStreamCtrlArray(AXIS_SIZE_C-1 downto 0);
 
-   signal pgpTxOut : Pgp3TxOutType;
-   signal pgpRxOut : Pgp3RxOutType;
+   signal pgpTxOut : Pgp4TxOutType;
+   signal pgpRxOut : Pgp4RxOutType;
 
    signal stableClk : sl;
    signal stableRst : sl;
@@ -85,7 +91,7 @@ begin
          arst   => extRst,
          rstOut => stableRst);
 
-   U_Pgp : entity surf.Pgp3GtyUsWrapper
+   U_Pgp : entity surf.Pgp4GtyUsWrapper
       generic map (
          TPD_G       => TPD_G,
          NUM_LANES_G => 1,
@@ -95,22 +101,22 @@ begin
          stableClk         => stableClk,
          stableRst         => stableRst,
          -- Gt Serial IO
-         pgpGtTxP(0)       => qsfpTxP(0),
-         pgpGtTxN(0)       => qsfpTxN(0),
-         pgpGtRxP(0)       => qsfpRxP(0),
-         pgpGtRxN(0)       => qsfpRxN(0),
+         pgpGtTxP(0)       => gtTxP(0),
+         pgpGtTxN(0)       => gtTxN(0),
+         pgpGtRxP(0)       => gtRxP(0),
+         pgpGtRxN(0)       => gtRxN(0),
          -- GT Clocking
-         pgpRefClkP        => qsfpRefClkP(0),
-         pgpRefClkN        => qsfpRefClkN(0),
+         pgpRefClkP        => gtClkP,
+         pgpRefClkN        => gtClkN,
          pgpRefClkDiv2Bufg => stableClk,
          -- Clocking
          pgpClk(0)         => clk,
          pgpClkRst(0)      => rst,
          -- Non VC Rx Signals
-         pgpRxIn(0)        => PGP3_RX_IN_INIT_C,
+         pgpRxIn(0)        => PGP4_RX_IN_INIT_C,
          pgpRxOut(0)       => pgpRxOut,
          -- Non VC Tx Signals
-         pgpTxIn(0)        => PGP3_TX_IN_INIT_C,
+         pgpTxIn(0)        => PGP4_TX_IN_INIT_C,
          pgpTxOut(0)       => pgpTxOut,
          -- Frame Transmit Interface
          pgpTxMasters      => txMasters,
@@ -119,16 +125,19 @@ begin
          pgpRxMasters      => rxMasters,
          pgpRxCtrl         => rxCtrl);
 
+   -------------------------
+   -- Terminate Unused Lanes
+   -------------------------
    U_UnusedGty : entity surf.Gtye4ChannelDummy
       generic map (
          TPD_G   => TPD_G,
-         WIDTH_G => 15)
+         WIDTH_G => 3)
       port map (
          refClk => clk,
-         gtRxP  => qsfpRxP(15 downto 1),
-         gtRxN  => qsfpRxN(15 downto 1),
-         gtTxP  => qsfpTxP(15 downto 1),
-         gtTxN  => qsfpTxN(15 downto 1));
+         gtRxP  => gtRxP(3 downto 1),
+         gtRxN  => gtRxN(3 downto 1),
+         gtTxP  => gtTxP(3 downto 1),
+         gtTxN  => gtTxN(3 downto 1));
 
    -------------------
    -- Application Core
@@ -138,7 +147,7 @@ begin
          TPD_G        => TPD_G,
          BUILD_INFO_G => BUILD_INFO_G,
          XIL_DEVICE_G => "ULTRASCALE",
-         APP_TYPE_G   => "PGP3",
+         APP_TYPE_G   => "PGP4",
          AXIS_SIZE_G  => AXIS_SIZE_C)
       port map (
          -- Clock and Reset
@@ -171,7 +180,15 @@ begin
          axilWriteMasters => bootWriteMasters,
          axilWriteSlaves  => bootWriteSlaves,
          axilReadMasters  => bootReadMasters,
-         axilReadSlaves   => bootReadSlaves);
+         axilReadSlaves   => bootReadSlaves,
+         -- System Ports
+         emcClk           => emcClk,
+         -- Boot Memory Ports
+         flashCsL         => flashCsL,
+         flashMosi        => flashMosi,
+         flashMiso        => flashMiso,
+         flashHoldL       => flashHoldL,
+         flashWp          => flashWp);
 
    ----------------
    -- Misc. Signals
