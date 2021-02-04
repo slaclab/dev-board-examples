@@ -193,13 +193,14 @@ begin
    ----------------
    -- Misc. Signals
    ----------------
-   led(7) <= extRst;
-   led(6) <= rst;
-   led(5) <= pgpTxOut.linkReady and not(rst);
-   led(4) <= pgpTxOut.phyTxActive and not(rst);
-   led(3) <= pgpRxOut.remRxLinkReady and not(rst);
-   led(2) <= pgpRxOut.linkDown and not(rst);
-   led(1) <= pgpRxOut.linkReady and not(rst);
-   led(0) <= pgpRxOut.phyRxActive and not(rst);
+   sfpTxDisL <= x"F";
+   led(7)    <= extRst;
+   led(6)    <= rst;
+   led(5)    <= pgpTxOut.linkReady and not(rst);
+   led(4)    <= pgpTxOut.phyTxActive and not(rst);
+   led(3)    <= pgpRxOut.remRxLinkReady and not(rst);
+   led(2)    <= pgpRxOut.linkDown and not(rst);
+   led(1)    <= pgpRxOut.linkReady and not(rst);
+   led(0)    <= pgpRxOut.phyRxActive and not(rst);
 
 end top_level;
