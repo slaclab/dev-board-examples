@@ -96,7 +96,7 @@ $ conda activate rogue_v5.8.0
 # Launch the GUI in RUDP mode
 $ python scripts/DevBoardGui.py --type rudp
 ```
-<img src="docs/images/devGui_RUDP.png" width="200">
+<img src="docs/images/devGui_RUDP.png" width="400">
 
 <!--- ########################################################################################### -->
 
@@ -120,6 +120,6 @@ $ conda activate rogue_v5.8.0
 # Launch the GUI in PCIe mode
 $ python scripts/DevBoardGui.py --type pcie
 ```
-<img src="docs/images/devGui_PCIe.png" width="200">
+<img src="docs/images/devGui_PCIe.png" width="400">
 
 <!--- ########################################################################################### -->
