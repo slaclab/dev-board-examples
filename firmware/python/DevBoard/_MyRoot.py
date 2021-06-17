@@ -27,6 +27,7 @@ class MyRoot(pr.Root):
             ip          = '192.168.2.10',
             lane        = 0,
             enPrbs      = True,
+            jumbo       = False,
             fpgaType    = '',
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
@@ -34,20 +35,20 @@ class MyRoot(pr.Root):
         #################################################################
 
         # DataDev PCIe Card (used for PGP PCIe applications)
-        if ( type == 'datadev' ):
+        if ( type == 'pcie' ):
 
             self.vc0Srp  = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+0,True)
             self.vc1Prbs = rogue.hardware.axi.AxiStreamDma(dev,(lane*0x100)+1,True)
 
         # RUDP Ethernet
-        elif ( type == 'eth' ):
+        elif ( type == 'rudp' ):
 
             # Create the ETH interface @ IP Address = ip
             self.rudp = pr.protocols.UdpRssiPack(
                 host    = ip,
                 port    = 8192,
                 packVer = 2,
-                jumbo   = True,
+                jumbo   = jumbo,
                 expand  = False,
                 )
             self.add(self.rudp)

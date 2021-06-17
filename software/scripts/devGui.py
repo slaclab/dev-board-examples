@@ -43,7 +43,7 @@ if __name__ == "__main__":
         "--type",
         type     = str,
         required = True,
-        help     = "define the type of interface",
+        help     = "Define the type of interface [rudp or pcie].  rudp for Ethernet builds and pcie for PGP builds",
     )
 
     parser.add_argument(
