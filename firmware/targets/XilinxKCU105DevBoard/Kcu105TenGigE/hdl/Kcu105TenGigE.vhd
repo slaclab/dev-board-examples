@@ -58,7 +58,7 @@ end Kcu105TenGigE;
 architecture top_level of Kcu105TenGigE is
 
    constant AXIS_SIZE_C : positive         := 1;
-   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";  -- 192.168.2.10
+   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";      -- 192.168.2.10
    constant MAC_ADDR_C  : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01
 
    signal txMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
@@ -123,7 +123,7 @@ begin
          APP_TYPE_G      => "ETH",
          AXIS_SIZE_G     => AXIS_SIZE_C,
          APP_ILEAVE_EN_G => true,
-         JUMBO_G         => true,
+         JUMBO_G         => false,
          DHCP_G          => false,
          MAC_ADDR_G      => MAC_ADDR_C,
          IP_ADDR_G       => IP_ADDR_C)

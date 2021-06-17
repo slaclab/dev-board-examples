@@ -123,14 +123,16 @@ begin
    -------------------
    U_App : entity work.AppCore
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         XIL_DEVICE_G => "ULTRASCALE",
-         APP_TYPE_G   => "ETH",
-         AXIS_SIZE_G  => AXIS_SIZE_C,
-         DHCP_G       => false,
-         IP_ADDR_G    => x"0A_02_A8_C0",  -- 192.168.2.10
-         MAC_ADDR_G   => MAC_ADDR_INIT_C)
+         TPD_G           => TPD_G,
+         BUILD_INFO_G    => BUILD_INFO_G,
+         XIL_DEVICE_G    => "ULTRASCALE",
+         APP_TYPE_G      => "ETH",
+         AXIS_SIZE_G     => AXIS_SIZE_C,
+         APP_ILEAVE_EN_G => true,
+         JUMBO_G         => false,
+         DHCP_G          => false,
+         IP_ADDR_G       => x"0A_02_A8_C0",  -- 192.168.2.10
+         MAC_ADDR_G      => MAC_ADDR_INIT_C)
       port map (
          -- Clock and Reset
          clk              => clk,
@@ -167,14 +169,14 @@ begin
    ----------------
    -- Misc. Signals
    ----------------
-   led(7)    <= '1';
-   led(6)    <= '1';
-   led(5)    <= extRst;
-   led(4)    <= extRst;
-   led(3)    <= rstL;
-   led(2)    <= rstL;
-   led(1)    <= phyReady;
-   led(0)    <= phyReady;
+   led(7) <= '1';
+   led(6) <= '1';
+   led(5) <= extRst;
+   led(4) <= extRst;
+   led(3) <= rstL;
+   led(2) <= rstL;
+   led(1) <= phyReady;
+   led(0) <= phyReady;
 
    rstL        <= not(rst);
    qsfpRstL    <= (others => rstL);

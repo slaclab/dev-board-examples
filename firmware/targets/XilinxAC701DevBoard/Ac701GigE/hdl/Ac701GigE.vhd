@@ -126,6 +126,8 @@ begin
          XIL_DEVICE_G    => "7SERIES",
          APP_TYPE_G      => "ETH",
          AXIS_SIZE_G     => 1,
+         APP_ILEAVE_EN_G => true,
+         JUMBO_G         => false,
          DHCP_G          => false,
          IP_ADDR_G       => x"0A_02_A8_C0",  -- 192.168.2.10
          MAC_ADDR_G      => MAC_ADDR_INIT_C)
