@@ -1,9 +1,6 @@
 # Define target output
 target: prom
 
-# Define Firmware Version Number
-export PRJ_VERSION = 0x00000001
-
 # Define target part
 export PRJ_PART = XC7K325TFFG900-2
 
@@ -12,4 +9,5 @@ export PRJ_PART = XC7K325TFFG900-2
 export TOP_DIR = $(abspath $(PWD)/../../..)
 
 # Use top level makefile
+include $(TOP_DIR)/targets/shared_config.mk
 include $(TOP_DIR)/submodules/ruckus/system_vivado.mk

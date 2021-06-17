@@ -5,9 +5,6 @@ target: mcs
 #export GZIP_BUILD_IMAGE = 1
 export GEN_PYROGUE_ZIP = 0
 
-# Define Firmware Version Number
-export PRJ_VERSION = 0x00000003
-
 # Define target part
 export PRJ_PART = XCKU040-FFVA1156-2-E
 
@@ -16,4 +13,5 @@ export PRJ_PART = XCKU040-FFVA1156-2-E
 export TOP_DIR = $(abspath $(PWD)/../../..)
 
 # Use top level makefile
+include $(TOP_DIR)/targets/shared_config.mk
 include $(TOP_DIR)/submodules/ruckus/system_vivado.mk
