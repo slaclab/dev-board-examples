@@ -1,0 +1,119 @@
+
+GitBase: ..
+
+TopRoguePackage: dev_board_examples
+
+RoguePackages:
+  - submodules/surf/python
+  - python
+
+RogueConfig:
+  - ../software/config
+
+RogueScripts:
+  - ../software/scripts/devGui.py
+
+Targets:
+################################################################################
+  Ac701GigE:
+    ImageDir: targets/XilinxAC701DevBoard/Ac701GigE/images
+    Extensions:
+      - bit
+  Ac701Pgp2b:
+    ImageDir: targets/XilinxAC701DevBoard/Ac701Pgp2b/images
+    Extensions:
+      - bit
+  Ac701Pgp4_6Gbps:
+    ImageDir: targets/XilinxAC701DevBoard/Ac701Pgp4_6Gbps/images
+    Extensions:
+      - bit
+################################################################################
+  Kc705GigE:
+    ImageDir: targets/XilinxKC705DevBoard/Kc705GigE/images
+    Extensions:
+      - bit
+  Kc705Pgp2b:
+    ImageDir: targets/XilinxKC705DevBoard/Kc705Pgp2b/images
+    Extensions:
+      - bit
+################################################################################
+  Kcu105GigE:
+    ImageDir: targets/XilinxKCU105DevBoard/Kcu105GigE/images
+    Extensions:
+      - bit
+  Kcu105Pgp2b:
+    ImageDir: targets/XilinxKCU105DevBoard/Kcu105Pgp2b/images
+    Extensions:
+      - bit
+  Kcu105Pgp4_10Gbps:
+    ImageDir: targets/XilinxKCU105DevBoard/Kcu105Pgp4_10Gbps/images
+    Extensions:
+      - bit
+  Kcu105TenGigE:
+    ImageDir: targets/XilinxKCU105DevBoard/Kcu105TenGigE/images
+    Extensions:
+      - bit
+################################################################################
+  Kcu116GigE:
+    ImageDir: targets/XilinxKCU116DevBoard/Kcu116GigE/images
+    Extensions:
+      - bit
+  Kcu116Pgp2b:
+    ImageDir: targets/XilinxKCU116DevBoard/Kcu116Pgp2b/images
+    Extensions:
+      - bit
+  Kcu116Pgp4_10Gbps:
+    ImageDir: targets/XilinxKCU116DevBoard/Kcu116Pgp4_10Gbps/images
+    Extensions:
+      - bit
+  Kcu116TenGigE:
+    ImageDir: targets/XilinxKCU116DevBoard/Kcu116TenGigE/images
+    Extensions:
+      - bit
+################################################################################
+  VCU128GigE:
+    ImageDir: targets/XilinxVCU128DevBoard/VCU128GigE/images
+    Extensions:
+      - bit
+  VCU128Pgp2b:
+    ImageDir: targets/XilinxVCU128DevBoard/VCU128Pgp2b/images
+    Extensions:
+      - bit
+  VCU128Pgp4_10Gbps:
+    ImageDir: targets/XilinxVCU128DevBoard/VCU128Pgp4_10Gbps/images
+    Extensions:
+      - bit
+  VCU128TenGigE:
+    ImageDir: targets/XilinxVCU128DevBoard/VCU128TenGigE/images
+    Extensions:
+      - bit
+################################################################################
+Releases:
+  all:
+    Primary: True
+    Targets:
+      #######################################
+      - Ac701GigE
+      - Ac701Pgp2b
+      - Ac701Pgp4_6Gbps
+      #######################################
+      - Kc705GigE
+      - Kc705Pgp2b
+      #######################################
+      - Kcu105GigE
+      - Kcu105Pgp2b
+      - Kcu105Pgp4_10Gbps
+      - Kcu105TenGigE
+      #######################################
+      - Kcu116GigE
+      - Kcu116Pgp2b
+      - Kcu116Pgp4_10Gbps
+      - Kcu116TenGigE
+      #######################################
+      - VCU128GigE
+      - VCU128Pgp2b
+      - VCU128Pgp4_10Gbps
+      - VCU128TenGigE
+      #######################################
+    Types:
+      - FW_only

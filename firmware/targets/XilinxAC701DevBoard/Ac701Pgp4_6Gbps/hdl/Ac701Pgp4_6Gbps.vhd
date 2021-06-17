@@ -1,15 +1,7 @@
 -------------------------------------------------------------------------------
--- File       : Kc705GigE.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: Example using 1000BASE-SX Protocol
--------------------------------------------------------------------------------
--- https://www.xilinx.com/products/boards-and-kits/kc705.html
---
--- Note: Using the QSPI (not BPI) for booting from PROM.
---       J3 needs to have the jumper installed
---       SW13 needs to be in the "00001" position to set FPGA.M[2:0] = "001"
---
+-- Description: Example using PGPv4 Protocol
 -------------------------------------------------------------------------------
 -- This file is part of 'Example Project Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the
@@ -27,21 +19,20 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiStreamPkg.all;
 use surf.AxiLitePkg.all;
-use surf.EthMacPkg.all;
+use surf.Pgp4Pkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
 
-entity Kc705GigE is
+entity Ac701Pgp4_6Gbps is
    generic (
-      TPD_G         : time    := 1 ns;
-      BUILD_INFO_G  : BuildInfoType;
-      SIM_SPEEDUP_G : boolean := false;
-      SIMULATION_G  : boolean := false);
+      TPD_G        : time    := 1 ns;
+      BUILD_INFO_G : BuildInfoType;
+      SIMULATION_G : boolean := false);
    port (
       -- LEDs and Reset button
       extRst   : in  sl;
-      led      : out slv(7 downto 0);
+      led      : out slv(3 downto 0);
       -- XADC Ports
       vPIn     : in  sl;
       vNIn     : in  sl;
@@ -51,6 +42,9 @@ entity Kc705GigE is
       bootCsL  : out sl;
       bootMosi : out sl;
       bootMiso : in  sl;
+      -- MGT Clock Select
+      clkSelA  : out slv(1 downto 0);
+      clkSelB  : out slv(1 downto 0);
       -- GT Pins
       gtClkP   : in  sl;
       gtClkN   : in  sl;
@@ -58,65 +52,83 @@ entity Kc705GigE is
       gtRxN    : in  sl;
       gtTxP    : out sl;
       gtTxN    : out sl);
-end Kc705GigE;
+end Ac701Pgp4_6Gbps;
 
-architecture top_level of Kc705GigE is
+architecture top_level of Ac701Pgp4_6Gbps is
 
-   constant AXIS_SIZE_C : positive         := 1;
-   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";      -- 192.168.2.10
-   constant MAC_ADDR_C  : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01
+   constant AXIS_SIZE_C : positive := 4;
 
    signal txMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
    signal txSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
    signal rxMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
-   signal rxSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
+   signal rxCtrl    : AxiStreamCtrlArray(AXIS_SIZE_C-1 downto 0);
+
+   signal pgpTxOut : Pgp4TxOutType;
+   signal pgpRxOut : Pgp4RxOutType;
 
    signal bootReadMasters  : AxiLiteReadMasterArray(1 downto 0);
    signal bootReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
    signal bootWriteMasters : AxiLiteWriteMasterArray(1 downto 0);
    signal bootWriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0);
 
-   signal clk      : sl;
-   signal rst      : sl;
-   signal phyReady : sl;
+   signal clk : sl;
+   signal rst : sl;
+
+   signal stableClk : sl;
+   signal stableRst : sl;
+
 
 begin
 
-   -------------------------
-   -- GigE Core for KINTEX-7
-   -------------------------
-   U_ETH_PHY_MAC : entity surf.GigEthGtx7Wrapper
+   U_PwrUpRst : entity surf.PwrUpRst
       generic map (
-         TPD_G              => TPD_G,
-         NUM_LANE_G         => 1,
-         -- Clocking Configurations
-         USE_GTREFCLK_G     => false,
-         CLKIN_PERIOD_G     => 8.0,
-         DIVCLK_DIVIDE_G    => 1,
-         CLKFBOUT_MULT_F_G  => 8.0,
-         CLKOUT0_DIVIDE_F_G => 8.0,
-         -- AXI Streaming Configurations
-         AXIS_CONFIG_G      => (others => EMAC_AXIS_CONFIG_C))
+         TPD_G => TPD_G)
       port map (
-         -- Streaming DMA Interface
-         dmaClk       => (others => clk),
-         dmaRst       => (others => rst),
-         dmaIbMasters => rxMasters,
-         dmaIbSlaves  => rxSlaves,
-         dmaObMasters => txMasters,
-         dmaObSlaves  => txSlaves,
-         -- Misc. Signals
-         extRst       => extRst,
-         phyClk       => clk,
-         phyRst       => rst,
-         phyReady(0)  => phyReady,
-         -- MGT Ports
-         gtClkP       => gtClkP,
-         gtClkN       => gtClkN,
-         gtTxP(0)     => gtTxP,
-         gtTxN(0)     => gtTxN,
-         gtRxP(0)     => gtRxP,
-         gtRxN(0)     => gtRxN);
+         arst   => extRst,
+         clk    => stableClk,
+         rstOut => stableRst);
+
+   -----------------------
+   -- PGP Core for ARTIX-7
+   -----------------------
+   U_PGP : entity surf.Pgp4Gtp7Wrapper
+      generic map (
+         TPD_G                => TPD_G,
+         ROGUE_SIM_EN_G       => SIMULATION_G,
+         ROGUE_SIM_PORT_NUM_G => 9000,
+         NUM_LANES_G          => 1,
+         NUM_VC_G             => 4,
+         SPEED_GRADE_G        => 2,
+         RATE_G               => "6.25Gbps",
+         REFCLK_FREQ_G        => 125.0E+6)
+      port map (
+         -- Stable Clock and Reset
+         stableClk         => stableClk,
+         stableRst         => stableRst,
+         -- Gt Serial IO
+         pgpGtTxP(0)       => gtTxP,
+         pgpGtTxN(0)       => gtTxN,
+         pgpGtRxP(0)       => gtRxP,
+         pgpGtRxN(0)       => gtRxN,
+         -- GT Clocking
+         pgpRefClkP        => gtClkP,
+         pgpRefClkN        => gtClkN,
+         pgpRefClkDiv2Bufg => stableClk,
+         -- Clocking
+         pgpClk(0)         => clk,
+         pgpClkRst(0)      => rst,
+         -- Non VC TX Signals
+         pgpTxIn(0)        => PGP4_TX_IN_INIT_C,
+         pgpTxOut(0)       => pgpTxOut,
+         -- Non VC RX Signals
+         pgpRxIn(0)        => PGP4_RX_IN_INIT_C,
+         pgpRxOut(0)       => pgpRxOut,
+         -- Frame Transmit Interface
+         pgpTxMasters      => txMasters,
+         pgpTxSlaves       => txSlaves,
+         -- Frame Receive Interface
+         pgpRxMasters      => rxMasters,
+         pgpRxCtrl         => rxCtrl);
 
    -------------------
    -- Application Core
@@ -125,13 +137,10 @@ begin
       generic map (
          TPD_G           => TPD_G,
          BUILD_INFO_G    => BUILD_INFO_G,
-         CLK_FREQUENCY_G => 125.0E+6,
          XIL_DEVICE_G    => "7SERIES",
-         APP_TYPE_G      => "ETH",
-         AXIS_SIZE_G     => AXIS_SIZE_C,
-         DHCP_G          => false,
-         MAC_ADDR_G      => MAC_ADDR_C,
-         IP_ADDR_G       => IP_ADDR_C)
+         APP_TYPE_G      => "PGP4",
+         CLK_FREQUENCY_G => (6.25E+9/66.0),
+         AXIS_SIZE_G     => AXIS_SIZE_C)
       port map (
          -- Clock and Reset
          clk              => clk,
@@ -140,7 +149,7 @@ begin
          txMasters        => txMasters,
          txSlaves         => txSlaves,
          rxMasters        => rxMasters,
-         rxSlaves         => rxSlaves,
+         rxCtrl           => rxCtrl,
          -- BOOT Prom Interface
          bootWriteMasters => bootWriteMasters,
          bootWriteSlaves  => bootWriteSlaves,
@@ -174,13 +183,12 @@ begin
    ----------------
    -- Misc. Signals
    ----------------
-   led(7) <= '0';
-   led(6) <= '0';
-   led(5) <= '0';
-   led(4) <= '0';
-   led(3) <= '1';
-   led(2) <= '0';
-   led(1) <= not(rst);
-   led(0) <= phyReady;
+   clkSelA <= "00";
+   clkSelB <= "00";
+
+   led(3) <= pgpTxOut.linkReady and not(stableRst);
+   led(2) <= pgpRxOut.linkReady and not(stableRst);
+   led(1) <= pgpRxOut.remRxLinkReady and not(stableRst);
+   led(0) <= pgpRxOut.phyRxActive and not(stableRst);
 
 end top_level;

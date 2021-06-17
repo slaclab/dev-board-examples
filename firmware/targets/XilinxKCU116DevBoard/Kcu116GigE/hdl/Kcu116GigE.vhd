@@ -140,7 +140,7 @@ begin
          XIL_DEVICE_G    => "ULTRASCALE",
          APP_TYPE_G      => "ETH",
          AXIS_SIZE_G     => AXIS_SIZE_C,
-         DHCP_G          => true,
+         DHCP_G          => false,
          IP_ADDR_G       => x"0A_02_A8_C0",  -- 192.168.2.10
          MAC_ADDR_G      => MAC_ADDR_INIT_C)
       port map (

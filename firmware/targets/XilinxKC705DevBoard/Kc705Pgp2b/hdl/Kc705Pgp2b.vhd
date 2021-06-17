@@ -1,8 +1,7 @@
 -------------------------------------------------------------------------------
--- File       : Kc705GigE.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: Example using 1000BASE-SX Protocol
+-- Description: Example using PGP2B Protocol
 -------------------------------------------------------------------------------
 -- https://www.xilinx.com/products/boards-and-kits/kc705.html
 --
@@ -25,14 +24,14 @@ use ieee.std_logic_1164.all;
 
 library surf;
 use surf.StdRtlPkg.all;
-use surf.AxiStreamPkg.all;
 use surf.AxiLitePkg.all;
-use surf.EthMacPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.Pgp2bPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
 
-entity Kc705GigE is
+entity Kc705Pgp2b is
    generic (
       TPD_G         : time    := 1 ns;
       BUILD_INFO_G  : BuildInfoType;
@@ -58,80 +57,107 @@ entity Kc705GigE is
       gtRxN    : in  sl;
       gtTxP    : out sl;
       gtTxN    : out sl);
-end Kc705GigE;
+end Kc705Pgp2b;
 
-architecture top_level of Kc705GigE is
+architecture top_level of Kc705Pgp2b is
 
-   constant AXIS_SIZE_C : positive         := 1;
-   constant IP_ADDR_C   : slv(31 downto 0) := x"0A02A8C0";      -- 192.168.2.10
-   constant MAC_ADDR_C  : slv(47 downto 0) := x"010300564400";  -- 00:44:56:00:03:01
+   constant AXIS_SIZE_C : positive := 4;
 
    signal txMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
    signal txSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
    signal rxMasters : AxiStreamMasterArray(AXIS_SIZE_C-1 downto 0);
-   signal rxSlaves  : AxiStreamSlaveArray(AXIS_SIZE_C-1 downto 0);
+   signal rxCtrl    : AxiStreamCtrlArray(AXIS_SIZE_C-1 downto 0);
+
+   signal pgpTxOut : Pgp2bTxOutType;
+   signal pgpRxOut : Pgp2bRxOutType;
 
    signal bootReadMasters  : AxiLiteReadMasterArray(1 downto 0);
    signal bootReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
    signal bootWriteMasters : AxiLiteWriteMasterArray(1 downto 0);
    signal bootWriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0);
 
-   signal clk      : sl;
-   signal rst      : sl;
-   signal phyReady : sl;
+   signal clk : sl;
+   signal rst : sl;
 
 begin
 
-   -------------------------
-   -- GigE Core for KINTEX-7
-   -------------------------
-   U_ETH_PHY_MAC : entity surf.GigEthGtx7Wrapper
-      generic map (
-         TPD_G              => TPD_G,
-         NUM_LANE_G         => 1,
-         -- Clocking Configurations
-         USE_GTREFCLK_G     => false,
-         CLKIN_PERIOD_G     => 8.0,
-         DIVCLK_DIVIDE_G    => 1,
-         CLKFBOUT_MULT_F_G  => 8.0,
-         CLKOUT0_DIVIDE_F_G => 8.0,
-         -- AXI Streaming Configurations
-         AXIS_CONFIG_G      => (others => EMAC_AXIS_CONFIG_C))
-      port map (
-         -- Streaming DMA Interface
-         dmaClk       => (others => clk),
-         dmaRst       => (others => rst),
-         dmaIbMasters => rxMasters,
-         dmaIbSlaves  => rxSlaves,
-         dmaObMasters => txMasters,
-         dmaObSlaves  => txSlaves,
-         -- Misc. Signals
-         extRst       => extRst,
-         phyClk       => clk,
-         phyRst       => rst,
-         phyReady(0)  => phyReady,
-         -- MGT Ports
-         gtClkP       => gtClkP,
-         gtClkN       => gtClkN,
-         gtTxP(0)     => gtTxP,
-         gtTxN(0)     => gtTxN,
-         gtRxP(0)     => gtRxP,
-         gtRxN(0)     => gtRxN);
+   REAL_PGP : if (not SIMULATION_G) generate
+      ------------------------
+      -- PGP Core for KINTEX-7
+      ------------------------
+      U_PGP : entity surf.Pgp2bGtx7VarLatWrapper
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            -- External Reset
+            extRst       => extRst,
+            -- Clock and Reset
+            pgpClk       => clk,
+            pgpRst       => rst,
+            -- Non VC TX Signals
+            pgpTxIn      => PGP2B_TX_IN_INIT_C,
+            pgpTxOut     => pgpTxOut,
+            -- Non VC RX Signals
+            pgpRxIn      => PGP2B_RX_IN_INIT_C,
+            pgpRxOut     => pgpRxOut,
+            -- Frame TX Interface
+            pgpTxMasters => txMasters,
+            pgpTxSlaves  => txSlaves,
+            -- Frame RX Interface
+            pgpRxMasters => rxMasters,
+            pgpRxCtrl    => rxCtrl,
+            -- GT Pins
+            gtClkP       => gtClkP,
+            gtClkN       => gtClkN,
+            gtTxP        => gtTxP,
+            gtTxN        => gtTxN,
+            gtRxP        => gtRxP,
+            gtRxN        => gtRxN);
+   end generate REAL_PGP;
+
+   SIM_PGP : if (SIMULATION_G) generate
+      U_SimModel : entity surf.PgpSimModel
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            pgpTxClk     => clk,
+            pgpTxClkRst  => rst,
+            pgpRxClk     => clk,
+            pgpRxClkRst  => rst,
+            pgpTxIn      => PGP2B_TX_IN_INIT_C,
+            pgpTxOut     => pgpTxOut,
+            pgpRxIn      => PGP2B_RX_IN_INIT_C,
+            pgpRxOut     => pgpRxOut,
+            pgpTxMasters => txMasters,
+            pgpTxSlaves  => txSlaves,
+            pgpRxMasters => rxMasters,
+            pgpRxCtrl    => rxCtrl);
+
+      clk <= gtClkP;
+
+      U_PwrUpRst : entity surf.PwrUpRst
+         generic map (
+            TPD_G          => TPD_G,
+            SIM_SPEEDUP_G  => SIM_SPEEDUP_G,
+            IN_POLARITY_G  => '1',
+            OUT_POLARITY_G => '1')
+         port map (
+            clk    => clk,
+            arst   => extRst,
+            rstOut => rst);
+
+   end generate SIM_PGP;
 
    -------------------
    -- Application Core
    -------------------
    U_App : entity work.AppCore
       generic map (
-         TPD_G           => TPD_G,
-         BUILD_INFO_G    => BUILD_INFO_G,
-         CLK_FREQUENCY_G => 125.0E+6,
-         XIL_DEVICE_G    => "7SERIES",
-         APP_TYPE_G      => "ETH",
-         AXIS_SIZE_G     => AXIS_SIZE_C,
-         DHCP_G          => false,
-         MAC_ADDR_G      => MAC_ADDR_C,
-         IP_ADDR_G       => IP_ADDR_C)
+         TPD_G        => TPD_G,
+         BUILD_INFO_G => BUILD_INFO_G,
+         XIL_DEVICE_G => "7SERIES",
+         APP_TYPE_G   => "PGP",
+         AXIS_SIZE_G  => AXIS_SIZE_C)
       port map (
          -- Clock and Reset
          clk              => clk,
@@ -140,7 +166,7 @@ begin
          txMasters        => txMasters,
          txSlaves         => txSlaves,
          rxMasters        => rxMasters,
-         rxSlaves         => rxSlaves,
+         rxCtrl           => rxCtrl,
          -- BOOT Prom Interface
          bootWriteMasters => bootWriteMasters,
          bootWriteSlaves  => bootWriteSlaves,
@@ -180,7 +206,7 @@ begin
    led(4) <= '0';
    led(3) <= '1';
    led(2) <= '0';
-   led(1) <= not(rst);
-   led(0) <= phyReady;
+   led(1) <= pgpTxOut.linkReady and not(rst);
+   led(0) <= pgpRxOut.linkReady and not(rst);
 
 end top_level;
