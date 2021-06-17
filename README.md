@@ -17,20 +17,20 @@ Development Board Firmware/Software Examples
 
 4) Setup for large filesystems on github
 
-```
+```bash
 $ git lfs install
 ```
 
 5) Verify that you have git version 2.13.0 (or later) installed 
 
-```
+```bash
 $ git version
 git version 2.13.0
 ```
 
 6) Verify that you have git-lfs version 2.1.1 (or later) installed 
 
-```
+```bash
 $ git-lfs version
 git-lfs/2.1.1
 ```
@@ -39,7 +39,7 @@ git-lfs/2.1.1
 
 # Clone the GIT repository
 
-```
+```bash
 $ git clone --recursive git@github.com:slaclab/dev-board-examples
 ```
 
@@ -51,36 +51,23 @@ $ git clone --recursive git@github.com:slaclab/dev-board-examples
 
 > If you are on the SLAC network, here's how to setup the Xilinx licensing
   
-```
+```bash
 $ source dev-board-examples/firmware/setup_env_slac.sh
 ```
 
 > Else you will need to install Vivado and install the Xilinx Licensing
 
-2) Go to the firmware's target directory:
+2) Go to the target directory and build the firmware via `make`:
 
-> Example of building the KC705 10 GbE firmware example target:
+> Example of building the KCU105 10 GbE firmware example target:
 
-```
-$ cd dev-board-examples/firmware/targets/XilinxKC705DevBoard/Kc705TenGigE
-```
-
-3) Optional: Review the results in GUI mode
-
-```
-$ make gui
-```
-
-
-3) Build the firmware
-
-```
+```bash
+$ cd dev-board-examples/firmware/targets/XilinxKCU105DevBoard/Kcu105TenGigE
 $ make
 ```
 
-4) Optional: Open up the project in GUI mode to view the firmware build results
-
-```
+3) Optional: Review the results in GUI mode
+```bash
 $ make gui
 ```
 
@@ -92,20 +79,47 @@ $ make gui
 
 <!--- ########################################################################################### -->
 
-# How to run the Software Development GUI
+# How to run the Software Development GUI for RUDP 
 
-```
+These instructions are for any of the Ethernet firmware build (1 GbE and 10 GbE):
+
+```bash
 # Go to software directory
 $ cd dev-board-examples/software/rogue
 
-# Activate Rogue conda Environment 
+# Setup conda environment
 $ source /path/to/my/anaconda3/etc/profile.d/conda.sh
 
-# Setup the Python Environment
-$ source setup_env.sh
+# Activate Rogue conda Environment (refer to "How to install the Rogue With Anacond section")
+$ conda activate rogue_v5.8.0
 
-# Launch the GUI
-$ python scripts/DevBoardGui.py
+# Launch the GUI in RUDP mode
+$ python scripts/DevBoardGui.py --type rudp
 ```
+<img src="docs/images/devGui_RUDP.png" width="200">
+
+<!--- ########################################################################################### -->
+
+# How to run the Software Development GUI for PCIe 
+
+These instructions are for any of the PCIe firmware build (PGP2b and PGPv4):
+
+> https://github.com/slaclab/axi-pcie-core
+> https://github.com/slaclab/pgp-pcie-apps
+
+```bash
+# Go to software directory
+$ cd dev-board-examples/software/rogue
+
+# Setup conda environment
+$ source /path/to/my/anaconda3/etc/profile.d/conda.sh
+
+# Activate Rogue conda Environment (refer to "How to install the Rogue With Anacond section")
+$ conda activate rogue_v5.8.0
+
+# Launch the GUI in PCIe mode
+$ python scripts/DevBoardGui.py --type pcie
+```
+<img src="docs/images/devGui_PCIe.png" width="200">
 
 <!--- ########################################################################################### -->
