@@ -85,7 +85,7 @@ These instructions are for any of the Ethernet firmware build (1 GbE and 10 GbE)
 
 ```bash
 # Go to software directory
-$ cd dev-board-examples/software/rogue
+$ cd dev-board-examples/software
 
 # Setup conda environment
 $ source /path/to/my/anaconda3/etc/profile.d/conda.sh
@@ -109,7 +109,7 @@ These instructions are for any of the PCIe firmware build (PGP2b and PGPv4):
 
 ```bash
 # Go to software directory
-$ cd dev-board-examples/software/rogue
+$ cd dev-board-examples/software
 
 # Setup conda environment
 $ source /path/to/my/anaconda3/etc/profile.d/conda.sh
