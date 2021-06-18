@@ -94,7 +94,7 @@ $ source /path/to/my/anaconda3/etc/profile.d/conda.sh
 $ conda activate rogue_v5.8.0
 
 # Launch the GUI in RUDP mode
-$ python scripts/DevBoardGui.py --type rudp
+$ python scripts/devGui.py --type rudp
 ```
 <img src="docs/images/devGui_RUDP.png" width="800">
 
@@ -118,7 +118,7 @@ $ source /path/to/my/anaconda3/etc/profile.d/conda.sh
 $ conda activate rogue_v5.8.0
 
 # Launch the GUI in PCIe mode
-$ python scripts/DevBoardGui.py --type pcie
+$ python scripts/devGui.py --type pcie
 ```
 <img src="docs/images/devGui_PCIe.png" width="800">
 
