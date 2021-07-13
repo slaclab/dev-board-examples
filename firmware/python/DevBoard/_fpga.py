@@ -63,18 +63,18 @@ class Fpga(pr.Device):
             expand = False,
         ))
 
-        if ( commType == 'eth' ):
+        if ( commType == 'rudp' ):
 
             self.add(rssi.RssiCore(
                 offset = 0x00070000,
                 expand = False,
             ))
 
-            # self.add(udp.UdpEngine(
-                # offset = 0x00078000,
-                # numSrv = 1,
-                # expand = False,
-            # ))
+            self.add(udp.UdpEngine(
+                offset = 0x00078000,
+                numSrv = 1,
+                expand = False,
+            ))
 
         self.add(axi.AxiStreamMonAxiL(
             name        = 'AxisMon',

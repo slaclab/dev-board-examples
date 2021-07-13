@@ -79,8 +79,8 @@ class MyRoot(pr.Root):
             pyrogue.streamConnect(self.prbTx, self.vc1Prbs)
             self.add(self.prbTx)
 
-        else:
-            pyrogue.streamConnect(self.vc1Prbs,self.vc1Prbs)
+        # else:
+            # pyrogue.streamConnect(self.vc1Prbs,self.vc1Prbs)
 
         # Add registers
         self.add(devBoard.Fpga(
