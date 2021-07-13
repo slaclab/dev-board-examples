@@ -102,6 +102,14 @@ if __name__ == "__main__":
         help     = "Enable PRBS testing",
     )
 
+    parser.add_argument(
+        "--jumbo",
+        type     = argBool,
+        required = False,
+        default  = False,
+        help     = "Enable RUDP jumbo frames",
+    )
+
     parser.add_argument('--html', help='Use html for tables', action="store_true")
 
     # Get the arguments
@@ -116,6 +124,7 @@ if __name__ == "__main__":
             lane        = args.lane,
             enPrbs      = args.enPrbs,
             fpgaType    = args.fpgaType,
+            jumbo       = args.jumbo,
             pollEn      = args.pollEn,
             initRead    = args.initRead,
         ) as root:
