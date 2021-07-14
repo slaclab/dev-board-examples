@@ -81,8 +81,7 @@ architecture mapping of EthPortMapping is
          addrBits     => 15,
          connectivity => x"FFFF"));
 
-   constant WINDOW_ADDR_SIZE_C : positive := 5;  -- 32 buffers (2^4) -- Enable JUMBO for 14JUNE2021 DEMO
-   -- constant WINDOW_ADDR_SIZE_C : positive := 4;  -- 16 buffers (2^4)
+   constant WINDOW_ADDR_SIZE_C : positive := 4;  -- 16 buffers (2^4)
    constant MAX_SEG_SIZE_C     : positive := ite(JUMBO_G, 8192, 1024);
 
    constant MB_STREAM_CONFIG_C : AxiStreamConfigType := (
